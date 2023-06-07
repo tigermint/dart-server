@@ -39,3 +39,6 @@ out/
 
 ### Enviorment ###
 *.yml
+
+### VCS ###
+.github/
