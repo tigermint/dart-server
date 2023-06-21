@@ -102,9 +102,9 @@ jobs:
         run: |
           ./gradlew jib
           echo "GAR_IMAGE_NAME=$(./gradlew printJibImageName --quiet)" >> $GITHUB_ENV
+          echo "GAR_IMAGE_NAME=${GAR_IMAGE_NAME}"
 
       # END - Docker auth and build
-
       - name: Deploy to Cloud Run
         id: deploy
         uses: google-github-actions/deploy-cloudrun@v0
