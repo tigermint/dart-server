@@ -1,0 +1,3 @@
+[submodule "dart-secret"]
+	path = dart-secret
+	url = https://github.com/SWM-TEAM-SSH/dart-secret.git

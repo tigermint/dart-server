@@ -13,7 +13,7 @@ jib{
         image='asia-northeast3-docker.pkg.dev/dart-388516/cloud-run-source-deploy/dart-server'
         auth {
             username = '_json_key'
-            password = new String(Base64.getDecoder().decode(System.getenv("DART_SERVER_INFRA_KEY")))
+            password = new String(Base64.getDecoder().decode(System.getenv("GOOGLE_AR_CLIENT_SECRET")))
         }
     }
     container {
