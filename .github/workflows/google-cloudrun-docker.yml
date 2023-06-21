@@ -101,7 +101,8 @@ jobs:
            GOOGLE_AR_CLIENT_SECRET: ${{ secrets.GOOGLE_AR_CLIENT_SECRET }}
         run: |
           ./gradlew jib
-          echo "IMAGE_HASH=$( docker images --digests ${GAR_LOCATION}-docker.pkg.dev/${PROJECT_ID}/cloud-run-source-deploy/${SERVICE} --no-trunc | awk '{print $3}' | tail -1 )" >> $GITHUB_ENV
+          echo "IMAGE_HASH=$(docker images --digests ${GAR_LOCATION}-docker.pkg.dev/${PROJECT_ID}/cloud-run-source-deploy/${SERVICE} --no-trunc | awk 'NR>1 {print $3}' | tail -n 1)" >> $GITHUB_ENV
+
 
       # END - Docker auth and build
       - name: Deploy to Cloud Run
