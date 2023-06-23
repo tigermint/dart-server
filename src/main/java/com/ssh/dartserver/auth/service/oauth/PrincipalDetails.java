@@ -1,6 +1,6 @@
 package com.ssh.dartserver.auth.service.oauth;
 
-import com.ssh.dartserver.User.domain.User;
+import com.ssh.dartserver.user.domain.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 

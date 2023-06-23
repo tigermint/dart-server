@@ -2,8 +2,8 @@ package com.ssh.dartserver.auth.service.jwt;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.ssh.dartserver.User.domain.User;
-import com.ssh.dartserver.User.repository.UserRepository;
+import com.ssh.dartserver.user.domain.User;
+import com.ssh.dartserver.user.repository.UserRepository;
 import com.ssh.dartserver.auth.service.oauth.PrincipalDetails;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,7 +19,7 @@ import java.io.IOException;
 
 
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     public JwtAuthorizationFilter(AuthenticationManager authenticationManager, UserRepository userRepository) {
         super(authenticationManager);
