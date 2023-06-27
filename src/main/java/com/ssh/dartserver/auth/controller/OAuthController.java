@@ -9,13 +9,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 @RequiredArgsConstructor
 @RestController
 public class OAuthController {
     private final OAuthService oAuthService;
 
     @PostMapping("/v1/auth/kakao")
-    public ResponseEntity<TokenResponseDto> jwtCreate(@RequestBody TokenRequestDto request) {
+    public ResponseEntity<TokenResponseDto> jwtCreate(@Valid @RequestBody TokenRequestDto request) {
         return ResponseEntity.ok(oAuthService.create(request));
     }
 }
