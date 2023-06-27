@@ -3,7 +3,7 @@ package com.ssh.dartserver.auth.service;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.ssh.dartserver.user.domain.User;
-import com.ssh.dartserver.user.repository.UserRepository;
+import com.ssh.dartserver.user.infra.persistence.UserRepository;
 import com.ssh.dartserver.auth.domain.KakaoUser;
 import com.ssh.dartserver.auth.domain.OAuthUserInfo;
 import com.ssh.dartserver.auth.dto.request.TokenRequestDto;
