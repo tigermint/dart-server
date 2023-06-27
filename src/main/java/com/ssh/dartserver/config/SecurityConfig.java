@@ -1,6 +1,6 @@
 package com.ssh.dartserver.config;
 
-import com.ssh.dartserver.User.repository.UserRepository;
+import com.ssh.dartserver.user.infra.persistence.UserRepository;
 import com.ssh.dartserver.auth.service.jwt.JwtAuthenticationFilter;
 import com.ssh.dartserver.auth.service.jwt.JwtAuthorizationFilter;
 import lombok.RequiredArgsConstructor;

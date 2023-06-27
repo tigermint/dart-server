@@ -3,7 +3,7 @@ package com.ssh.dartserver.auth.service.jwt;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ssh.dartserver.User.dto.LoginRequestsDto;
+import com.ssh.dartserver.auth.dto.request.LoginRequestsDto;
 import com.ssh.dartserver.auth.service.oauth.PrincipalDetails;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

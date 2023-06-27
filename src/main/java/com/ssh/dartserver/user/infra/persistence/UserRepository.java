@@ -1,6 +1,6 @@
-package com.ssh.dartserver.User.repository;
+package com.ssh.dartserver.user.infra.persistence;
 
-import com.ssh.dartserver.User.domain.User;
+import com.ssh.dartserver.user.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

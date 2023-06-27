@@ -1,7 +1,7 @@
 package com.ssh.dartserver.auth.service.oauth;
 
-import com.ssh.dartserver.User.domain.User;
-import com.ssh.dartserver.User.repository.UserRepository;
+import com.ssh.dartserver.user.domain.User;
+import com.ssh.dartserver.user.infra.persistence.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

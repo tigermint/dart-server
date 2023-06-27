@@ -1,12 +1,11 @@
 package com.ssh.dartserver.auth.dto.request;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.Data;
 
-@Getter
-@NoArgsConstructor
-@AllArgsConstructor
+import javax.validation.constraints.NotBlank;
+
+@Data
 public class TokenRequestDto {
+    @NotBlank
     private String accessToken;
 }
