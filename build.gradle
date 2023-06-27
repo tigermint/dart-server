@@ -2,6 +2,23 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '2.7.12'
     id 'io.spring.dependency-management' version '1.1.0'
+    id 'com.google.cloud.tools.jib' version '3.3.2'
+}
+
+jib{
+    from{
+        image='adoptopenjdk/openjdk11:jre-11.0.2.9-alpine'
+    }
+    to{
+        image='asia-northeast3-docker.pkg.dev/dart-388516/cloud-run-source-deploy/dart-server'
+        auth {
+            username = '_json_key'
+            password = new String(Base64.getDecoder().decode(System.getenv("GOOGLE_AR_CLIENT_SECRET")))
+        }
+    }
+    container {
+        jvmFlags = ['-Xms512m', '-Xmx512m']
+    }
 }
 
 group = 'com.ssh'
