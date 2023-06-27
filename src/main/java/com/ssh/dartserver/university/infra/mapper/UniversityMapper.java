@@ -9,6 +9,6 @@ import org.mapstruct.factory.Mappers;
 public interface UniversityMapper {
     UniversityMapper INSTANCE = Mappers.getMapper(UniversityMapper.class);
 
-    University fromDto(UniversityDto universityDto);
+    University toEntity(UniversityDto universityDto);
     UniversityDto toDto(University university);
 }

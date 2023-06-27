@@ -16,7 +16,7 @@ public class UniversityService {
     private final UniversityRepository universityRepository;
     private final UniversityMapper universityMapper;
 
-    public List<UniversityDto> readAllUniversities() {
+    public List<UniversityDto> list() {
         return universityRepository.findAll(Sort.by(Sort.Direction.ASC, "name")).stream()
                 .map(universityMapper::toDto)
                 .collect(Collectors.toList());

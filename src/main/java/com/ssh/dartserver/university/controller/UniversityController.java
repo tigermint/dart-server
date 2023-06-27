@@ -14,8 +14,8 @@ import java.util.List;
 public class UniversityController {
     private final UniversityService universityService;
 
-    @GetMapping("/v1/university")
-    public ResponseEntity<List<UniversityDto>> readAllUniversities() {
-        return ResponseEntity.ok(universityService.readAllUniversities());
+    @GetMapping("/v1/universities")
+    public ResponseEntity<List<UniversityDto>> list() {
+        return ResponseEntity.ok(universityService.list());
     }
 }
