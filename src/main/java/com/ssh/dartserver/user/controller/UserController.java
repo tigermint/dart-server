@@ -19,20 +19,19 @@ public class UserController {
 
     @PostMapping("/signup")
     public ResponseEntity<UserResponseDto> create(Authentication authentication, @Valid @RequestBody UserRequestDto request) {
-        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
-        return ResponseEntity.ok(userService.create(principal.getUser(), request));
+        return getUserResponseDtoResponseEntity(authentication, request);
     }
+
 
     @GetMapping("/me")
     public ResponseEntity<UserResponseDto> read(Authentication authentication) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
-        return ResponseEntity.ok(userService.read(principal.getUser()));
+        return ResponseEntity.ok(userService.read(principal.getUser().getId()));
     }
 
     @PutMapping("/me")
     public ResponseEntity<UserResponseDto> update(Authentication authentication, @Valid @RequestBody UserRequestDto request) {
-        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
-        return ResponseEntity.ok(userService.update(principal.getUser(), request));
+        return getUserResponseDtoResponseEntity(authentication, request);
     }
 
     @DeleteMapping("/me")
@@ -40,5 +39,9 @@ public class UserController {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         userService.delete(principal.getUser());
         return ResponseEntity.ok("회원 탈퇴가 완료되었습니다.");
+    }
+    private ResponseEntity<UserResponseDto> getUserResponseDtoResponseEntity(Authentication authentication, UserRequestDto request) {
+        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
+        return ResponseEntity.ok(userService.update(principal.getUser(), request));
     }
 }
