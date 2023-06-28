@@ -6,8 +6,8 @@ import java.time.LocalDateTime;
 
 @Data
 public class UserResponseDto {
-    private int userId;
-    private int univId;
+    private Long userId;
+    private Long universityId;
     private String name;
     private String phone;
     private String universityName;
