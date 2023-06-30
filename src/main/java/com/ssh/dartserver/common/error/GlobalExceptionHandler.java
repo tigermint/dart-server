@@ -1,5 +1,6 @@
 package com.ssh.dartserver.common.error;
 
+import com.auth0.jwt.exceptions.SignatureVerificationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -22,6 +23,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException ex) {
+        return ResponseEntity.badRequest().body(ex.getMessage());
+    }
+
+    @ExceptionHandler(SignatureVerificationException.class)
+    public ResponseEntity<String> handleSignatureVerificationException(SignatureVerificationException ex) {
         return ResponseEntity.badRequest().body(ex.getMessage());
     }
 }
