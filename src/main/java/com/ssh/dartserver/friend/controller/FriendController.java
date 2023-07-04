@@ -52,6 +52,7 @@ public class FriendController {
     /**
      * 친구 삭제
      * @param authentication
+     * 
      * @param friendUserId
      * @return
      */
