@@ -21,22 +21,6 @@ jib{
     }
 }
 
-//jib{
-//    from{
-//        image='adoptopenjdk/openjdk11:jre-11.0.2.9-alpine'
-//    }
-//    to{
-//        image='asia-northeast3-docker.pkg.dev/dart-388516/cloud-run-source-deploy/dart-server'
-//        auth {
-//            username = '_json_key'
-//            password = new String(Base64.getDecoder().decode(System.getenv("GOOGLE_AR_CLIENT_SECRET")))
-//        }
-//    }
-//    container {
-//        jvmFlags = ['-Xms512m', '-Xmx512m']
-//    }
-//}
-
 group = 'com.ssh'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
