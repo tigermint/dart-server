@@ -21,5 +21,7 @@ public interface FriendRepository extends JpaRepository<Friend, Long>{
             "left join\n" +
             "(select friend_user_id from friend where user_id = :userId) as b on a.friend_user_id = b.friend_user_id\n" +
             "where b.friend_user_id is null", nativeQuery = true)
-    List<Long> findAllByRequiredFriend(@Param("userId") Long userId);
+    List<Long> findAllFriendsOfFriendsById(@Param("userId") Long userId);
+
+
 }

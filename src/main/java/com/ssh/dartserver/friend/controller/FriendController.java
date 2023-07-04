@@ -44,7 +44,7 @@ public class FriendController {
     public ResponseEntity<List<FriendResponseDto>> list(Authentication authentication, @RequestParam(defaultValue = "false") boolean suggested) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         if(suggested) {
-            return ResponseEntity.ok(friendService.requiredList(principal.getUser()));
+            return ResponseEntity.ok(friendService.possibleList(principal.getUser()));
         }
         return ResponseEntity.ok(friendService.list(principal.getUser()));
     }
