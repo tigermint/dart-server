@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -53,16 +54,27 @@ public class FriendService {
         friendRepository.deleteById(friend.getId());
     }
 
-
-    public List<FriendResponseDto> requiredList(User user) {
+    /**
+     * 친구의 친구 및 같은 학교 학과 친구 목록을 반환한다.
+     * @param user
+     * @return
+     */
+    public List<FriendResponseDto> possibleList(User user) {
         List<FriendResponseDto> dtos = new ArrayList<>();
-        List<User> requiredUsers = friendRepository.findAllByRequiredFriend(user.getId()).stream()
+
+        List<User> friendsOfFriends = friendRepository.findAllFriendsOfFriendsById(user.getId()).stream()
                 .map(userRepository::findById)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList());
 
-        requiredUsers.forEach(requiredUser -> dtos.add(friendMapper.toFriendResponseDto(requiredUser)));
+        List<User> sameDepartmentUsers = userRepository.findAllByUniversityId(user.getUniversity().getId());
+
+        List<User> possibleUsers = Stream.concat(friendsOfFriends.stream(), sameDepartmentUsers.stream())
+                .distinct()
+                .collect(Collectors.toList());
+
+        possibleUsers.forEach(possibleUser -> dtos.add(friendMapper.toFriendResponseDto(possibleUser)));
         return dtos;
     }
 }
