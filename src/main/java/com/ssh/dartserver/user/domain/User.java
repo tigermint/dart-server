@@ -1,7 +1,7 @@
 package com.ssh.dartserver.user.domain;
 
-import com.ssh.dartserver.common.BaseTimeEntity;
-import com.ssh.dartserver.common.Role;
+import com.ssh.dartserver.common.domain.BaseTimeEntity;
+import com.ssh.dartserver.common.domain.Role;
 import com.ssh.dartserver.university.domain.University;
 import com.ssh.dartserver.user.dto.UserRequestDto;
 import lombok.*;
