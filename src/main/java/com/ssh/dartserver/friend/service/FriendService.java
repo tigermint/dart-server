@@ -68,13 +68,27 @@ public class FriendService {
                 .map(Optional::get)
                 .collect(Collectors.toList());
 
-        List<User> sameDepartmentUsers = userRepository.findAllByUniversityId(user.getUniversity().getId());
+        List<User> sameDepartmentUsers = userRepository.findAllByUniversityId(user.getUniversity().getId()).stream()
+                .filter(departmentUser -> !departmentUser.getId().equals(user.getId()))
+                .collect(Collectors.toList());
 
         List<User> possibleUsers = Stream.concat(friendsOfFriends.stream(), sameDepartmentUsers.stream())
                 .distinct()
                 .collect(Collectors.toList());
 
-        possibleUsers.forEach(possibleUser -> dtos.add(friendMapper.toFriendResponseDto(possibleUser)));
+
+        List<User> friends = friendRepository.findAllByUserId(user.getId()).stream()
+                .map(friend -> userRepository.findById(friend.getFriendUserId()))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
+
+        List<User> possibleUsersWithoutFriends = possibleUsers.stream()
+                .filter(possibleUser -> friends.stream().noneMatch(friend -> friend.getId().equals(possibleUser.getId())))
+                .collect(Collectors.toList());
+
+
+        possibleUsersWithoutFriends.forEach(possibleUser -> dtos.add(friendMapper.toFriendResponseDto(possibleUser)));
         return dtos;
     }
 }
