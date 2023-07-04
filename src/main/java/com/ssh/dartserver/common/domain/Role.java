@@ -1,4 +1,4 @@
-package com.ssh.dartserver.common;
+package com.ssh.dartserver.common.domain;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

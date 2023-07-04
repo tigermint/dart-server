@@ -10,7 +10,7 @@ import com.ssh.dartserver.auth.dto.request.TokenRequestDto;
 import com.ssh.dartserver.auth.dto.response.TokenResponseDto;
 import com.ssh.dartserver.auth.infra.KakaoRestTemplate;
 import com.ssh.dartserver.auth.service.jwt.JwtProperties;
-import com.ssh.dartserver.common.Role;
+import com.ssh.dartserver.common.domain.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;

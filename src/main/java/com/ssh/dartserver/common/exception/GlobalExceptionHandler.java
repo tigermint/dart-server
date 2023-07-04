@@ -1,4 +1,4 @@
-package com.ssh.dartserver.common.error;
+package com.ssh.dartserver.common.exception;
 
 import com.auth0.jwt.exceptions.SignatureVerificationException;
 import org.springframework.http.ResponseEntity;
