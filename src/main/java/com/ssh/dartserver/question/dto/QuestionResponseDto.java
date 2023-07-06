@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class QuestionResponseDto {
-    private String questionId;
+    private Long questionId;
     private String content;
     private String icon;
 }
