@@ -28,16 +28,15 @@ public class User extends BaseTimeEntity {
 
     @Enumerated(EnumType.STRING)
     private Role role;
-
     private String point;
 
-    //== social login ==//
-    //이름이 구려 굳이 필요 없다
     @Column(unique = true)
     private String username;
-
     private String providerId;
     private String provider;
+
+    @Embedded
+    private RecommendationCode recommendationCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "university_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
@@ -53,5 +52,6 @@ public class User extends BaseTimeEntity {
         this.admissionNum = userRequestDto.getAdmissionNum();
         this.name = userRequestDto.getName();
         this.phone = userRequestDto.getPhone();
+        this.recommendationCode = RecommendationCode.generate();
     }
 }
