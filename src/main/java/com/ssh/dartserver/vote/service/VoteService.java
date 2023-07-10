@@ -3,6 +3,7 @@ package com.ssh.dartserver.vote.service;
 import com.ssh.dartserver.question.domain.Question;
 import com.ssh.dartserver.question.infra.mapper.QuestionMapper;
 import com.ssh.dartserver.question.infra.persistence.QuestionRepository;
+import com.ssh.dartserver.university.infra.mapper.UniversityMapper;
 import com.ssh.dartserver.user.domain.User;
 import com.ssh.dartserver.user.infra.mapper.UserMapper;
 import com.ssh.dartserver.user.infra.persistence.UserRepository;
@@ -29,6 +30,7 @@ public class VoteService {
     private final VoteMapper voteMapper;
     private final QuestionMapper questionMapper;
     private final UserMapper userMapper;
+    private final UniversityMapper universityMapper;
 
     @Transactional
     public void create(User user, VoteResultRequestDto request) {
@@ -70,8 +72,10 @@ public class VoteService {
         return dtos;
     }
     private ReceivedVoteResponseDto getReceivedVoteResponseDto(Vote vote, User pickedUser) {
-        return voteMapper.toReceivedVoteResponseDto(questionMapper.toDto(vote.getQuestion())
-                , userMapper.toResponseDto(pickedUser, pickedUser.getUniversity())
-                , vote);
+        return voteMapper.toReceivedVoteResponseDto(
+                questionMapper.toDto(vote.getQuestion()),
+                userMapper.toUserWithUniversityResponseDto(userMapper.toUserResponseDto(pickedUser), universityMapper.toUniversityResponseDto(pickedUser.getUniversity())),
+                vote
+        );
     }
 }
