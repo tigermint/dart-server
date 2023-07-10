@@ -1,6 +1,6 @@
 package com.ssh.dartserver.university.service;
 
-import com.ssh.dartserver.university.dto.UniversityDto;
+import com.ssh.dartserver.university.dto.UniversityResponseDto;
 import com.ssh.dartserver.university.infra.mapper.UniversityMapper;
 import com.ssh.dartserver.university.infra.persistence.UniversityRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,9 +16,9 @@ public class UniversityService {
     private final UniversityRepository universityRepository;
     private final UniversityMapper universityMapper;
 
-    public List<UniversityDto> list() {
+    public List<UniversityResponseDto> list() {
         return universityRepository.findAll(Sort.by(Sort.Direction.ASC, "name")).stream()
-                .map(universityMapper::toDto)
+                .map(universityMapper::toUniversityResponseDto)
                 .collect(Collectors.toList());
     }
 }

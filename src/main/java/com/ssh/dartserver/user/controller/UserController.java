@@ -2,7 +2,7 @@ package com.ssh.dartserver.user.controller;
 
 import com.ssh.dartserver.auth.service.oauth.PrincipalDetails;
 import com.ssh.dartserver.user.dto.UserRequestDto;
-import com.ssh.dartserver.user.dto.UserResponseDto;
+import com.ssh.dartserver.user.dto.UserWithUniversityResponseDto;
 import com.ssh.dartserver.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,20 +18,21 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/signup")
-    public ResponseEntity<UserResponseDto> create(Authentication authentication, @Valid @RequestBody UserRequestDto request) {
-        return getUserResponseDtoResponseEntity(authentication, request);
+    public ResponseEntity<UserWithUniversityResponseDto> signup(Authentication authentication, @Valid @RequestBody UserRequestDto request) {
+        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
+        return ResponseEntity.ok(userService.completeSignupWithRecommendationCode(principal.getUser(), request));
     }
 
-
     @GetMapping("/me")
-    public ResponseEntity<UserResponseDto> read(Authentication authentication) {
+    public ResponseEntity<UserWithUniversityResponseDto> read(Authentication authentication) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         return ResponseEntity.ok(userService.read(principal.getUser().getId()));
     }
 
     @PutMapping("/me")
-    public ResponseEntity<UserResponseDto> update(Authentication authentication, @Valid @RequestBody UserRequestDto request) {
-        return getUserResponseDtoResponseEntity(authentication, request);
+    public ResponseEntity<UserWithUniversityResponseDto> update(Authentication authentication, @Valid @RequestBody UserRequestDto request) {
+        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
+        return ResponseEntity.ok(userService.updateUserInformation(principal.getUser(), request));
     }
 
     @DeleteMapping("/me")
@@ -39,9 +40,5 @@ public class UserController {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         userService.delete(principal.getUser());
         return ResponseEntity.ok("회원 탈퇴가 완료되었습니다.");
-    }
-    private ResponseEntity<UserResponseDto> getUserResponseDtoResponseEntity(Authentication authentication, UserRequestDto request) {
-        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
-        return ResponseEntity.ok(userService.update(principal.getUser(), request));
     }
 }
