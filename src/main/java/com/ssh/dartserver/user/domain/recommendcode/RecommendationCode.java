@@ -1,4 +1,4 @@
-package com.ssh.dartserver.user.domain;
+package com.ssh.dartserver.user.domain.recommendcode;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -6,9 +6,6 @@ import lombok.NoArgsConstructor;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import java.util.Objects;
-import java.util.Random;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @Getter
 @NoArgsConstructor
@@ -16,9 +13,6 @@ import java.util.stream.IntStream;
 public class RecommendationCode {
     private static final int DEFAULT_CODE_LENGTH = 8;
     private static final int MINIMUM_CODE_LENGTH = 1;
-    private static final String CHAR_POOL = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-
-    private static final Random RANDOM = new Random();
 
     @Column(name = "recommendation_code")
     private String value;
@@ -28,20 +22,9 @@ public class RecommendationCode {
         this.value = value;
     }
 
-    public static RecommendationCode generate() {
-        return generate(DEFAULT_CODE_LENGTH);
-    }
-
-    public static RecommendationCode generate(int length) {
-        if(length < MINIMUM_CODE_LENGTH) {
-            throw new IllegalArgumentException("최소 길이는 1입니다.");
-        }
-
-        String generatedCode = IntStream.range(0, length)
-                .mapToObj(i -> CHAR_POOL.charAt(RANDOM.nextInt(CHAR_POOL.length())))
-                .map(String::valueOf)
-                .collect(Collectors.joining(""));
-        return new RecommendationCode(generatedCode);
+    public static RecommendationCode generate(RandomRecommendCodeGeneratable randomGenerator) {
+        String generator = randomGenerator.generator(DEFAULT_CODE_LENGTH);
+        return new RecommendationCode(generator);
     }
 
     private void validate(String value) {
