@@ -7,6 +7,6 @@ import lombok.Data;
 public class FriendResponseDto {
     private Long userId;
     private String name;
-    private int admissionNum;
+    private int admissionYear;
     private UniversityResponseDto university;
 }
