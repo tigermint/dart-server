@@ -1,7 +1,7 @@
 package com.ssh.dartserver.university.infra.mapper;
 
 import com.ssh.dartserver.university.domain.University;
-import com.ssh.dartserver.university.dto.UniversityDto;
+import com.ssh.dartserver.university.dto.UniversityResponseDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -9,6 +9,6 @@ import org.mapstruct.factory.Mappers;
 public interface UniversityMapper {
     UniversityMapper INSTANCE = Mappers.getMapper(UniversityMapper.class);
 
-    University toEntity(UniversityDto universityDto);
-    UniversityDto toDto(University university);
+    University toEntity(UniversityResponseDto universityDto);
+    UniversityResponseDto toUniversityResponseDto(University university);
 }

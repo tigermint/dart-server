@@ -1,7 +1,7 @@
 package com.ssh.dartserver.vote.dto.response;
 
 import com.ssh.dartserver.question.dto.QuestionResponseDto;
-import com.ssh.dartserver.user.dto.UserResponseDto;
+import com.ssh.dartserver.user.dto.UserWithUniversityResponseDto;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -9,6 +9,6 @@ import java.time.LocalDateTime;
 public class ReceivedVoteResponseDto {
     private Long voteId;
     private QuestionResponseDto question;
-    private UserResponseDto pickedUser;
+    private UserWithUniversityResponseDto pickedUser;
     private LocalDateTime pickedTime;
 }

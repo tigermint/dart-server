@@ -1,11 +1,14 @@
 package com.ssh.dartserver.friend.service;
 
 import com.ssh.dartserver.friend.domain.Friend;
+import com.ssh.dartserver.friend.dto.FriendRecommendationCodeRequestDto;
 import com.ssh.dartserver.friend.dto.FriendRequestDto;
 import com.ssh.dartserver.friend.dto.FriendResponseDto;
 import com.ssh.dartserver.friend.infra.mapper.FriendMapper;
 import com.ssh.dartserver.friend.infra.persistence.FriendRepository;
+import com.ssh.dartserver.university.infra.mapper.UniversityMapper;
 import com.ssh.dartserver.user.domain.User;
+import com.ssh.dartserver.user.domain.recommendcode.RecommendationCode;
 import com.ssh.dartserver.user.infra.persistence.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,11 +27,23 @@ public class FriendService {
     private final UserRepository userRepository;
     private final FriendRepository friendRepository;
     private final FriendMapper friendMapper;
+    private final UniversityMapper universityMapper;
 
     @Transactional
     public void create(User user, FriendRequestDto request) {
         Friend friend = Friend.builder()
                 .friendUserId(request.getFriendUserId())
+                .user(user)
+                .build();
+        friendRepository.save(friend);
+    }
+
+    @Transactional
+    public void createFriendByRecommendationCode(User user, FriendRecommendationCodeRequestDto request) {
+        User friendUser = userRepository.findByRecommendationCode(new RecommendationCode(request.getRecommendationCode()))
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 추천인 코드입니다."));
+        Friend friend = Friend.builder()
+                .friendUserId(friendUser.getId())
                 .user(user)
                 .build();
         friendRepository.save(friend);
@@ -41,7 +56,8 @@ public class FriendService {
         friends.forEach(friend -> {
             User friendUserInfo = userRepository.findById(friend.getFriendUserId())
                     .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
-            dtos.add(friendMapper.toFriendResponseDto(friendUserInfo));
+            dtos.add(friendMapper.toFriendResponseDto(friendUserInfo,
+                    universityMapper.toUniversityResponseDto(friendUserInfo.getUniversity())));
         });
 
         return dtos;
@@ -88,7 +104,8 @@ public class FriendService {
                 .collect(Collectors.toList());
 
 
-        possibleUsersWithoutFriends.forEach(possibleUser -> dtos.add(friendMapper.toFriendResponseDto(possibleUser)));
+        possibleUsersWithoutFriends.forEach(possibleUser -> dtos.add(
+                friendMapper.toFriendResponseDto(possibleUser, universityMapper.toUniversityResponseDto(possibleUser.getUniversity()))));
         return dtos;
     }
 }
