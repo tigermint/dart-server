@@ -10,7 +10,7 @@ public interface FriendMapper {
 
     @Mapping(target = "userId", source = "friendUserInfo.id")
     @Mapping(target = "university", source = "friendUserInfo.university")
-    @Mapping(target = "admissionNum", source = "friendUserInfo.admissionNum")
-    @Mapping(target = "name", source = "friendUserInfo.name")
+    @Mapping(target = "admissionNum", source = "friendUserInfo.personalInfo.name.value")
+    @Mapping(target = "name", source = "friendUserInfo.personalInfo.name.value")
     FriendResponseDto toFriendResponseDto(User friendUserInfo);
 }
