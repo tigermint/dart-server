@@ -36,12 +36,13 @@ public class FriendService {
     }
 
     @Transactional
-    public void createFriendByRecommendationCode(User user, FriendRecommendationCodeRequestDto request) {
+    public FriendResponseDto createFriendByRecommendationCode(User user, FriendRecommendationCodeRequestDto request) {
         User friendUser = userRepository.findByRecommendationCode(new RecommendationCode(request.getRecommendationCode()))
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 추천인 코드입니다."));
 
         isFriend(user, friendUser.getId());
         save(friendUser.getId(), user);
+        return friendMapper.toFriendResponseDto(friendUser, universityMapper.toUniversityResponseDto(friendUser.getUniversity()));
     }
 
     private void save(Long friendUser, User user) {

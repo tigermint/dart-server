@@ -41,10 +41,9 @@ public class FriendController {
      */
 
     @PostMapping("/invite")
-    public ResponseEntity<String> createFriendByRecommendationCode(Authentication authentication, @RequestBody @Valid FriendRecommendationCodeRequestDto request) {
+    public ResponseEntity<FriendResponseDto> createFriendByRecommendationCode(Authentication authentication, @RequestBody @Valid FriendRecommendationCodeRequestDto request) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
-        friendService.createFriendByRecommendationCode(principal.getUser(), request);
-        return ResponseEntity.ok("추천인 코드로 친구 추가 성공");
+        return ResponseEntity.ok(friendService.createFriendByRecommendationCode(principal.getUser(), request));
     }
 
     /**
