@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class NextVoteAvailableDateTime {
 
-    @Column
+    @Column(name = "next_vote_available_date_time")
     private LocalDateTime value;
 
 
