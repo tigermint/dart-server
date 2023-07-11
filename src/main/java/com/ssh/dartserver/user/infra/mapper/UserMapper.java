@@ -1,6 +1,7 @@
 package com.ssh.dartserver.user.infra.mapper;
 
 import com.ssh.dartserver.university.dto.UniversityResponseDto;
+import com.ssh.dartserver.user.controller.UserNextVoteResponseDto;
 import com.ssh.dartserver.user.domain.User;
 import com.ssh.dartserver.user.dto.UserResponseDto;
 import com.ssh.dartserver.user.dto.UserWithUniversityResponseDto;
@@ -20,4 +21,7 @@ public interface UserMapper {
     @Mapping(target = "admissionYear", source = "user.personalInfo.admissionYear.value")
     @Mapping(target = "recommendationCode", source = "user.recommendationCode.value")
     UserResponseDto toUserResponseDto(User user);
+
+    @Mapping(target = "nextVoteAvailableDateTime", source = "user.nextVoteAvailableDateTime.value")
+    UserNextVoteResponseDto toUserNextVoteResponseDto(User user);
 }

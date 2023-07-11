@@ -41,4 +41,11 @@ public class UserController {
         userService.delete(principal.getUser());
         return ResponseEntity.ok("회원 탈퇴가 완료되었습니다.");
     }
+
+    @GetMapping("/me/next-voting-time")
+    public ResponseEntity<UserNextVoteResponseDto> readNextVoteAvailableDateTime(Authentication authentication) {
+        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
+        return ResponseEntity.ok(userService.updateUserNextVoteAvailableDateTime(principal.getUser()));
+    }
+
 }

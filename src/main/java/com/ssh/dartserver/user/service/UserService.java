@@ -3,6 +3,8 @@ package com.ssh.dartserver.user.service;
 import com.ssh.dartserver.university.domain.University;
 import com.ssh.dartserver.university.infra.mapper.UniversityMapper;
 import com.ssh.dartserver.university.infra.persistence.UniversityRepository;
+import com.ssh.dartserver.user.controller.UserNextVoteResponseDto;
+import com.ssh.dartserver.user.domain.NextVoteAvailableDateTime;
 import com.ssh.dartserver.user.domain.User;
 import com.ssh.dartserver.user.domain.personalinfo.AdmissionYear;
 import com.ssh.dartserver.user.domain.personalinfo.Name;
@@ -16,6 +18,8 @@ import com.ssh.dartserver.user.infra.persistence.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 @Service
 @Transactional(readOnly = true)
@@ -35,6 +39,7 @@ public class UserService {
         return userMapper.toUserWithUniversityResponseDto(userMapper.toUserResponseDto(user),
                 universityMapper.toUniversityResponseDto(user.getUniversity()));
     }
+
     @Transactional
     public UserWithUniversityResponseDto completeSignupWithRecommendationCode(User user, UserRequestDto userRequestDto) {
         user.updateWithRecommendationCode(getPersonalInfo(userRequestDto), getUniversity(userRequestDto.getUniversityId()), randomGenerator);
@@ -51,11 +56,18 @@ public class UserService {
         return userMapper.toUserWithUniversityResponseDto(userMapper.toUserResponseDto(user),
                 universityMapper.toUniversityResponseDto(user.getUniversity()));
     }
+    @Transactional
+    public UserNextVoteResponseDto updateUserNextVoteAvailableDateTime(User user) {
+        user.updateNextVoteAvailableDateTime(NextVoteAvailableDateTime.of(LocalDateTime.now().plusMinutes(40)));
+        userRepository.save(user);
+        return userMapper.toUserNextVoteResponseDto(user);
+    }
 
     @Transactional
     public void delete(User user) {
         userRepository.delete(user);
     }
+
     private PersonalInfo getPersonalInfo(UserRequestDto userRequestDto) {
         return PersonalInfo.builder()
                 .phone(new Phone(userRequestDto.getPhone()))
