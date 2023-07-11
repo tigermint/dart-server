@@ -31,22 +31,32 @@ public class FriendService {
 
     @Transactional
     public void create(User user, FriendRequestDto request) {
-        Friend friend = Friend.builder()
-                .friendUserId(request.getFriendUserId())
-                .user(user)
-                .build();
-        friendRepository.save(friend);
+        isFriend(user, request.getFriendUserId());
+        save(request.getFriendUserId(), user);
     }
 
     @Transactional
     public void createFriendByRecommendationCode(User user, FriendRecommendationCodeRequestDto request) {
         User friendUser = userRepository.findByRecommendationCode(new RecommendationCode(request.getRecommendationCode()))
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 추천인 코드입니다."));
+
+        isFriend(user, friendUser.getId());
+        save(friendUser.getId(), user);
+    }
+
+    private void save(Long friendUser, User user) {
         Friend friend = Friend.builder()
-                .friendUserId(friendUser.getId())
+                .friendUserId(friendUser)
                 .user(user)
                 .build();
         friendRepository.save(friend);
+    }
+
+    private void isFriend(User user, Long friendUser) {
+        friendRepository.findByUserIdAndFriendUserId(user.getId(), friendUser)
+                .ifPresent(friend -> {
+                    throw new IllegalArgumentException("이미 친구 관계인 유저입니다.");
+                });
     }
 
     public List<FriendResponseDto> list(User user) {
@@ -70,11 +80,6 @@ public class FriendService {
         friendRepository.deleteById(friend.getId());
     }
 
-    /**
-     * 친구의 친구 및 같은 학교 학과 친구 목록을 반환한다.
-     * @param user
-     * @return
-     */
     public List<FriendResponseDto> possibleList(User user) {
         List<FriendResponseDto> dtos = new ArrayList<>();
 
