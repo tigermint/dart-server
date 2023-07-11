@@ -1,15 +1,26 @@
 package com.ssh.dartserver.user.domain.personalinfo;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 
-@RequiredArgsConstructor
-@Getter
 public enum Gender {
+    MALE("MALE"), FEMALE("FEMALE");
+    private final String value;
 
-    MALE("MALE", "남자"),
-    FEMALE("FEMALE", "여자");
-
-    private final String key;
-    private final String title;
+    Gender(String value) {
+        this.value = value;
+    }
+    @JsonCreator
+    public static Gender from(String value) {
+        for (Gender gender : values()) {
+            if (gender.getValue().equals(value)) {
+                return gender;
+            }
+        }
+        return null;
+    }
+    @JsonValue
+    public String getValue() {
+        return value;
+    }
 }

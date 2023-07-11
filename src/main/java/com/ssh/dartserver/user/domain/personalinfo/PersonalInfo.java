@@ -4,9 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Embeddable;
-import javax.persistence.Embedded;
-import javax.persistence.Enumerated;
+import javax.persistence.*;
 
 @Getter
 @NoArgsConstructor
@@ -16,7 +14,7 @@ public class PersonalInfo {
     private Name name;
     @Embedded
     private Phone phone;
-    @Enumerated
+    @Enumerated(EnumType.STRING)
     private Gender gender;
     @Embedded
     private AdmissionYear admissionYear;

@@ -1,7 +1,5 @@
 package com.ssh.dartserver.user.dto;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ssh.dartserver.user.domain.personalinfo.Gender;
 import lombok.Data;
 
@@ -26,17 +24,4 @@ public class UserRequestDto {
 
     @NotNull(message = "성별을 선택해주세요")
     private Gender gender;
-
-    @JsonCreator
-    public UserRequestDto(@JsonProperty("universityId") Long universityId,
-                          @JsonProperty("admissionNum") int admissionYear,
-                          @JsonProperty("name") String name,
-                          @JsonProperty("phone") String phone,
-                          @JsonProperty("gender") Gender gender) {
-        this.universityId = universityId;
-        this.admissionYear = admissionYear;
-        this.name = name;
-        this.phone = phone;
-        this.gender = gender;
-    }
 }

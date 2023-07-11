@@ -16,7 +16,7 @@ public interface UserMapper {
 
     @Mapping(target = "name", source = "user.personalInfo.name.value")
     @Mapping(target = "phone", source = "user.personalInfo.phone.value")
-    @Mapping(target = "gender", source = "user.personalInfo.gender.key")
+    @Mapping(target = "gender", source = "user.personalInfo.gender.value")
     @Mapping(target = "admissionYear", source = "user.personalInfo.admissionYear.value")
     @Mapping(target = "recommendationCode", source = "user.recommendationCode.value")
     UserResponseDto toUserResponseDto(User user);
