@@ -15,8 +15,13 @@ public class NextVoteAvailableDateTime {
     @Column(name = "next_vote_available_date_time")
     private LocalDateTime value;
 
-
     public NextVoteAvailableDateTime(LocalDateTime value) {
         this.value = value;
     }
+
+    public static NextVoteAvailableDateTime of(LocalDateTime value) {
+        return new NextVoteAvailableDateTime(value);
+    }
+
+
 }

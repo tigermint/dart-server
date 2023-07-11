@@ -9,6 +9,7 @@ import com.ssh.dartserver.user.domain.recommendcode.RecommendationCode;
 import lombok.*;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -19,6 +20,7 @@ public class User extends BaseTimeEntity {
     @Id @GeneratedValue
     @Column(name = "user_id")
     private Long id;
+
     private String password;
 
     @Embedded
@@ -51,7 +53,12 @@ public class User extends BaseTimeEntity {
 
     public void updateWithRecommendationCode(PersonalInfo personalInfo, University university, RandomRecommendCodeGeneratable randomGenerator) {
         this.personalInfo = personalInfo;
-        this.recommendationCode = RecommendationCode.generate(randomGenerator);
+        this.nextVoteAvailableDateTime = NextVoteAvailableDateTime.of(LocalDateTime.now());
         this.university = university;
+        this.recommendationCode = RecommendationCode.generate(randomGenerator);
+    }
+
+    public void updateNextVoteAvailableDateTime(NextVoteAvailableDateTime nextVoteAvailableDateTime) {
+        this.nextVoteAvailableDateTime = nextVoteAvailableDateTime;
     }
 }
