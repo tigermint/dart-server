@@ -38,6 +38,7 @@ public class User extends BaseTimeEntity {
     private String username;
     private String providerId;
     private String provider;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "university_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private University university;
@@ -53,12 +54,8 @@ public class User extends BaseTimeEntity {
 
     public void updateWithRecommendationCode(PersonalInfo personalInfo, University university, RandomRecommendCodeGeneratable randomGenerator) {
         this.personalInfo = personalInfo;
-        this.nextVoteAvailableDateTime = NextVoteAvailableDateTime.of(LocalDateTime.now());
+        this.nextVoteAvailableDateTime = new NextVoteAvailableDateTime(LocalDateTime.now());
         this.university = university;
         this.recommendationCode = RecommendationCode.generate(randomGenerator);
-    }
-
-    public void updateNextVoteAvailableDateTime(NextVoteAvailableDateTime nextVoteAvailableDateTime) {
-        this.nextVoteAvailableDateTime = nextVoteAvailableDateTime;
     }
 }

@@ -4,7 +4,6 @@ import com.ssh.dartserver.university.domain.University;
 import com.ssh.dartserver.university.infra.mapper.UniversityMapper;
 import com.ssh.dartserver.university.infra.persistence.UniversityRepository;
 import com.ssh.dartserver.user.controller.UserNextVoteResponseDto;
-import com.ssh.dartserver.user.domain.NextVoteAvailableDateTime;
 import com.ssh.dartserver.user.domain.User;
 import com.ssh.dartserver.user.domain.personalinfo.AdmissionYear;
 import com.ssh.dartserver.user.domain.personalinfo.Name;
@@ -19,13 +18,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 
 public class UserService {
+
+    private static final int NEXT_VOTE_AVAILABLE_MINUTES = 40;
 
     private final UserRepository userRepository;
     private final UniversityRepository universityRepository;
@@ -58,7 +57,7 @@ public class UserService {
     }
     @Transactional
     public UserNextVoteResponseDto updateUserNextVoteAvailableDateTime(User user) {
-        user.updateNextVoteAvailableDateTime(NextVoteAvailableDateTime.of(LocalDateTime.now().plusMinutes(40)));
+        user.getNextVoteAvailableDateTime().plusMinutes(NEXT_VOTE_AVAILABLE_MINUTES);
         userRepository.save(user);
         return userMapper.toUserNextVoteResponseDto(user);
     }
