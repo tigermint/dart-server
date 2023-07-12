@@ -87,6 +87,7 @@ public class FriendService {
         List<User> friendsOfFriends = friendRepository.findAllFriendsOfFriendsById(user.getId()).stream()
                 .map(userRepository::findById)
                 .filter(Optional::isPresent)
+                .filter(friend -> !friend.get().getId().equals(user.getId()))
                 .map(Optional::get)
                 .collect(Collectors.toList());
 
