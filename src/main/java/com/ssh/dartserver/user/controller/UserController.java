@@ -1,6 +1,7 @@
 package com.ssh.dartserver.user.controller;
 
 import com.ssh.dartserver.auth.service.oauth.PrincipalDetails;
+import com.ssh.dartserver.user.dto.UserNextVoteResponseDto;
 import com.ssh.dartserver.user.dto.UserRequestDto;
 import com.ssh.dartserver.user.dto.UserWithUniversityResponseDto;
 import com.ssh.dartserver.user.service.UserService;

@@ -3,7 +3,7 @@ package com.ssh.dartserver.user.service;
 import com.ssh.dartserver.university.domain.University;
 import com.ssh.dartserver.university.infra.mapper.UniversityMapper;
 import com.ssh.dartserver.university.infra.persistence.UniversityRepository;
-import com.ssh.dartserver.user.controller.UserNextVoteResponseDto;
+import com.ssh.dartserver.user.dto.UserNextVoteResponseDto;
 import com.ssh.dartserver.user.domain.User;
 import com.ssh.dartserver.user.domain.personalinfo.AdmissionYear;
 import com.ssh.dartserver.user.domain.personalinfo.Name;
