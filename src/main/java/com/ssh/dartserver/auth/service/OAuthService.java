@@ -3,6 +3,8 @@ package com.ssh.dartserver.auth.service;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.ssh.dartserver.user.domain.User;
+import com.ssh.dartserver.user.domain.personalinfo.Gender;
+import com.ssh.dartserver.user.domain.personalinfo.PersonalInfo;
 import com.ssh.dartserver.user.infra.persistence.UserRepository;
 import com.ssh.dartserver.auth.domain.KakaoUser;
 import com.ssh.dartserver.auth.domain.OAuthUserInfo;
@@ -37,6 +39,9 @@ public class OAuthService {
                         .provider(kakaoUser.getProvider())
                         .providerId(kakaoUser.getProviderId())
                         .role(Role.USER)
+                        .personalInfo(PersonalInfo.builder()
+                                .gender(Gender.UNKNOWN)
+                                .build())
                         .build();
                 userEntity = userRepository.save(userRequest);
             }
