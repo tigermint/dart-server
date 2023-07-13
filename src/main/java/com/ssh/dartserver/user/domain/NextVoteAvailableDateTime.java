@@ -19,9 +19,7 @@ public class NextVoteAvailableDateTime {
         this.value = value;
     }
 
-    public static NextVoteAvailableDateTime of(LocalDateTime value) {
-        return new NextVoteAvailableDateTime(value);
+    public void plusMinutes(int value) {
+        this.value = this.value.plusMinutes(value);
     }
-
-
 }

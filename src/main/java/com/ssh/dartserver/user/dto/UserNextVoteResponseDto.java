@@ -1,4 +1,4 @@
-package com.ssh.dartserver.user.controller;
+package com.ssh.dartserver.user.dto;
 
 import lombok.Data;
 

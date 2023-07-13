@@ -4,7 +4,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
+import javax.persistence.Embeddable;
+import javax.persistence.Embedded;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 
 @Getter
 @NoArgsConstructor
@@ -12,10 +15,13 @@ import javax.persistence.*;
 public class PersonalInfo {
     @Embedded
     private Name name;
+
     @Embedded
     private Phone phone;
+
     @Enumerated(EnumType.STRING)
     private Gender gender;
+
     @Embedded
     private AdmissionYear admissionYear;
 
