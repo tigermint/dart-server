@@ -15,6 +15,9 @@ public class UserRequestDto {
     @NotNull(message = "학번을 입력해주세요")
     private int admissionYear;
 
+    @NotNull(message = "몇년생인지 입력해주세요")
+    private int birthYear;
+
     @NotBlank(message = "이름을 입력해주세요")
     private String name;
 
