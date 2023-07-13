@@ -1,6 +1,7 @@
 package com.ssh.dartserver.user.domain.personalinfo;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
 import javax.persistence.Column;
@@ -11,9 +12,13 @@ import javax.persistence.Embeddable;
 @Embeddable
 public class Phone {
     @Column(name = "phone")
-    private String value;
+    private final String value;
 
-    public Phone(String value) {
-        this.value = value;
+    public Phone() {
+        this.value = "";
+    }
+
+    public static Phone newInstance(String value) {
+        return new Phone(value);
     }
 }

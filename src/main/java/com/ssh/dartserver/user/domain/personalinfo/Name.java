@@ -2,18 +2,24 @@ package com.ssh.dartserver.user.domain.personalinfo;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
 @Getter
+@RequiredArgsConstructor
 @Embeddable
-@NoArgsConstructor
 public class Name {
     @Column(name = "name")
-    private String value;
+    private final String value;
 
-    public Name(String value) {
-        this.value = value;
+    public Name() {
+        this.value = "";
     }
+
+    public static Name newInstance(String value) {
+        return new Name(value);
+    }
+
 }
