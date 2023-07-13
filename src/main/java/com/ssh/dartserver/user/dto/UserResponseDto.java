@@ -8,6 +8,7 @@ public class UserResponseDto {
     private String name;
     private String phone;
     private String gender;
-    private String admissionYear;
+    private int admissionYear;
+    private int birthYear;
     private String recommendationCode;
 }

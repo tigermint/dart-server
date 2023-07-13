@@ -25,11 +25,16 @@ public class PersonalInfo {
     @Embedded
     private AdmissionYear admissionYear;
 
+    @Embedded
+    private BirthYear birthYear;
+
+
     @Builder
-    public PersonalInfo(Name name, Phone phone, Gender gender, AdmissionYear admissionYear) {
+    public PersonalInfo(Name name, Phone phone, Gender gender, AdmissionYear admissionYear, BirthYear birthYear) {
         this.name = name;
         this.phone = phone;
         this.gender = gender;
         this.admissionYear = admissionYear;
+        this.birthYear = birthYear;
     }
 }

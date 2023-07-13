@@ -3,12 +3,9 @@ package com.ssh.dartserver.user.service;
 import com.ssh.dartserver.university.domain.University;
 import com.ssh.dartserver.university.infra.mapper.UniversityMapper;
 import com.ssh.dartserver.university.infra.persistence.UniversityRepository;
+import com.ssh.dartserver.user.domain.personalinfo.*;
 import com.ssh.dartserver.user.dto.UserNextVoteResponseDto;
 import com.ssh.dartserver.user.domain.User;
-import com.ssh.dartserver.user.domain.personalinfo.AdmissionYear;
-import com.ssh.dartserver.user.domain.personalinfo.Name;
-import com.ssh.dartserver.user.domain.personalinfo.PersonalInfo;
-import com.ssh.dartserver.user.domain.personalinfo.Phone;
 import com.ssh.dartserver.user.domain.recommendcode.RandomRecommendCodeGenerator;
 import com.ssh.dartserver.user.dto.UserRequestDto;
 import com.ssh.dartserver.user.dto.UserWithUniversityResponseDto;
@@ -23,7 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 
 public class UserService {
-
     private static final int NEXT_VOTE_AVAILABLE_MINUTES = 40;
 
     private final UserRepository userRepository;
@@ -69,10 +65,11 @@ public class UserService {
 
     private PersonalInfo getPersonalInfo(UserRequestDto userRequestDto) {
         return PersonalInfo.builder()
-                .phone(new Phone(userRequestDto.getPhone()))
-                .name(new Name(userRequestDto.getName()))
+                .phone(Phone.newInstance(userRequestDto.getPhone()))
+                .name(Name.newInstance(userRequestDto.getName()))
+                .admissionYear(AdmissionYear.newInstance(userRequestDto.getAdmissionYear()))
+                .birthYear(BirthYear.newInstance(userRequestDto.getBirthYear()))
                 .gender(userRequestDto.getGender())
-                .admissionYear(new AdmissionYear(userRequestDto.getAdmissionYear()))
                 .build();
     }
 
