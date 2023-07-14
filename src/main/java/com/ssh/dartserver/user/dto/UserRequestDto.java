@@ -22,7 +22,7 @@ public class UserRequestDto {
     private String name;
 
     @NotBlank(message = "휴대폰번호를 입력해주세요")
-    @Pattern(regexp = "^01[016789]-?\\d{3,4}-?\\d{4}$", message = "휴대폰번호를 정확히 입력해주세요")
+    @Pattern(regexp = "^01[016789]\\d{3,4}\\d{4}$", message = "휴대폰번호를 정확히 입력해주세요")
     private String phone;
 
     @NotNull(message = "성별을 선택해주세요")
