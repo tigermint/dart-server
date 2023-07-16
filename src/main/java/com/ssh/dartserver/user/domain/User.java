@@ -42,6 +42,7 @@ public class User extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "university_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private University university;
+
     public void updateWithRecommendationCode(PersonalInfo personalInfo, University university, RandomRecommendCodeGeneratable randomGenerator) {
         this.personalInfo = personalInfo;
         this.university = university;

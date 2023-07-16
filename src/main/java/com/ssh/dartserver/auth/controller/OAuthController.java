@@ -18,12 +18,12 @@ public class OAuthController {
     private final OAuthService oAuthService;
 
     @PostMapping("/v1/auth/kakao")
-    public ResponseEntity<TokenResponse> jwtCreate(@Valid @RequestBody KakaoTokenRequest request) {
+    public ResponseEntity<TokenResponse> jwtCreateForKakao(@Valid @RequestBody KakaoTokenRequest request) {
         return ResponseEntity.ok(oAuthService.createTokenForKakao(request));
     }
 
     @PostMapping("/v1/auth/apple")
-    public ResponseEntity<TokenResponse> jwtCreate4Apple(@Valid @RequestBody AppleTokenRequest request) {
+    public ResponseEntity<TokenResponse> jwtCreateForApple(@Valid @RequestBody AppleTokenRequest request) {
         return ResponseEntity.ok(oAuthService.createTokenForApple(request));
     }
 }
