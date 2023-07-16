@@ -30,4 +30,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleSignatureVerificationException(SignatureVerificationException ex) {
         return ResponseEntity.badRequest().body(ex.getMessage());
     }
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<String> handleRuntimeException(RuntimeException ex) {
+        return ResponseEntity.badRequest().body(ex.getMessage());
+    }
 }
