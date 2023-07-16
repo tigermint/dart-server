@@ -1,10 +1,10 @@
 package com.ssh.dartserver.user.infra.mapper;
 
-import com.ssh.dartserver.university.dto.UniversityResponseDto;
-import com.ssh.dartserver.user.dto.UserNextVoteResponseDto;
+import com.ssh.dartserver.university.dto.UniversityResponse;
+import com.ssh.dartserver.user.dto.UserNextVoteResponse;
 import com.ssh.dartserver.user.domain.User;
-import com.ssh.dartserver.user.dto.UserResponseDto;
-import com.ssh.dartserver.user.dto.UserWithUniversityResponseDto;
+import com.ssh.dartserver.user.dto.UserResponse;
+import com.ssh.dartserver.user.dto.UserWithUniversityResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -13,7 +13,7 @@ public interface UserMapper {
 
     @Mapping(target = "userResponseDto", source = "userResponseDto")
     @Mapping(target = "universityResponseDto", source = "universityResponseDto")
-    UserWithUniversityResponseDto toUserWithUniversityResponseDto(UserResponseDto userResponseDto, UniversityResponseDto universityResponseDto);
+    UserWithUniversityResponse toUserWithUniversityResponseDto(UserResponse userResponseDto, UniversityResponse universityResponseDto);
 
     @Mapping(target = "name", source = "user.personalInfo.name.value")
     @Mapping(target = "phone", source = "user.personalInfo.phone.value")
@@ -21,8 +21,8 @@ public interface UserMapper {
     @Mapping(target = "admissionYear", source = "user.personalInfo.admissionYear.value")
     @Mapping(target = "birthYear", source = "user.personalInfo.birthYear.value")
     @Mapping(target = "recommendationCode", source = "user.recommendationCode.value")
-    UserResponseDto toUserResponseDto(User user);
+    UserResponse toUserResponseDto(User user);
 
     @Mapping(target = "nextVoteAvailableDateTime", source = "user.nextVoteAvailableDateTime.value")
-    UserNextVoteResponseDto toUserNextVoteResponseDto(User user);
+    UserNextVoteResponse toUserNextVoteResponseDto(User user);
 }

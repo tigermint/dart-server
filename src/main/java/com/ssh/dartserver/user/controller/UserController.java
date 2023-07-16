@@ -1,9 +1,9 @@
 package com.ssh.dartserver.user.controller;
 
 import com.ssh.dartserver.auth.service.oauth.PrincipalDetails;
-import com.ssh.dartserver.user.dto.UserNextVoteResponseDto;
-import com.ssh.dartserver.user.dto.UserRequestDto;
-import com.ssh.dartserver.user.dto.UserWithUniversityResponseDto;
+import com.ssh.dartserver.user.dto.UserNextVoteResponse;
+import com.ssh.dartserver.user.dto.UserRequest;
+import com.ssh.dartserver.user.dto.UserWithUniversityResponse;
 import com.ssh.dartserver.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,19 +19,19 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("/signup")
-    public ResponseEntity<UserWithUniversityResponseDto> signup(Authentication authentication, @Valid @RequestBody UserRequestDto request) {
+    public ResponseEntity<UserWithUniversityResponse> signup(Authentication authentication, @Valid @RequestBody UserRequest request) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         return ResponseEntity.ok(userService.completeSignupWithRecommendationCode(principal.getUser(), request));
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UserWithUniversityResponseDto> read(Authentication authentication) {
+    public ResponseEntity<UserWithUniversityResponse> read(Authentication authentication) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         return ResponseEntity.ok(userService.read(principal.getUser().getId()));
     }
 
     @PutMapping("/me")
-    public ResponseEntity<UserWithUniversityResponseDto> update(Authentication authentication, @Valid @RequestBody UserRequestDto request) {
+    public ResponseEntity<UserWithUniversityResponse> update(Authentication authentication, @Valid @RequestBody UserRequest request) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         return ResponseEntity.ok(userService.updateUserInformation(principal.getUser(), request));
     }
@@ -44,7 +44,7 @@ public class UserController {
     }
 
     @GetMapping("/me/next-voting-time")
-    public ResponseEntity<UserNextVoteResponseDto> readNextVoteAvailableDateTime(Authentication authentication) {
+    public ResponseEntity<UserNextVoteResponse> readNextVoteAvailableDateTime(Authentication authentication) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         return ResponseEntity.ok(userService.updateUserNextVoteAvailableDateTime(principal.getUser()));
     }

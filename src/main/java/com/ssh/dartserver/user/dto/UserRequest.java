@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 @Data
-public class UserRequestDto {
+public class UserRequest {
     @NotNull(message = "학교를 선택해주세요")
     private Long universityId;
 

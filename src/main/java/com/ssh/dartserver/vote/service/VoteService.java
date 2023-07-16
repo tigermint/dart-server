@@ -8,8 +8,8 @@ import com.ssh.dartserver.user.domain.User;
 import com.ssh.dartserver.user.infra.mapper.UserMapper;
 import com.ssh.dartserver.user.infra.persistence.UserRepository;
 import com.ssh.dartserver.vote.domain.Vote;
-import com.ssh.dartserver.vote.dto.request.VoteResultRequestDto;
-import com.ssh.dartserver.vote.dto.response.ReceivedVoteResponseDto;
+import com.ssh.dartserver.vote.dto.VoteResultRequest;
+import com.ssh.dartserver.vote.dto.ReceivedVoteResponse;
 import com.ssh.dartserver.vote.infra.mapper.VoteMapper;
 import com.ssh.dartserver.vote.infra.persistence.VoteRepository;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +33,7 @@ public class VoteService {
     private final UniversityMapper universityMapper;
 
     @Transactional
-    public void create(User user, VoteResultRequestDto request) {
+    public void create(User user, VoteResultRequest request) {
         Question question = questionRepository.findById(request.getQuestionId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 질문입니다."));
 
@@ -54,7 +54,7 @@ public class VoteService {
         voteRepository.save(vote);
     }
 
-    public ReceivedVoteResponseDto read(Long voteId) {
+    public ReceivedVoteResponse read(Long voteId) {
         Vote vote = voteRepository.findById(voteId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 투표입니다."));
         User pickedUser = userRepository.findById(vote.getPickedUser().getId())
@@ -62,16 +62,16 @@ public class VoteService {
         return getReceivedVoteResponseDto(vote, pickedUser);
     }
 
-    public List<ReceivedVoteResponseDto> list(User user) {
-        List<ReceivedVoteResponseDto> dtos = new ArrayList<>();
+    public List<ReceivedVoteResponse> list(User user) {
+        List<ReceivedVoteResponse> dtos = new ArrayList<>();
         List<Vote> votes = voteRepository.findAllByPickedUserId(user.getId());
         votes.forEach(vote -> {
-            ReceivedVoteResponseDto dto = getReceivedVoteResponseDto(vote, vote.getPickedUser());
+            ReceivedVoteResponse dto = getReceivedVoteResponseDto(vote, vote.getPickedUser());
             dtos.add(dto);
         });
         return dtos;
     }
-    private ReceivedVoteResponseDto getReceivedVoteResponseDto(Vote vote, User pickedUser) {
+    private ReceivedVoteResponse getReceivedVoteResponseDto(Vote vote, User pickedUser) {
         return voteMapper.toReceivedVoteResponseDto(
                 questionMapper.toDto(vote.getQuestion()),
                 userMapper.toUserWithUniversityResponseDto(userMapper.toUserResponseDto(pickedUser), universityMapper.toUniversityResponseDto(pickedUser.getUniversity())),

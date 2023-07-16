@@ -3,7 +3,7 @@ package com.ssh.dartserver.auth.service.jwt;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ssh.dartserver.auth.dto.request.LoginRequestsDto;
+import com.ssh.dartserver.auth.dto.LoginRequest;
 import com.ssh.dartserver.auth.service.oauth.PrincipalDetails;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -30,9 +30,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         ObjectMapper om = new ObjectMapper();
-        LoginRequestsDto loginRequestsDto = null;
+        LoginRequest loginRequestsDto = null;
         try {
-            loginRequestsDto = om.readValue(request.getInputStream(), LoginRequestsDto.class);
+            loginRequestsDto = om.readValue(request.getInputStream(), LoginRequest.class);
         } catch (Exception e) {
             e.printStackTrace();
         }

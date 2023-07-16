@@ -1,9 +1,9 @@
 package com.ssh.dartserver.friend.service;
 
 import com.ssh.dartserver.friend.domain.Friend;
-import com.ssh.dartserver.friend.dto.FriendRecommendationCodeRequestDto;
-import com.ssh.dartserver.friend.dto.FriendRequestDto;
-import com.ssh.dartserver.friend.dto.FriendResponseDto;
+import com.ssh.dartserver.friend.dto.FriendRecommendationCodeRequest;
+import com.ssh.dartserver.friend.dto.FriendRequest;
+import com.ssh.dartserver.friend.dto.FriendResponse;
 import com.ssh.dartserver.friend.infra.mapper.FriendMapper;
 import com.ssh.dartserver.friend.infra.persistence.FriendRepository;
 import com.ssh.dartserver.university.infra.mapper.UniversityMapper;
@@ -30,16 +30,15 @@ public class FriendService {
     private final UniversityMapper universityMapper;
 
     @Transactional
-    public void create(User user, FriendRequestDto request) {
+    public void create(User user, FriendRequest request) {
         isFriend(user, request.getFriendUserId());
         save(request.getFriendUserId(), user);
     }
 
     @Transactional
-    public FriendResponseDto createFriendByRecommendationCode(User user, FriendRecommendationCodeRequestDto request) {
+    public FriendResponse createFriendByRecommendationCode(User user, FriendRecommendationCodeRequest request) {
         User friendUser = userRepository.findByRecommendationCode(new RecommendationCode(request.getRecommendationCode()))
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 추천인 코드입니다."));
-
         isFriend(user, friendUser.getId());
         save(friendUser.getId(), user);
         return friendMapper.toFriendResponseDto(friendUser, universityMapper.toUniversityResponseDto(friendUser.getUniversity()));
@@ -60,9 +59,9 @@ public class FriendService {
                 });
     }
 
-    public List<FriendResponseDto> list(User user) {
+    public List<FriendResponse> list(User user) {
         List<Friend> friends = friendRepository.findAllByUserId(user.getId());
-        List<FriendResponseDto> dtos = new ArrayList<>();
+        List<FriendResponse> dtos = new ArrayList<>();
 
         friends.forEach(friend -> {
             User friendUserInfo = userRepository.findById(friend.getFriendUserId())
@@ -81,8 +80,8 @@ public class FriendService {
         friendRepository.deleteById(friend.getId());
     }
 
-    public List<FriendResponseDto> possibleList(User user) {
-        List<FriendResponseDto> dtos = new ArrayList<>();
+    public List<FriendResponse> possibleList(User user) {
+        List<FriendResponse> dtos = new ArrayList<>();
 
         List<User> friendsOfFriends = friendRepository.findAllFriendsOfFriendsById(user.getId()).stream()
                 .map(userRepository::findById)

@@ -1,9 +1,9 @@
 package com.ssh.dartserver.friend.controller;
 
 import com.ssh.dartserver.auth.service.oauth.PrincipalDetails;
-import com.ssh.dartserver.friend.dto.FriendRecommendationCodeRequestDto;
-import com.ssh.dartserver.friend.dto.FriendRequestDto;
-import com.ssh.dartserver.friend.dto.FriendResponseDto;
+import com.ssh.dartserver.friend.dto.FriendRecommendationCodeRequest;
+import com.ssh.dartserver.friend.dto.FriendRequest;
+import com.ssh.dartserver.friend.dto.FriendResponse;
 import com.ssh.dartserver.friend.service.FriendService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +27,7 @@ public class FriendController {
      * @return
      */
     @PostMapping
-    public ResponseEntity<String> create(Authentication authentication, @RequestBody @Valid FriendRequestDto request){
+    public ResponseEntity<String> create(Authentication authentication, @RequestBody @Valid FriendRequest request){
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         friendService.create(principal.getUser(), request);
         return ResponseEntity.ok("친구 추가 성공");
@@ -41,7 +41,7 @@ public class FriendController {
      */
 
     @PostMapping("/invite")
-    public ResponseEntity<FriendResponseDto> createFriendByRecommendationCode(Authentication authentication, @RequestBody @Valid FriendRecommendationCodeRequestDto request) {
+    public ResponseEntity<FriendResponse> createFriendByRecommendationCode(Authentication authentication, @RequestBody @Valid FriendRecommendationCodeRequest request) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         return ResponseEntity.ok(friendService.createFriendByRecommendationCode(principal.getUser(), request));
     }
@@ -55,7 +55,7 @@ public class FriendController {
      */
 
     @GetMapping
-    public ResponseEntity<List<FriendResponseDto>> list(Authentication authentication, @RequestParam(defaultValue = "false") boolean suggested) {
+    public ResponseEntity<List<FriendResponse>> list(Authentication authentication, @RequestParam(defaultValue = "false") boolean suggested) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         if(suggested) {
             return ResponseEntity.ok(friendService.possibleList(principal.getUser()));

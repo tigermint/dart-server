@@ -1,9 +1,9 @@
-package com.ssh.dartserver.auth.dto.request;
+package com.ssh.dartserver.auth.dto;
 
 import lombok.Data;
 
 @Data
-public class LoginRequestsDto {
+public class LoginRequest {
     private String username;
     private String password;
 }
