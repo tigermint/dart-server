@@ -1,6 +1,6 @@
 package com.ssh.dartserver.question.controller;
 
-import com.ssh.dartserver.question.dto.QuestionResponseDto;
+import com.ssh.dartserver.question.dto.QuestionResponse;
 import com.ssh.dartserver.question.service.QuestionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +15,7 @@ public class QuestionController {
     private final QuestionService questionService;
 
     @GetMapping("/v1/questions")
-    public ResponseEntity<List<QuestionResponseDto>> list() {
+    public ResponseEntity<List<QuestionResponse>> list() {
         return ResponseEntity.ok(questionService.list());
     }
 }

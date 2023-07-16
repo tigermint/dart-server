@@ -1,9 +1,9 @@
 package com.ssh.dartserver.vote.infra.mapper;
 
-import com.ssh.dartserver.question.dto.QuestionResponseDto;
-import com.ssh.dartserver.user.dto.UserWithUniversityResponseDto;
+import com.ssh.dartserver.question.dto.QuestionResponse;
+import com.ssh.dartserver.user.dto.UserWithUniversityResponse;
 import com.ssh.dartserver.vote.domain.Vote;
-import com.ssh.dartserver.vote.dto.response.ReceivedVoteResponseDto;
+import com.ssh.dartserver.vote.dto.ReceivedVoteResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -13,6 +13,6 @@ public interface VoteMapper {
     @Mapping(target = "pickedTime", source = "vote.pickedTime")
     @Mapping(target = "question", source = "question")
     @Mapping(target = "pickedUser", source = "pickedUser")
-    ReceivedVoteResponseDto toReceivedVoteResponseDto(QuestionResponseDto question, UserWithUniversityResponseDto pickedUser, Vote vote);
+    ReceivedVoteResponse toReceivedVoteResponseDto(QuestionResponse question, UserWithUniversityResponse pickedUser, Vote vote);
 
 }

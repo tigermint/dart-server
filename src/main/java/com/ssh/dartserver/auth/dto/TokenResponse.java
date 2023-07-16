@@ -1,13 +1,13 @@
-package com.ssh.dartserver.auth.dto.response;
+package com.ssh.dartserver.auth.dto;
 
 import lombok.Data;
 
 @Data
-public class TokenResponseDto {
+public class TokenResponse {
     private String jwtToken;
     private String providerId;
 
-    public TokenResponseDto(String jwtToken, String providerId) {
+    public TokenResponse(String jwtToken, String providerId) {
         this.jwtToken = jwtToken;
         this.providerId = providerId;
     }

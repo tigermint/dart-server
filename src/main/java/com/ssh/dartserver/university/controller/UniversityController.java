@@ -1,6 +1,6 @@
 package com.ssh.dartserver.university.controller;
 
-import com.ssh.dartserver.university.dto.UniversityResponseDto;
+import com.ssh.dartserver.university.dto.UniversityResponse;
 import com.ssh.dartserver.university.service.UniversityService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +15,7 @@ public class UniversityController {
     private final UniversityService universityService;
 
     @GetMapping("/v1/universities")
-    public ResponseEntity<List<UniversityResponseDto>> list() {
+    public ResponseEntity<List<UniversityResponse>> list() {
         return ResponseEntity.ok(universityService.list());
     }
 }

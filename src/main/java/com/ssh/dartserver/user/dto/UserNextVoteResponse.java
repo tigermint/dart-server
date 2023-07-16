@@ -5,6 +5,6 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-public class UserNextVoteResponseDto {
+public class UserNextVoteResponse {
     private LocalDateTime nextVoteAvailableDateTime;
 }

@@ -1,11 +1,11 @@
-package com.ssh.dartserver.vote.dto.request;
+package com.ssh.dartserver.vote.dto;
 
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 
 @Data
-public class VoteResultRequestDto {
+public class VoteResultRequest {
     @NotNull
     private Long questionId;
     @NotNull

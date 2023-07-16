@@ -1,7 +1,7 @@
 package com.ssh.dartserver.question.service;
 
 import com.ssh.dartserver.question.domain.Question;
-import com.ssh.dartserver.question.dto.QuestionResponseDto;
+import com.ssh.dartserver.question.dto.QuestionResponse;
 import com.ssh.dartserver.question.infra.mapper.QuestionMapper;
 import com.ssh.dartserver.question.infra.persistence.QuestionRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,7 @@ public class QuestionService {
     private final QuestionRepository questionRepository;
     private final QuestionMapper questionMapper;
 
-    public List<QuestionResponseDto> list() {
+    public List<QuestionResponse> list() {
         List<Question> questions = questionRepository.findRandomQuestions();
         return questions.stream()
                 .map(questionMapper::toDto)

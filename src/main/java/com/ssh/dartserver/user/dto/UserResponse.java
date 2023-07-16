@@ -3,7 +3,7 @@ package com.ssh.dartserver.user.dto;
 import lombok.Data;
 
 @Data
-public class UserResponseDto {
+public class UserResponse {
     private Long id;
     private String name;
     private String phone;

@@ -1,7 +1,7 @@
 package com.ssh.dartserver.question.infra.mapper;
 
 import com.ssh.dartserver.question.domain.Question;
-import com.ssh.dartserver.question.dto.QuestionResponseDto;
+import com.ssh.dartserver.question.dto.QuestionResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -9,5 +9,5 @@ import org.mapstruct.Mapping;
 public interface QuestionMapper {
 
     @Mapping(target = "questionId", source = "id")
-    QuestionResponseDto toDto(Question  question);
+    QuestionResponse toDto(Question  question);
 }
