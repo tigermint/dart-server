@@ -6,10 +6,12 @@ import com.ssh.dartserver.university.domain.University;
 import com.ssh.dartserver.user.domain.personalinfo.PersonalInfo;
 import com.ssh.dartserver.user.domain.recommendcode.RandomRecommendCodeGeneratable;
 import com.ssh.dartserver.user.domain.recommendcode.RecommendationCode;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -46,13 +48,17 @@ public class User extends BaseTimeEntity {
     public void updateWithRecommendationCode(PersonalInfo personalInfo, University university, RandomRecommendCodeGeneratable randomGenerator) {
         this.personalInfo = personalInfo;
         this.university = university;
-        this.nextVoteAvailableDateTime = new NextVoteAvailableDateTime(LocalDateTime.now());
+        this.nextVoteAvailableDateTime = NextVoteAvailableDateTime.newInstance();
         this.recommendationCode = RecommendationCode.generate(randomGenerator);
     }
 
     public void update(PersonalInfo personalInfo, University university) {
         this.personalInfo = personalInfo;
         this.university = university;
+    }
+
+    public void updateNextVoteAvailableDateTime(int value) {
+        this.nextVoteAvailableDateTime = NextVoteAvailableDateTime.plusMinutes(value);
     }
 
 }

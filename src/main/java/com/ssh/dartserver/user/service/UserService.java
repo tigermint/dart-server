@@ -3,10 +3,10 @@ package com.ssh.dartserver.user.service;
 import com.ssh.dartserver.university.domain.University;
 import com.ssh.dartserver.university.infra.mapper.UniversityMapper;
 import com.ssh.dartserver.university.infra.persistence.UniversityRepository;
-import com.ssh.dartserver.user.domain.personalinfo.*;
-import com.ssh.dartserver.user.dto.UserNextVoteResponse;
 import com.ssh.dartserver.user.domain.User;
+import com.ssh.dartserver.user.domain.personalinfo.*;
 import com.ssh.dartserver.user.domain.recommendcode.RandomRecommendCodeGenerator;
+import com.ssh.dartserver.user.dto.UserNextVoteResponse;
 import com.ssh.dartserver.user.dto.UserRequest;
 import com.ssh.dartserver.user.dto.UserWithUniversityResponse;
 import com.ssh.dartserver.user.infra.mapper.UserMapper;
@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-
 public class UserService {
     private static final int NEXT_VOTE_AVAILABLE_MINUTES = 40;
 
@@ -51,11 +50,12 @@ public class UserService {
         return userMapper.toUserWithUniversityResponseDto(userMapper.toUserResponseDto(user),
                 universityMapper.toUniversityResponseDto(user.getUniversity()));
     }
+
     @Transactional
     public UserNextVoteResponse updateUserNextVoteAvailableDateTime(User user) {
-        user.getNextVoteAvailableDateTime().plusMinutes(NEXT_VOTE_AVAILABLE_MINUTES);
+        user.updateNextVoteAvailableDateTime(NEXT_VOTE_AVAILABLE_MINUTES);
         userRepository.save(user);
-        return userMapper.toUserNextVoteResponseDto(user);
+        return userMapper.toUserNextVoteResponseDto(user.getNextVoteAvailableDateTime().getValue());
     }
 
     @Transactional
