@@ -1,12 +1,14 @@
 package com.ssh.dartserver.user.infra.mapper;
 
 import com.ssh.dartserver.university.dto.UniversityResponse;
-import com.ssh.dartserver.user.dto.UserNextVoteResponse;
 import com.ssh.dartserver.user.domain.User;
+import com.ssh.dartserver.user.dto.UserNextVoteResponse;
 import com.ssh.dartserver.user.dto.UserResponse;
 import com.ssh.dartserver.user.dto.UserWithUniversityResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+
+import java.time.LocalDateTime;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
@@ -23,6 +25,6 @@ public interface UserMapper {
     @Mapping(target = "recommendationCode", source = "user.recommendationCode.value")
     UserResponse toUserResponseDto(User user);
 
-    @Mapping(target = "nextVoteAvailableDateTime", source = "user.nextVoteAvailableDateTime.value")
-    UserNextVoteResponse toUserNextVoteResponseDto(User user);
+    @Mapping(target = "nextVoteAvailableDateTime", source = "nextVoteAvailableDateTime")
+    UserNextVoteResponse toUserNextVoteResponseDto(LocalDateTime nextVoteAvailableDateTime);
 }
