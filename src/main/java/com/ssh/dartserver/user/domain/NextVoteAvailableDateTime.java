@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 @Embeddable
 @Getter
@@ -21,14 +22,13 @@ public class NextVoteAvailableDateTime {
     }
 
     public static NextVoteAvailableDateTime newInstance() {
-        return new NextVoteAvailableDateTime(
-                DateTimeUtils.nowFromZone()
-        );
+        return new NextVoteAvailableDateTime(DateTimeUtils.nowFromZone());
     }
 
     public static NextVoteAvailableDateTime plusMinutes(int value) {
         return new NextVoteAvailableDateTime(
-                DateTimeUtils.nowFromZone().plusMinutes(value)
-        );
+                DateTimeUtils.nowFromZone()
+                        .plusMinutes(value)
+                        .truncatedTo(ChronoUnit.SECONDS));
     }
 }

@@ -46,7 +46,13 @@ public class UserController {
     @GetMapping("/me/next-voting-time")
     public ResponseEntity<UserNextVoteResponse> readNextVoteAvailableDateTime(Authentication authentication) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
-        return ResponseEntity.ok(userService.updateUserNextVoteAvailableDateTime(principal.getUser()));
+        return ResponseEntity.ok(userService.readNextVoteAvailableDateTime(principal.getUser()));
+    }
+
+    @PostMapping("/me/next-voting-time")
+    public ResponseEntity<UserNextVoteResponse> updateNextVoteAvailableDateTime(Authentication authentication) {
+        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
+        return ResponseEntity.ok(userService.updateNextVoteAvailableDateTime(principal.getUser()));
     }
 
 }

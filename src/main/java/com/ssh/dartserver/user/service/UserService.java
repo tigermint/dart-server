@@ -51,8 +51,12 @@ public class UserService {
                 universityMapper.toUniversityResponseDto(user.getUniversity()));
     }
 
+    public UserNextVoteResponse readNextVoteAvailableDateTime(User user) {
+        return userMapper.toUserNextVoteResponseDto(user.getNextVoteAvailableDateTime().getValue());
+    }
+
     @Transactional
-    public UserNextVoteResponse updateUserNextVoteAvailableDateTime(User user) {
+    public UserNextVoteResponse updateNextVoteAvailableDateTime(User user) {
         user.updateNextVoteAvailableDateTime(NEXT_VOTE_AVAILABLE_MINUTES);
         userRepository.save(user);
         return userMapper.toUserNextVoteResponseDto(user.getNextVoteAvailableDateTime().getValue());
