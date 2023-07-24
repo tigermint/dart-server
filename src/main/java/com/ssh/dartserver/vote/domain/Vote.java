@@ -21,6 +21,7 @@ public class Vote{
     private Long secondUserId;
     private Long thirdUserId;
     private Long fourthUserId;
+
     private LocalDateTime pickedTime;
 
     @ManyToOne(fetch = FetchType.LAZY)
