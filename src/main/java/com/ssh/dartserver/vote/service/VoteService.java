@@ -1,5 +1,6 @@
 package com.ssh.dartserver.vote.service;
 
+import com.ssh.dartserver.common.utils.DateTimeUtils;
 import com.ssh.dartserver.question.domain.Question;
 import com.ssh.dartserver.question.infra.mapper.QuestionMapper;
 import com.ssh.dartserver.question.infra.persistence.QuestionRepository;
@@ -8,15 +9,14 @@ import com.ssh.dartserver.user.domain.User;
 import com.ssh.dartserver.user.infra.mapper.UserMapper;
 import com.ssh.dartserver.user.infra.persistence.UserRepository;
 import com.ssh.dartserver.vote.domain.Vote;
-import com.ssh.dartserver.vote.dto.VoteResultRequest;
 import com.ssh.dartserver.vote.dto.ReceivedVoteResponse;
+import com.ssh.dartserver.vote.dto.VoteResultRequest;
 import com.ssh.dartserver.vote.infra.mapper.VoteMapper;
 import com.ssh.dartserver.vote.infra.persistence.VoteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,10 +27,12 @@ public class VoteService {
     private final VoteRepository voteRepository;
     private final QuestionRepository questionRepository;
     private final UserRepository userRepository;
+
     private final VoteMapper voteMapper;
     private final QuestionMapper questionMapper;
     private final UserMapper userMapper;
     private final UniversityMapper universityMapper;
+
 
     @Transactional
     public void create(User user, VoteResultRequest request) {
@@ -45,7 +47,7 @@ public class VoteService {
                 .secondUserId(request.getSecondUserId())
                 .thirdUserId(request.getThirdUserId())
                 .fourthUserId(request.getFourthUserId())
-                .pickedTime(LocalDateTime.now())
+                .pickedTime(DateTimeUtils.nowFromZone())
                 .pickedUser(pickedUser)
                 .user(user)
                 .question(question)
