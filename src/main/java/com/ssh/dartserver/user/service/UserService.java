@@ -1,5 +1,6 @@
 package com.ssh.dartserver.user.service;
 
+import com.ssh.dartserver.friend.infra.persistence.FriendRepository;
 import com.ssh.dartserver.university.domain.University;
 import com.ssh.dartserver.university.infra.mapper.UniversityMapper;
 import com.ssh.dartserver.university.infra.persistence.UniversityRepository;
@@ -20,12 +21,15 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserService {
     private static final int NEXT_VOTE_AVAILABLE_MINUTES = 40;
+    private final RandomRecommendCodeGenerator randomGenerator;
 
     private final UserRepository userRepository;
     private final UniversityRepository universityRepository;
+    private final FriendRepository friendRepository;
+
     private final UserMapper userMapper;
     private final UniversityMapper universityMapper;
-    private final RandomRecommendCodeGenerator randomGenerator;
+
 
     public UserWithUniversityResponse read(Long id) {
         User user = userRepository.findById(id)
@@ -64,6 +68,7 @@ public class UserService {
 
     @Transactional
     public void delete(User user) {
+        friendRepository.deleteAllByUserIdAndFriendUserId(user.getId(), user.getId());
         userRepository.delete(user);
     }
 
