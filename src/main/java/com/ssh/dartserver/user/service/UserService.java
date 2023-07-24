@@ -12,6 +12,7 @@ import com.ssh.dartserver.user.dto.UserRequest;
 import com.ssh.dartserver.user.dto.UserWithUniversityResponse;
 import com.ssh.dartserver.user.infra.mapper.UserMapper;
 import com.ssh.dartserver.user.infra.persistence.UserRepository;
+import com.ssh.dartserver.vote.infra.persistence.VoteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +27,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final UniversityRepository universityRepository;
     private final FriendRepository friendRepository;
+    private final VoteRepository voteRepository;
 
     private final UserMapper userMapper;
     private final UniversityMapper universityMapper;
@@ -69,6 +71,7 @@ public class UserService {
     @Transactional
     public void delete(User user) {
         friendRepository.deleteAllByUserIdAndFriendUserId(user.getId(), user.getId());
+        voteRepository.deleteAllByPickedUserId(user.getId());
         userRepository.delete(user);
     }
 
