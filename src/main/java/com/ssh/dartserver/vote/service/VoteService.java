@@ -1,18 +1,19 @@
 package com.ssh.dartserver.vote.service;
 
 import com.ssh.dartserver.common.utils.DateTimeUtils;
+import com.ssh.dartserver.notification.PlatformNotification;
 import com.ssh.dartserver.question.domain.Question;
-import com.ssh.dartserver.question.infra.mapper.QuestionMapper;
-import com.ssh.dartserver.question.infra.persistence.QuestionRepository;
-import com.ssh.dartserver.university.infra.mapper.UniversityMapper;
+import com.ssh.dartserver.question.dto.mapper.QuestionMapper;
+import com.ssh.dartserver.question.infra.QuestionRepository;
+import com.ssh.dartserver.university.dto.mapper.UniversityMapper;
 import com.ssh.dartserver.user.domain.User;
-import com.ssh.dartserver.user.infra.mapper.UserMapper;
-import com.ssh.dartserver.user.infra.persistence.UserRepository;
+import com.ssh.dartserver.user.dto.mapper.UserMapper;
+import com.ssh.dartserver.user.infra.UserRepository;
 import com.ssh.dartserver.vote.domain.Vote;
 import com.ssh.dartserver.vote.dto.ReceivedVoteResponse;
 import com.ssh.dartserver.vote.dto.VoteResultRequest;
-import com.ssh.dartserver.vote.infra.mapper.VoteMapper;
-import com.ssh.dartserver.vote.infra.persistence.VoteRepository;
+import com.ssh.dartserver.vote.dto.mapper.VoteMapper;
+import com.ssh.dartserver.vote.infra.VoteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,6 +33,8 @@ public class VoteService {
     private final QuestionMapper questionMapper;
     private final UserMapper userMapper;
     private final UniversityMapper universityMapper;
+
+    private final PlatformNotification notification;
 
 
     @Transactional
@@ -53,6 +56,11 @@ public class VoteService {
                 .question(question)
                 .build();
 
+        String contents = String.format("%d학번 %s학생이 당신을 투표했어요!",
+                user.getPersonalInfo().getAdmissionYear().getValue() - 2000,
+                user.getPersonalInfo().getGender().getKorValue());
+
+        notification.postNotificationSpecificDevice(pickedUser.getId(), contents);
         voteRepository.save(vote);
     }
 

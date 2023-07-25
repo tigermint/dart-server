@@ -1,18 +1,20 @@
 package com.ssh.dartserver.user.service;
 
-import com.ssh.dartserver.friend.infra.persistence.FriendRepository;
+import com.ssh.dartserver.common.utils.DateTimeUtils;
+import com.ssh.dartserver.friend.infra.FriendRepository;
+import com.ssh.dartserver.notification.PlatformNotification;
 import com.ssh.dartserver.university.domain.University;
-import com.ssh.dartserver.university.infra.mapper.UniversityMapper;
-import com.ssh.dartserver.university.infra.persistence.UniversityRepository;
+import com.ssh.dartserver.university.dto.mapper.UniversityMapper;
+import com.ssh.dartserver.university.infra.UniversityRepository;
 import com.ssh.dartserver.user.domain.User;
 import com.ssh.dartserver.user.domain.personalinfo.*;
 import com.ssh.dartserver.user.domain.recommendcode.RandomRecommendCodeGenerator;
 import com.ssh.dartserver.user.dto.UserNextVoteResponse;
 import com.ssh.dartserver.user.dto.UserRequest;
 import com.ssh.dartserver.user.dto.UserWithUniversityResponse;
-import com.ssh.dartserver.user.infra.mapper.UserMapper;
-import com.ssh.dartserver.user.infra.persistence.UserRepository;
-import com.ssh.dartserver.vote.infra.persistence.VoteRepository;
+import com.ssh.dartserver.user.dto.mapper.UserMapper;
+import com.ssh.dartserver.user.infra.UserRepository;
+import com.ssh.dartserver.vote.infra.VoteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +33,8 @@ public class UserService {
 
     private final UserMapper userMapper;
     private final UniversityMapper universityMapper;
+
+    private final PlatformNotification notification;
 
 
     public UserWithUniversityResponse read(Long id) {
@@ -64,7 +68,13 @@ public class UserService {
     @Transactional
     public UserNextVoteResponse updateNextVoteAvailableDateTime(User user) {
         user.updateNextVoteAvailableDateTime(NEXT_VOTE_AVAILABLE_MINUTES);
+
         userRepository.save(user);
+
+        //사용자의 다음 투표 가능 시간 예약
+        String contents = "새로운 투표가 가능합니다. Dart로 돌아와주세요!";
+        notification.postNotificationNextVoteAvailableDateTime(user.getId(), DateTimeUtils.toUTC(user.getNextVoteAvailableDateTime().getValue()), contents);
+
         return userMapper.toUserNextVoteResponseDto(user.getNextVoteAvailableDateTime().getValue());
     }
 
