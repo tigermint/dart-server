@@ -1,4 +1,4 @@
-package com.ssh.dartserver.university.infra.persistence;
+package com.ssh.dartserver.university.infra;
 
 import com.ssh.dartserver.university.domain.University;
 import org.springframework.data.domain.Sort;

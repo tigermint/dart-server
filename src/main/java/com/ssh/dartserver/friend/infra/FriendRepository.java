@@ -1,4 +1,4 @@
-package com.ssh.dartserver.friend.infra.persistence;
+package com.ssh.dartserver.friend.infra;
 
 import com.ssh.dartserver.friend.domain.Friend;
 import org.springframework.data.jpa.repository.JpaRepository;

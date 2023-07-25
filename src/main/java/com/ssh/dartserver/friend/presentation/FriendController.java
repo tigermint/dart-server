@@ -1,4 +1,4 @@
-package com.ssh.dartserver.friend.controller;
+package com.ssh.dartserver.friend.presentation;
 
 import com.ssh.dartserver.auth.service.oauth.PrincipalDetails;
 import com.ssh.dartserver.friend.dto.FriendRecommendationCodeRequest;

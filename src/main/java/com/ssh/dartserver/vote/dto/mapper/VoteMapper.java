@@ -1,4 +1,4 @@
-package com.ssh.dartserver.vote.infra.mapper;
+package com.ssh.dartserver.vote.dto.mapper;
 
 import com.ssh.dartserver.question.dto.QuestionResponse;
 import com.ssh.dartserver.user.dto.UserWithUniversityResponse;

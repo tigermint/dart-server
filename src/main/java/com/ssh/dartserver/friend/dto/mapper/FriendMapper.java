@@ -1,4 +1,4 @@
-package com.ssh.dartserver.friend.infra.mapper;
+package com.ssh.dartserver.friend.dto.mapper;
 
 import com.ssh.dartserver.friend.dto.FriendResponse;
 import com.ssh.dartserver.university.dto.UniversityResponse;

@@ -1,4 +1,4 @@
-package com.ssh.dartserver.question.infra.persistence;
+package com.ssh.dartserver.question.infra;
 
 import com.ssh.dartserver.question.domain.Question;
 import org.springframework.data.jpa.repository.JpaRepository;

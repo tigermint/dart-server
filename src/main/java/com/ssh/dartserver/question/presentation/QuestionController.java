@@ -1,4 +1,4 @@
-package com.ssh.dartserver.question.controller;
+package com.ssh.dartserver.question.presentation;
 
 import com.ssh.dartserver.question.dto.QuestionResponse;
 import com.ssh.dartserver.question.service.QuestionService;
