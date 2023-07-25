@@ -1,4 +1,4 @@
-package com.ssh.dartserver.question.infra.mapper;
+package com.ssh.dartserver.question.dto.mapper;
 
 import com.ssh.dartserver.question.domain.Question;
 import com.ssh.dartserver.question.dto.QuestionResponse;

@@ -1,4 +1,4 @@
-package com.ssh.dartserver.user.infra.persistence;
+package com.ssh.dartserver.user.infra;
 
 import com.ssh.dartserver.user.domain.User;
 import com.ssh.dartserver.user.domain.recommendcode.RecommendationCode;

@@ -2,8 +2,8 @@ package com.ssh.dartserver.question.service;
 
 import com.ssh.dartserver.question.domain.Question;
 import com.ssh.dartserver.question.dto.QuestionResponse;
-import com.ssh.dartserver.question.infra.mapper.QuestionMapper;
-import com.ssh.dartserver.question.infra.persistence.QuestionRepository;
+import com.ssh.dartserver.question.dto.mapper.QuestionMapper;
+import com.ssh.dartserver.question.infra.QuestionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

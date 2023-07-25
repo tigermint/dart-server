@@ -1,4 +1,4 @@
-package com.ssh.dartserver.user.infra.mapper;
+package com.ssh.dartserver.user.dto.mapper;
 
 import com.ssh.dartserver.university.dto.UniversityResponse;
 import com.ssh.dartserver.user.domain.User;

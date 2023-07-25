@@ -1,4 +1,4 @@
-package com.ssh.dartserver.user.controller;
+package com.ssh.dartserver.user.presentation;
 
 import com.ssh.dartserver.auth.service.oauth.PrincipalDetails;
 import com.ssh.dartserver.user.dto.UserNextVoteResponse;

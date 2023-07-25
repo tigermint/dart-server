@@ -1,4 +1,4 @@
-package com.ssh.dartserver.university.controller;
+package com.ssh.dartserver.university.presentation;
 
 import com.ssh.dartserver.university.dto.UniversityResponse;
 import com.ssh.dartserver.university.service.UniversityService;

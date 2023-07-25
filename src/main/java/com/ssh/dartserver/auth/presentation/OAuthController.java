@@ -1,4 +1,4 @@
-package com.ssh.dartserver.auth.controller;
+package com.ssh.dartserver.auth.presentation;
 
 import com.ssh.dartserver.auth.dto.AppleTokenRequest;
 import com.ssh.dartserver.auth.dto.KakaoTokenRequest;

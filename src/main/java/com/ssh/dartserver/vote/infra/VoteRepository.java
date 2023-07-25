@@ -1,4 +1,4 @@
-package com.ssh.dartserver.vote.infra.persistence;
+package com.ssh.dartserver.vote.infra;
 
 import com.ssh.dartserver.vote.domain.Vote;
 import org.springframework.data.jpa.repository.JpaRepository;

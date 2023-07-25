@@ -1,8 +1,8 @@
 package com.ssh.dartserver.university.service;
 
 import com.ssh.dartserver.university.dto.UniversityResponse;
-import com.ssh.dartserver.university.infra.mapper.UniversityMapper;
-import com.ssh.dartserver.university.infra.persistence.UniversityRepository;
+import com.ssh.dartserver.university.dto.mapper.UniversityMapper;
+import com.ssh.dartserver.university.infra.UniversityRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;

@@ -20,7 +20,7 @@ import com.ssh.dartserver.user.domain.personalinfo.Gender;
 import com.ssh.dartserver.user.domain.personalinfo.PersonalInfo;
 import com.ssh.dartserver.auth.dto.ApplePublicKey;
 import com.ssh.dartserver.auth.dto.GetApplePublicKeyResponse;
-import com.ssh.dartserver.user.infra.persistence.UserRepository;
+import com.ssh.dartserver.user.infra.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
