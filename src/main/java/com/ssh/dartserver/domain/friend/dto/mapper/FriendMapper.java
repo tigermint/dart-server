@@ -11,6 +11,7 @@ public interface FriendMapper {
 
     @Mapping(target = "userId", source = "friendUserInfo.id")
     @Mapping(target = "admissionYear", source = "friendUserInfo.personalInfo.admissionYear.value")
+    @Mapping(target="gender", source = "friendUserInfo.personalInfo.gender.value")
     @Mapping(target = "name", source = "friendUserInfo.personalInfo.name.value")
     @Mapping(target = "university", source = "university")
     FriendResponse toFriendResponseDto(User friendUserInfo, UniversityResponse university);

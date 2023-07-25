@@ -1,21 +1,20 @@
 package com.ssh.dartserver.domain.user.service;
 
-import com.ssh.dartserver.domain.user.domain.personalinfo.*;
-import com.ssh.dartserver.domain.user.dto.UserRequest;
-import com.ssh.dartserver.domain.user.infra.UserRepository;
-import com.ssh.dartserver.global.utils.DateTimeUtils;
 import com.ssh.dartserver.domain.friend.infra.FriendRepository;
-import com.ssh.dartserver.global.infra.notification.PlatformNotification;
 import com.ssh.dartserver.domain.university.domain.University;
 import com.ssh.dartserver.domain.university.dto.mapper.UniversityMapper;
 import com.ssh.dartserver.domain.university.infra.UniversityRepository;
 import com.ssh.dartserver.domain.user.domain.User;
-import com.ssh.dartserver.user.domain.personalinfo.*;
+import com.ssh.dartserver.domain.user.domain.personalinfo.*;
 import com.ssh.dartserver.domain.user.domain.recommendcode.RandomRecommendCodeGenerator;
 import com.ssh.dartserver.domain.user.dto.UserNextVoteResponse;
+import com.ssh.dartserver.domain.user.dto.UserRequest;
 import com.ssh.dartserver.domain.user.dto.UserWithUniversityResponse;
 import com.ssh.dartserver.domain.user.dto.mapper.UserMapper;
+import com.ssh.dartserver.domain.user.infra.UserRepository;
 import com.ssh.dartserver.domain.vote.infra.VoteRepository;
+import com.ssh.dartserver.global.infra.notification.PlatformNotification;
+import com.ssh.dartserver.global.utils.DateTimeUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

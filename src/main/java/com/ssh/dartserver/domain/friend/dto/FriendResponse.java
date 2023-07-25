@@ -7,6 +7,7 @@ import lombok.Data;
 public class FriendResponse {
     private Long userId;
     private String name;
+    private String gender;
     private int admissionYear;
     private UniversityResponse university;
 }
