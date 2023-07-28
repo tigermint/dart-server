@@ -67,24 +67,27 @@ public class VoteService {
     public ReceivedVoteResponse read(Long voteId) {
         Vote vote = voteRepository.findById(voteId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 투표입니다."));
-        User pickedUser = userRepository.findById(vote.getPickedUser().getId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
-        return getReceivedVoteResponseDto(vote, pickedUser);
+        return getReceivedVoteResponseDto(vote);
     }
+
+    //TODO: 투표에서 나에게 투표를 한 사람의 정보를 가지고와야 함
 
     public List<ReceivedVoteResponse> list(User user) {
         List<ReceivedVoteResponse> dtos = new ArrayList<>();
+        //TODO: 나에게 투표한 사람 정보
         List<Vote> votes = voteRepository.findAllByPickedUserId(user.getId());
         votes.forEach(vote -> {
-            ReceivedVoteResponse dto = getReceivedVoteResponseDto(vote, vote.getPickedUser());
+            ReceivedVoteResponse dto = getReceivedVoteResponseDto(vote);
             dtos.add(dto);
         });
         return dtos;
     }
-    private ReceivedVoteResponse getReceivedVoteResponseDto(Vote vote, User pickedUser) {
+    private ReceivedVoteResponse getReceivedVoteResponseDto(Vote vote) {
         return voteMapper.toReceivedVoteResponseDto(
                 questionMapper.toDto(vote.getQuestion()),
-                userMapper.toUserWithUniversityResponseDto(userMapper.toUserResponseDto(pickedUser), universityMapper.toUniversityResponseDto(pickedUser.getUniversity())),
+                userMapper.toUserWithUniversityResponseDto(
+                        userMapper.toUserResponseDto(vote.getUser()),
+                        universityMapper.toUniversityResponseDto(vote.getUser().getUniversity())),
                 vote
         );
     }
