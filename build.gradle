@@ -10,13 +10,16 @@ jib{
         image='adoptopenjdk/openjdk11:jre-11.0.2.9-alpine'
     }
     to{
-        image='asia-northeast3-docker.pkg.dev/dart-388516/cloud-run-source-deploy/dart-server'
+        image='asia-northeast3-docker.pkg.dev/dart-388516/cloud-run-source-deploy/dart-server:latest'
         auth {
             username = '_json_key'
             password = new String(Base64.getDecoder().decode(System.getenv("GOOGLE_AR_CLIENT_SECRET")))
         }
     }
     container {
+        environment = [
+                "SPRING_PROFILE_ACTIVE": System.getenv("SPRING_PROFILES_ACTIVE")
+        ]
         jvmFlags = ['-Xms512m', '-Xmx512m']
     }
 }
@@ -62,8 +65,8 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
-task copyPrivate(type: Copy){
-    copy{
+tasks.register('copyPrivate', Copy) {
+    copy {
         from './dart-secret'
         include '*.yml'
         into 'src/main/resources'
