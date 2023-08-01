@@ -65,8 +65,8 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
-task copyPrivate(type: Copy){
-    copy{
+tasks.register('copyPrivate', Copy) {
+    copy {
         from './dart-secret'
         include '*.yml'
         into 'src/main/resources'
