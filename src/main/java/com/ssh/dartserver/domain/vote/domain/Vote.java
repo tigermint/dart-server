@@ -36,4 +36,8 @@ public class Vote{
     @JoinColumn(name = "picked_user_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private User pickedUser;
 
+
+    public void updateUser(Object o) {
+        this.user = (User) o;
+    }
 }

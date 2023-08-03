@@ -74,14 +74,15 @@ public class UserService {
         //사용자의 다음 투표 가능 시간 예약
         String contents = "새로운 투표가 가능합니다. Dart로 돌아와주세요!";
         notification.postNotificationNextVoteAvailableDateTime(user.getId(), DateTimeUtils.toUTC(user.getNextVoteAvailableDateTime().getValue()), contents);
-
         return userMapper.toUserNextVoteResponseDto(user.getNextVoteAvailableDateTime().getValue());
     }
 
     @Transactional
     public void delete(User user) {
-        friendRepository.deleteAllByUserIdAndFriendUserId(user.getId(), user.getId());
+        friendRepository.deleteAllByUserIdOrFriendUserId(user.getId(), user.getId());
         voteRepository.deleteAllByPickedUserId(user.getId());
+        voteRepository.findAllByUserId(user.getId())
+                .forEach(vote -> vote.updateUser(null));
         userRepository.delete(user);
     }
 

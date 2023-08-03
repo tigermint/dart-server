@@ -1,11 +1,5 @@
 package com.ssh.dartserver.domain.vote.service;
 
-import com.ssh.dartserver.domain.vote.dto.ReceivedVoteResponse;
-import com.ssh.dartserver.domain.vote.dto.VoteResultRequest;
-import com.ssh.dartserver.domain.vote.dto.mapper.VoteMapper;
-import com.ssh.dartserver.domain.vote.infra.VoteRepository;
-import com.ssh.dartserver.global.utils.DateTimeUtils;
-import com.ssh.dartserver.global.infra.notification.PlatformNotification;
 import com.ssh.dartserver.domain.question.domain.Question;
 import com.ssh.dartserver.domain.question.dto.mapper.QuestionMapper;
 import com.ssh.dartserver.domain.question.infra.QuestionRepository;
@@ -14,12 +8,19 @@ import com.ssh.dartserver.domain.user.domain.User;
 import com.ssh.dartserver.domain.user.dto.mapper.UserMapper;
 import com.ssh.dartserver.domain.user.infra.UserRepository;
 import com.ssh.dartserver.domain.vote.domain.Vote;
+import com.ssh.dartserver.domain.vote.dto.ReceivedVoteResponse;
+import com.ssh.dartserver.domain.vote.dto.VoteResultRequest;
+import com.ssh.dartserver.domain.vote.dto.mapper.VoteMapper;
+import com.ssh.dartserver.domain.vote.infra.VoteRepository;
+import com.ssh.dartserver.global.infra.notification.PlatformNotification;
+import com.ssh.dartserver.global.utils.DateTimeUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional(readOnly = true)
@@ -70,11 +71,8 @@ public class VoteService {
         return getReceivedVoteResponseDto(vote);
     }
 
-    //TODO: 투표에서 나에게 투표를 한 사람의 정보를 가지고와야 함
-
     public List<ReceivedVoteResponse> list(User user) {
         List<ReceivedVoteResponse> dtos = new ArrayList<>();
-        //TODO: 나에게 투표한 사람 정보
         List<Vote> votes = voteRepository.findAllByPickedUserId(user.getId());
         votes.forEach(vote -> {
             ReceivedVoteResponse dto = getReceivedVoteResponseDto(vote);
@@ -82,12 +80,15 @@ public class VoteService {
         });
         return dtos;
     }
+
     private ReceivedVoteResponse getReceivedVoteResponseDto(Vote vote) {
+        Optional<User> optionalUser = Optional.ofNullable(vote.getUser());
         return voteMapper.toReceivedVoteResponseDto(
                 questionMapper.toDto(vote.getQuestion()),
                 userMapper.toUserWithUniversityResponseDto(
-                        userMapper.toUserResponseDto(vote.getUser()),
-                        universityMapper.toUniversityResponseDto(vote.getUser().getUniversity())),
+                        userMapper.toUserResponseDto(optionalUser.orElse(null)),
+                        universityMapper.toUniversityResponseDto(optionalUser.map(User::getUniversity).orElse(null))
+                ),
                 vote
         );
     }
