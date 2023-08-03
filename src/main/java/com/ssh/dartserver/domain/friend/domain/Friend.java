@@ -11,11 +11,19 @@ import javax.persistence.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        columnNames = {"user_id", "friend_user_id"}
+                )
+        }
+)
 public class Friend {
     @Column(name = "friend_id")
     @Id @GeneratedValue
     private Long id;
 
+    @Column(name = "friend_user_id")
     private Long friendUserId;
 
     @ManyToOne(fetch = FetchType.LAZY)

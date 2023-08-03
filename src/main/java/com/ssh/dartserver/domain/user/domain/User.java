@@ -33,6 +33,7 @@ public class User extends BaseTimeEntity {
 
     @Enumerated(EnumType.STRING)
     private Role role;
+
     @Embedded
     private RecommendationCode recommendationCode;
 

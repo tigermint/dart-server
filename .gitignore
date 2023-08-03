@@ -42,3 +42,6 @@ out/
 
 ### VCS ###
 .github/
+
+### Gradle ###
+src/main/resources/
