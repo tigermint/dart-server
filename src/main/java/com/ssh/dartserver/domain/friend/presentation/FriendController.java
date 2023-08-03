@@ -29,7 +29,7 @@ public class FriendController {
     @PostMapping
     public ResponseEntity<String> create(Authentication authentication, @RequestBody @Valid FriendRequest request){
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
-        friendService.create(principal.getUser(), request);
+        friendService.createFriendById(principal.getUser(), request);
         return ResponseEntity.ok("친구 추가 성공");
     }
 
@@ -58,9 +58,9 @@ public class FriendController {
     public ResponseEntity<List<FriendResponse>> list(Authentication authentication, @RequestParam(defaultValue = "false") boolean suggested) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         if(suggested) {
-            return ResponseEntity.ok(friendService.possibleList(principal.getUser()));
+            return ResponseEntity.ok(friendService.listPossibleFriend(principal.getUser()));
         }
-        return ResponseEntity.ok(friendService.list(principal.getUser()));
+        return ResponseEntity.ok(friendService.listFriend(principal.getUser()));
     }
 
     /**

@@ -30,8 +30,8 @@ public class FriendService {
     private final UniversityMapper universityMapper;
 
     @Transactional
-    public void create(User user, FriendRequest request) {
-        isFriend(user, request.getFriendUserId());
+    public void createFriendById(User user, FriendRequest request) {
+        isFriend(user.getId(), request.getFriendUserId());
         save(request.getFriendUserId(), user);
     }
 
@@ -39,48 +39,25 @@ public class FriendService {
     public FriendResponse createFriendByRecommendationCode(User user, FriendRecommendationCodeRequest request) {
         User friendUser = userRepository.findByRecommendationCode(new RecommendationCode(request.getRecommendationCode()))
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 추천인 코드입니다."));
-        isFriend(user, friendUser.getId());
+        isFriend(user.getId(), friendUser.getId());
         save(friendUser.getId(), user);
         return friendMapper.toFriendResponseDto(friendUser, universityMapper.toUniversityResponseDto(friendUser.getUniversity()));
     }
 
-    private void save(Long friendUser, User user) {
-        Friend friend = Friend.builder()
-                .friendUserId(friendUser)
-                .user(user)
-                .build();
-        friendRepository.save(friend);
-    }
 
-    private void isFriend(User user, Long friendUser) {
-        friendRepository.findByUserIdAndFriendUserId(user.getId(), friendUser)
-                .ifPresent(friend -> {
-                    throw new IllegalArgumentException("이미 친구 관계인 유저입니다.");
-                });
-    }
-
-    public List<FriendResponse> list(User user) {
+    public List<FriendResponse> listFriend(User user) {
         List<Friend> friends = friendRepository.findAllByUserId(user.getId());
         List<FriendResponse> dtos = new ArrayList<>();
-
         friends.forEach(friend -> {
             User friendUserInfo = userRepository.findById(friend.getFriendUserId())
                     .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
             dtos.add(friendMapper.toFriendResponseDto(friendUserInfo,
                     universityMapper.toUniversityResponseDto(friendUserInfo.getUniversity())));
         });
-
         return dtos;
     }
 
-    @Transactional
-    public void delete(User user, Long friendUserId) {
-        Friend friend = friendRepository.findByUserIdAndFriendUserId(user.getId(), friendUserId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 친구입니다."));
-        friendRepository.deleteById(friend.getId());
-    }
-
-    public List<FriendResponse> possibleList(User user) {
+    public List<FriendResponse> listPossibleFriend(User user) {
         List<FriendResponse> dtos = new ArrayList<>();
 
         List<User> friendsOfFriends = friendRepository.findAllFriendsOfFriendsById(user.getId()).stream()
@@ -112,5 +89,30 @@ public class FriendService {
         possibleUsersWithoutFriends.forEach(possibleUser -> dtos.add(
                 friendMapper.toFriendResponseDto(possibleUser, universityMapper.toUniversityResponseDto(possibleUser.getUniversity()))));
         return dtos;
+    }
+
+    @Transactional
+    public void delete(User user, Long friendUserId) {
+        Friend friend = friendRepository.findByUserIdAndFriendUserId(user.getId(), friendUserId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 친구입니다."));
+        friendRepository.deleteById(friend.getId());
+    }
+
+
+    private void save(Long friendUser, User user) {
+        Friend friend = Friend.builder()
+                .friendUserId(friendUser)
+                .user(user)
+                .build();
+        friendRepository.save(friend);
+    }
+
+    private void isFriend(Long userId, Long friendUserId) {
+        if(userRepository.findById(friendUserId).isEmpty()){
+            throw new IllegalArgumentException("존재하지 않는 유저입니다.");
+        }
+        if(friendRepository.findByUserIdAndFriendUserId(userId, friendUserId).isPresent()){
+            throw new IllegalArgumentException("이미 친구 관계인 유저입니다.");
+        }
     }
 }
