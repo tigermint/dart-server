@@ -14,4 +14,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findAllByUniversityId(Long universityId);
 
     Optional<User> findByRecommendationCode(RecommendationCode recommendationCode);
+
+    Optional<User> findById(Long id);
 }

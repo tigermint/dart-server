@@ -10,4 +10,7 @@ public interface VoteRepository extends JpaRepository<Vote, Long> {
     List<Vote> findAllByPickedUserId(Long id);
 
     void deleteAllByPickedUserId(Long id);
+
+    List<Vote> findAllByUserId(Long id);
+
 }
