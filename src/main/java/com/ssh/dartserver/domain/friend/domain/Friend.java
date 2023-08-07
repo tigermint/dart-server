@@ -23,16 +23,17 @@ public class Friend {
     @Id @GeneratedValue
     private Long id;
 
-    @Column(name = "friend_user_id")
-    private Long friendUserId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "friend_user_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private User friendUser;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private User user;
 
     @Builder
-    public Friend(Long friendUserId, User user) {
-        this.friendUserId = friendUserId;
+    public Friend(User friendUser, User user) {
+        this.friendUser = friendUser;
         this.user = user;
     }
 }
