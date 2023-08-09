@@ -7,14 +7,12 @@ import com.ssh.dartserver.domain.university.infra.UniversityRepository;
 import com.ssh.dartserver.domain.user.domain.User;
 import com.ssh.dartserver.domain.user.domain.personalinfo.*;
 import com.ssh.dartserver.domain.user.domain.recommendcode.RandomRecommendCodeGenerator;
-import com.ssh.dartserver.domain.user.dto.UserNextVoteResponse;
-import com.ssh.dartserver.domain.user.dto.UserRequest;
+import com.ssh.dartserver.domain.user.dto.UserSignupRequest;
+import com.ssh.dartserver.domain.user.dto.UserUpdateRequest;
 import com.ssh.dartserver.domain.user.dto.UserWithUniversityResponse;
 import com.ssh.dartserver.domain.user.dto.mapper.UserMapper;
 import com.ssh.dartserver.domain.user.infra.UserRepository;
 import com.ssh.dartserver.domain.vote.infra.VoteRepository;
-import com.ssh.dartserver.global.infra.notification.PlatformNotification;
-import com.ssh.dartserver.global.utils.DateTimeUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class UserService {
-    private static final int NEXT_VOTE_AVAILABLE_MINUTES = 40;
     private final RandomRecommendCodeGenerator randomGenerator;
 
     private final UserRepository userRepository;
@@ -34,8 +31,13 @@ public class UserService {
     private final UserMapper userMapper;
     private final UniversityMapper universityMapper;
 
-    private final PlatformNotification notification;
-
+    @Transactional
+    public UserWithUniversityResponse signup(User user, UserSignupRequest userSignupRequest) {
+        user.signup(getPersonalInfo(userSignupRequest), getUniversity(userSignupRequest.getUniversityId()), randomGenerator);
+        userRepository.save(user);
+        return userMapper.toUserWithUniversityResponseDto(userMapper.toUserResponseDto(user),
+                universityMapper.toUniversityResponseDto(user.getUniversity()));
+    }
 
     public UserWithUniversityResponse read(Long id) {
         User user = userRepository.findById(id)
@@ -43,38 +45,14 @@ public class UserService {
         return userMapper.toUserWithUniversityResponseDto(userMapper.toUserResponseDto(user),
                 universityMapper.toUniversityResponseDto(user.getUniversity()));
     }
-
     @Transactional
-    public UserWithUniversityResponse completeSignupWithRecommendationCode(User user, UserRequest userRequestDto) {
-        user.updateWithRecommendationCode(getPersonalInfo(userRequestDto), getUniversity(userRequestDto.getUniversityId()), randomGenerator);
-        userRepository.save(user);
+    public UserWithUniversityResponse update(User user, UserUpdateRequest userUpdateRequest){
+        user.updateNickname(userUpdateRequest.getNickname());
+        user.updateProfileImageUrl(userUpdateRequest.getProfileImageUrl());
+        University university = universityRepository.findById(user.getUniversity().getId())
+                .orElse(null);
         return userMapper.toUserWithUniversityResponseDto(userMapper.toUserResponseDto(user),
-                universityMapper.toUniversityResponseDto(user.getUniversity()));
-    }
-
-
-    @Transactional
-    public UserWithUniversityResponse updateUserInformation(User user, UserRequest userRequestDto) {
-        user.update(getPersonalInfo(userRequestDto), getUniversity(userRequestDto.getUniversityId()));
-        userRepository.save(user);
-        return userMapper.toUserWithUniversityResponseDto(userMapper.toUserResponseDto(user),
-                universityMapper.toUniversityResponseDto(user.getUniversity()));
-    }
-
-    public UserNextVoteResponse readNextVoteAvailableDateTime(User user) {
-        return userMapper.toUserNextVoteResponseDto(user.getNextVoteAvailableDateTime().getValue());
-    }
-
-    @Transactional
-    public UserNextVoteResponse updateNextVoteAvailableDateTime(User user) {
-        user.updateNextVoteAvailableDateTime(NEXT_VOTE_AVAILABLE_MINUTES);
-
-        userRepository.save(user);
-
-        //사용자의 다음 투표 가능 시간 예약
-        String contents = "새로운 투표가 가능합니다. 엔대생으로 돌아와주세요!";
-        notification.postNotificationNextVoteAvailableDateTime(user.getId(), DateTimeUtils.toUTC(user.getNextVoteAvailableDateTime().getValue()), contents);
-        return userMapper.toUserNextVoteResponseDto(user.getNextVoteAvailableDateTime().getValue());
+                universityMapper.toUniversityResponseDto(university));
     }
 
     @Transactional
@@ -86,13 +64,15 @@ public class UserService {
         userRepository.delete(user);
     }
 
-    private PersonalInfo getPersonalInfo(UserRequest userRequestDto) {
+    private PersonalInfo getPersonalInfo(UserSignupRequest userSignupRequest) {
         return PersonalInfo.builder()
-                .phone(Phone.newInstance(userRequestDto.getPhone()))
-                .name(Name.newInstance(userRequestDto.getName()))
-                .admissionYear(AdmissionYear.newInstance(userRequestDto.getAdmissionYear()))
-                .birthYear(BirthYear.newInstance(userRequestDto.getBirthYear()))
-                .gender(userRequestDto.getGender())
+                .phone(Phone.from(userSignupRequest.getPhone()))
+                .name(Name.from(userSignupRequest.getName()))
+                .nickname(Nickname.from(null))
+                .admissionYear(AdmissionYear.from(userSignupRequest.getAdmissionYear()))
+                .birthYear(BirthYear.from(userSignupRequest.getBirthYear()))
+                .gender(userSignupRequest.getGender())
+                .profileImageUrl(ProfileImageUrl.from(null))
                 .build();
     }
 
