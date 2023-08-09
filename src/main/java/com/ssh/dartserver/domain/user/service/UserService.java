@@ -4,6 +4,7 @@ import com.ssh.dartserver.domain.friend.infra.FriendRepository;
 import com.ssh.dartserver.domain.university.domain.University;
 import com.ssh.dartserver.domain.university.dto.mapper.UniversityMapper;
 import com.ssh.dartserver.domain.university.infra.UniversityRepository;
+import com.ssh.dartserver.domain.user.domain.Point;
 import com.ssh.dartserver.domain.user.domain.User;
 import com.ssh.dartserver.domain.user.domain.personalinfo.*;
 import com.ssh.dartserver.domain.user.domain.recommendcode.RandomRecommendCodeGenerator;
@@ -21,6 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class UserService {
+    private static final int DEFAULT_POINT = 0;
+
     private final RandomRecommendCodeGenerator randomGenerator;
 
     private final UserRepository userRepository;
@@ -33,7 +36,12 @@ public class UserService {
 
     @Transactional
     public UserWithUniversityResponse signup(User user, UserSignupRequest userSignupRequest) {
-        user.signup(getPersonalInfo(userSignupRequest), getUniversity(userSignupRequest.getUniversityId()), randomGenerator);
+        user.signup(
+                getPersonalInfo(userSignupRequest),
+                getUniversity(userSignupRequest.getUniversityId()),
+                randomGenerator,
+                Point.from(DEFAULT_POINT)
+        );
         userRepository.save(user);
         return userMapper.toUserWithUniversityResponseDto(userMapper.toUserResponseDto(user),
                 universityMapper.toUniversityResponseDto(user.getUniversity()));
