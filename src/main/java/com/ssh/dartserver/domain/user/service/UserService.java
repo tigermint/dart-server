@@ -21,6 +21,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class UserService {
+    private static final String DEFAULT_PROFILE_IMAGE_URL = "DEFAULT";
+    private static final String DEFAULT_NICKNAME = "DEFAULT";
+
     private final RandomRecommendCodeGenerator randomGenerator;
 
     private final UserRepository userRepository;
@@ -32,8 +35,8 @@ public class UserService {
     private final UniversityMapper universityMapper;
 
     @Transactional
-    public UserWithUniversityResponse signup(User user, UserSignupRequest userSignupRequest) {
-        user.signup(getPersonalInfo(userSignupRequest), getUniversity(userSignupRequest.getUniversityId()), randomGenerator);
+    public UserWithUniversityResponse signup(User user, UserSignupRequest request) {
+        user.signup(getPersonalInfo(request), getUniversity(request.getUniversityId()), randomGenerator);
         userRepository.save(user);
         return userMapper.toUserWithUniversityResponseDto(userMapper.toUserResponseDto(user),
                 universityMapper.toUniversityResponseDto(user.getUniversity()));
@@ -46,9 +49,9 @@ public class UserService {
                 universityMapper.toUniversityResponseDto(user.getUniversity()));
     }
     @Transactional
-    public UserWithUniversityResponse update(User user, UserUpdateRequest userUpdateRequest){
-        user.updateNickname(userUpdateRequest.getNickname());
-        user.updateProfileImageUrl(userUpdateRequest.getProfileImageUrl());
+    public UserWithUniversityResponse update(User user, UserUpdateRequest request){
+        user.updateNickname(request.getNickname());
+        user.updateProfileImageUrl(request.getProfileImageUrl());
         University university = universityRepository.findById(user.getUniversity().getId())
                 .orElse(null);
         return userMapper.toUserWithUniversityResponseDto(userMapper.toUserResponseDto(user),
@@ -64,15 +67,15 @@ public class UserService {
         userRepository.delete(user);
     }
 
-    private PersonalInfo getPersonalInfo(UserSignupRequest userSignupRequest) {
+    private PersonalInfo getPersonalInfo(UserSignupRequest request) {
         return PersonalInfo.builder()
-                .phone(Phone.from(userSignupRequest.getPhone()))
-                .name(Name.from(userSignupRequest.getName()))
-                .nickname(Nickname.from(null))
-                .admissionYear(AdmissionYear.from(userSignupRequest.getAdmissionYear()))
-                .birthYear(BirthYear.from(userSignupRequest.getBirthYear()))
-                .gender(userSignupRequest.getGender())
-                .profileImageUrl(ProfileImageUrl.from(null))
+                .phone(Phone.from(request.getPhone()))
+                .name(Name.from(request.getName()))
+                .nickname(Nickname.from(DEFAULT_NICKNAME))
+                .admissionYear(AdmissionYear.from(request.getAdmissionYear()))
+                .birthYear(BirthYear.from(request.getBirthYear()))
+                .gender(request.getGender())
+                .profileImageUrl(ProfileImageUrl.from(DEFAULT_PROFILE_IMAGE_URL))
                 .build();
     }
 
