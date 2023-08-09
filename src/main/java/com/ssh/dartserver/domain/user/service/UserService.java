@@ -4,6 +4,7 @@ import com.ssh.dartserver.domain.friend.infra.FriendRepository;
 import com.ssh.dartserver.domain.university.domain.University;
 import com.ssh.dartserver.domain.university.dto.mapper.UniversityMapper;
 import com.ssh.dartserver.domain.university.infra.UniversityRepository;
+import com.ssh.dartserver.domain.user.domain.Point;
 import com.ssh.dartserver.domain.user.domain.User;
 import com.ssh.dartserver.domain.user.domain.personalinfo.*;
 import com.ssh.dartserver.domain.user.domain.recommendcode.RandomRecommendCodeGenerator;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
     private static final String DEFAULT_PROFILE_IMAGE_URL = "DEFAULT";
     private static final String DEFAULT_NICKNAME = "DEFAULT";
+    private static final int DEFAULT_POINT = 0;
 
     private final RandomRecommendCodeGenerator randomGenerator;
 
@@ -35,8 +37,13 @@ public class UserService {
     private final UniversityMapper universityMapper;
 
     @Transactional
-    public UserWithUniversityResponse signup(User user, UserSignupRequest request) {
-        user.signup(getPersonalInfo(request), getUniversity(request.getUniversityId()), randomGenerator);
+    public UserWithUniversityResponse signup(User user, UserSignupRequest userSignupRequest) {
+        user.signup(
+                getPersonalInfo(userSignupRequest),
+                getUniversity(userSignupRequest.getUniversityId()),
+                randomGenerator,
+                Point.from(DEFAULT_POINT)
+        );
         userRepository.save(user);
         return userMapper.toUserWithUniversityResponseDto(userMapper.toUserResponseDto(user),
                 universityMapper.toUniversityResponseDto(user.getUniversity()));
@@ -48,6 +55,7 @@ public class UserService {
         return userMapper.toUserWithUniversityResponseDto(userMapper.toUserResponseDto(user),
                 universityMapper.toUniversityResponseDto(user.getUniversity()));
     }
+  
     @Transactional
     public UserWithUniversityResponse update(User user, UserUpdateRequest request){
         user.updateNickname(request.getNickname());

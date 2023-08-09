@@ -31,6 +31,9 @@ public class User extends BaseTimeEntity {
     @Embedded
     private NextVoteAvailableDateTime nextVoteAvailableDateTime;
 
+    @Embedded
+    private Point point;
+
     @Enumerated(EnumType.STRING)
     private Role role;
 
@@ -46,11 +49,12 @@ public class User extends BaseTimeEntity {
     @JoinColumn(name = "university_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private University university;
 
-    public void signup(PersonalInfo personalInfo, University university, RandomRecommendCodeGeneratable randomGenerator) {
+    public void signup(PersonalInfo personalInfo, University university,RandomRecommendCodeGeneratable randomGenerator, Point point) {
         this.personalInfo = personalInfo;
         this.university = university;
         this.nextVoteAvailableDateTime = NextVoteAvailableDateTime.newInstance();
         this.recommendationCode = RecommendationCode.generate(randomGenerator);
+        this.point = point;
     }
 
     public void updateNickname(String value) {
@@ -63,6 +67,10 @@ public class User extends BaseTimeEntity {
 
     public void updateNextVoteAvailableDateTime(int value) {
         this.nextVoteAvailableDateTime = NextVoteAvailableDateTime.plusMinutes(value);
+    }
+
+    public void addPoint(int value) {
+        this.point = Point.from(this.point.getValue() + value);
     }
 
 }

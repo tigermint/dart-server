@@ -13,4 +13,5 @@ public class UserResponse {
     private int birthYear;
     private String recommendationCode;
     private String profileImageUrl;
+    private int point;
 }
