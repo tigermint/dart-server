@@ -21,7 +21,7 @@ public class VoteController {
     @PostMapping
     public ResponseEntity<String> create(Authentication authentication, @RequestBody @Valid VoteResultRequest request) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
-        voteService.create(principal.getUser(), request);
+        voteService.create(principal.getUser().getId(), request);
         return ResponseEntity.ok("ok");
     }
 

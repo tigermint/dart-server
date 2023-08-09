@@ -21,11 +21,16 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class VoteService {
+
+    private static final int VOTE_PICK_POINT = 20;
+    private static final int VOTED_PICKED_POINT = 10;
+
     private final VoteRepository voteRepository;
     private final QuestionRepository questionRepository;
     private final UserRepository userRepository;
@@ -39,12 +44,16 @@ public class VoteService {
 
 
     @Transactional
-    public void create(User user, VoteResultRequest request) {
+    public void create(Long userId, VoteResultRequest request) {
         Question question = questionRepository.findById(request.getQuestionId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 질문입니다."));
 
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
+
         User pickedUser = userRepository.findById(request.getPickedUserId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
+
 
         Vote vote = Vote.builder()
                 .firstUserId(request.getFirstUserId())
@@ -57,12 +66,24 @@ public class VoteService {
                 .question(question)
                 .build();
 
-        String contents = String.format("%d학번 %s학생이 당신을 투표했어요!",
-                user.getPersonalInfo().getAdmissionYear().getValue() - 2000,
-                user.getPersonalInfo().getGender().getKorValue());
-
-        notification.postNotificationSpecificDevice(pickedUser.getId(), contents);
         voteRepository.save(vote);
+        addPoint(user, pickedUser);
+        postNotification(user,pickedUser);
+    }
+
+    private void addPoint(User user, User pickedUser) {
+        user.addPoint(VOTE_PICK_POINT);
+        pickedUser.addPoint(VOTED_PICKED_POINT);
+    }
+
+    private void postNotification(User user, User pickedUser) {
+        String contents = String.format("%d학번 %s학생이 당신을 투표했어요. +%d점!",
+                user.getPersonalInfo().getAdmissionYear().getValue() - 2000,
+                user.getPersonalInfo().getGender().getKorValue(),
+                VOTED_PICKED_POINT);
+
+        CompletableFuture.runAsync(() -> notification.postNotificationSpecificDevice(pickedUser.getId(), contents));
+        //예외 발생 시 logger 추가 필요
     }
 
     public ReceivedVoteResponse read(Long voteId) {
