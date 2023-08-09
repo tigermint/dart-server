@@ -17,6 +17,9 @@ public class PersonalInfo {
     private Name name;
 
     @Embedded
+    private Nickname nickname;
+
+    @Embedded
     private Phone phone;
 
     @Enumerated(EnumType.STRING)
@@ -28,13 +31,26 @@ public class PersonalInfo {
     @Embedded
     private BirthYear birthYear;
 
+    @Embedded
+    private ProfileImageUrl profileImageUrl;
+
 
     @Builder
-    public PersonalInfo(Name name, Phone phone, Gender gender, AdmissionYear admissionYear, BirthYear birthYear) {
+    public PersonalInfo(Name name, Nickname nickname, Phone phone, Gender gender, AdmissionYear admissionYear, BirthYear birthYear, ProfileImageUrl profileImageUrl) {
         this.name = name;
+        this.nickname = nickname;
         this.phone = phone;
         this.gender = gender;
         this.admissionYear = admissionYear;
         this.birthYear = birthYear;
+        this.profileImageUrl = profileImageUrl;
+    }
+
+    public void updateNickname(String value) {
+        this.nickname = Nickname.from(value);
+    }
+
+    public void updateProfileImageUrl(String value) {
+        this.profileImageUrl = ProfileImageUrl.from(value);
     }
 }

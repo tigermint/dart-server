@@ -6,17 +6,17 @@ import javax.validation.constraints.NotNull;
 
 @Data
 public class VoteResultRequest {
-    @NotNull
+    @NotNull(message = "질문 id는 null 일 수 없습니다")
     private Long questionId;
-    @NotNull
+    @NotNull(message = "선택된 사용자 id는 null 일 수 없습니다")
     private Long pickedUserId;
-    @NotNull
+    @NotNull(message = "사용자 id는 null 일 수 없습니다")
     private Long firstUserId;
-    @NotNull
+    @NotNull(message = "사용자 id는 null 일 수 없습니다")
     private Long secondUserId;
-    @NotNull
+    @NotNull(message = "사용자 id는 null 일 수 없습니다")
     private Long thirdUserId;
-    @NotNull
+    @NotNull(message = "사용자 id는 null 일 수 없습니다")
     private Long fourthUserId;
 }
 

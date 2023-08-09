@@ -9,17 +9,16 @@ import javax.persistence.Embeddable;
 @Getter
 @Embeddable
 @NoArgsConstructor
-public class BirthYear {
+public class Nickname {
+    @Column(name = "nickname")
+    private String value;
 
-    @Column(name = "birth_year")
-    private int value;
-
-    public BirthYear(int value) {
+    public Nickname(String value) {
         this.value = value;
     }
 
-    public static BirthYear from(int value) {
-        return new BirthYear(value);
+    public static Nickname from(String value) {
+        return new Nickname(value);
     }
 
 }
