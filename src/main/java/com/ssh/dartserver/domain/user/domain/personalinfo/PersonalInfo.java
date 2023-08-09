@@ -1,5 +1,6 @@
 package com.ssh.dartserver.domain.user.domain.personalinfo;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,6 +12,8 @@ import javax.persistence.Enumerated;
 
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Embeddable
 public class PersonalInfo {
     @Embedded
@@ -34,17 +37,6 @@ public class PersonalInfo {
     @Embedded
     private ProfileImageUrl profileImageUrl;
 
-
-    @Builder
-    public PersonalInfo(Name name, Nickname nickname, Phone phone, Gender gender, AdmissionYear admissionYear, BirthYear birthYear, ProfileImageUrl profileImageUrl) {
-        this.name = name;
-        this.nickname = nickname;
-        this.phone = phone;
-        this.gender = gender;
-        this.admissionYear = admissionYear;
-        this.birthYear = birthYear;
-        this.profileImageUrl = profileImageUrl;
-    }
 
     public void updateNickname(String value) {
         this.nickname = Nickname.from(value);
