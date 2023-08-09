@@ -33,7 +33,7 @@ public class UserController {
         return ResponseEntity.ok(userService.read(principal.getUser().getId()));
     }
 
-    @PutMapping("/me")
+    @PatchMapping("/me")
     public ResponseEntity<UserWithUniversityResponse> update(Authentication authentication, @Valid @RequestBody UserUpdateRequest request) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         return ResponseEntity.ok(userService.update(principal.getUser(), request));
