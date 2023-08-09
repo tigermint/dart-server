@@ -6,6 +6,6 @@ import javax.validation.constraints.NotBlank;
 
 @Data
 public class KakaoTokenRequest {
-    @NotBlank
+    @NotBlank(message = "access token은 null 일 수 없습니다")
     private String accessToken;
 }
