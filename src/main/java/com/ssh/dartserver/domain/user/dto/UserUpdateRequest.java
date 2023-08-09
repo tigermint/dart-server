@@ -1,19 +1,15 @@
 package com.ssh.dartserver.domain.user.dto;
 
 import lombok.Data;
-import org.hibernate.validator.constraints.URL;
-import org.springframework.lang.Nullable;
 
-import javax.validation.constraints.Pattern;
+import javax.validation.constraints.NotBlank;
 
 @Data
 public class UserUpdateRequest {
 
-    @Nullable
-    @Pattern(regexp = "^$|\\S(.*\\S)?", message = "닉네임은 비어있지 않아야 합니다.")
+    @NotBlank(message = "닉네임은 blank 일 수 없습니다.")
     private String nickname;
 
-    @Nullable
-    @URL(message = "올바른 URL을 입력해주세요.")
+    @NotBlank(message = "프로필 이미지 URL은 blank 일 수 없습니다.")
     private String profileImageUrl;
 }
