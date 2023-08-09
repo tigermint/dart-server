@@ -17,7 +17,8 @@ public class AdmissionYear {
         this.value = value;
     }
 
-    public static AdmissionYear newInstance(int value) {
+    public static AdmissionYear from(int value) {
         return new AdmissionYear(value);
     }
+
 }
