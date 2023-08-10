@@ -63,6 +63,7 @@ public class UserService {
         userRepository.save(user);  //영속성 컨텍스트 진입하지 못해 변경감지 안됨
         University university = universityRepository.findById(user.getUniversity().getId()) //LazyInitializationException 발생
                 .orElse(null);
+        userRepository.save(user);
         return userMapper.toUserWithUniversityResponseDto(userMapper.toUserResponseDto(user),
                 universityMapper.toUniversityResponseDto(university));
     }

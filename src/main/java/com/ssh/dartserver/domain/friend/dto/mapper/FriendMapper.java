@@ -2,17 +2,14 @@ package com.ssh.dartserver.domain.friend.dto.mapper;
 
 import com.ssh.dartserver.domain.friend.dto.FriendResponse;
 import com.ssh.dartserver.domain.university.dto.UniversityResponse;
-import com.ssh.dartserver.domain.user.domain.User;
+import com.ssh.dartserver.domain.user.dto.UserResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface FriendMapper {
 
-    @Mapping(target = "userId", source = "friendUserInfo.id")
-    @Mapping(target = "admissionYear", source = "friendUserInfo.personalInfo.admissionYear.value")
-    @Mapping(target="gender", source = "friendUserInfo.personalInfo.gender.value")
-    @Mapping(target = "name", source = "friendUserInfo.personalInfo.name.value")
-    @Mapping(target = "university", source = "university")
-    FriendResponse toFriendResponseDto(User friendUserInfo, UniversityResponse university);
+    @Mapping(target = "userResponseDto", source = "friend")
+    @Mapping(target = "universityResponseDto", source = "university")
+    FriendResponse toFriendResponseDto(UserResponse friend, UniversityResponse university);
 }

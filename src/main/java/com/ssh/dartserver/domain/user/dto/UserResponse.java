@@ -13,5 +13,7 @@ public class UserResponse {
     private int birthYear;
     private String recommendationCode;
     private String profileImageUrl;
+    private String studentIdCardImageUrl;
+    private String studentIdCardVerificationStatus;
     private int point;
 }

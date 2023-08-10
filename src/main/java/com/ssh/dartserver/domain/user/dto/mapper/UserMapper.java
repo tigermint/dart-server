@@ -26,6 +26,8 @@ public interface UserMapper {
     @Mapping(target = "profileImageUrl", source = "user.personalInfo.profileImageUrl.value")
     @Mapping(target = "recommendationCode", source = "user.recommendationCode.value")
     @Mapping(target = "point", source = "user.point.value")
+    @Mapping(target = "studentIdCardImageUrl", source = "user.studentVerificationInfo.studentIdCardImageUrl.value")
+    @Mapping(target = "studentIdCardVerificationStatus", source = "user.studentVerificationInfo.studentIdCardVerificationStatus")
     UserResponse toUserResponseDto(User user);
 
     @Mapping(target = "nextVoteAvailableDateTime", source = "nextVoteAvailableDateTime")
