@@ -62,6 +62,7 @@ public class UserService {
         user.updateProfileImageUrl(request.getProfileImageUrl());
         University university = universityRepository.findById(user.getUniversity().getId())
                 .orElse(null);
+        userRepository.save(user);
         return userMapper.toUserWithUniversityResponseDto(userMapper.toUserResponseDto(user),
                 universityMapper.toUniversityResponseDto(university));
     }
