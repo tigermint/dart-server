@@ -9,6 +9,7 @@ import com.ssh.dartserver.domain.friend.infra.FriendRepository;
 import com.ssh.dartserver.domain.university.dto.mapper.UniversityMapper;
 import com.ssh.dartserver.domain.user.domain.User;
 import com.ssh.dartserver.domain.user.domain.recommendcode.RecommendationCode;
+import com.ssh.dartserver.domain.user.dto.mapper.UserMapper;
 import com.ssh.dartserver.domain.user.infra.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,7 @@ public class FriendService {
     private final FriendRepository friendRepository;
     private final FriendMapper friendMapper;
     private final UniversityMapper universityMapper;
+    private final UserMapper userMapper;
 
     @Transactional
     public void createFriendById(User user, FriendRequest request) {
@@ -46,18 +48,17 @@ public class FriendService {
             throw new IllegalArgumentException("이미 친구입니다.");
         }
         save(user, friendUser);
-        return friendMapper.toFriendResponseDto(friendUser, universityMapper.toUniversityResponseDto(friendUser.getUniversity()));
+        return getFriendResponseDto(friendUser);
     }
 
     public List<FriendResponse> listFriend(User user) {
         List<Friend> friends = friendRepository.findAllByUserId(user.getId());
         List<FriendResponse> friendResponses = new ArrayList<>();
-        friends.forEach(friend ->
-                friendResponses.add(friendMapper.toFriendResponseDto(friend.getFriendUser(),
-                    universityMapper.toUniversityResponseDto(friend.getFriendUser().getUniversity())))
-        );
+        friends.forEach(friend -> friendResponses.add(getFriendResponseDto(friend.getUser())));
         return friendResponses;
     }
+
+
     public List<FriendResponse> listPossibleFriend(User user) {
         List<FriendResponse> friendResponses = new ArrayList<>();
         List<User> addedMeAsFriendUsers = userRepository.findAllAddedMeAsFriendByUserId(user.getId());
@@ -73,11 +74,7 @@ public class FriendService {
                 .filter(friend -> !friendUsers.contains(friend))
                 .collect(Collectors.toList());
 
-        possibleFriends.forEach(friend ->
-                friendResponses.add(
-                        friendMapper.toFriendResponseDto(friend, universityMapper.toUniversityResponseDto(friend.getUniversity()))
-                )
-        );
+        possibleFriends.forEach(friend -> friendResponses.add(getFriendResponseDto(friend)));
         return friendResponses;
     }
 
@@ -99,6 +96,12 @@ public class FriendService {
                 .user(user)
                 .build();
         friendRepository.save(friend);
+    }
+
+    private FriendResponse getFriendResponseDto(User friend) {
+        return friendMapper.toFriendResponseDto(
+                userMapper.toUserResponseDto(friend), universityMapper.toUniversityResponseDto(friend.getUniversity())
+        );
     }
 
 }

@@ -1,13 +1,15 @@
 package com.ssh.dartserver.domain.friend.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.ssh.dartserver.domain.university.dto.UniversityResponse;
+import com.ssh.dartserver.domain.user.dto.UserResponse;
 import lombok.Data;
 
 @Data
 public class FriendResponse {
-    private Long userId;
-    private String name;
-    private String gender;
-    private int admissionYear;
-    private UniversityResponse university;
+    @JsonProperty("user")
+    private UserResponse userResponseDto;
+
+    @JsonProperty("university")
+    private UniversityResponse universityResponseDto;
 }
