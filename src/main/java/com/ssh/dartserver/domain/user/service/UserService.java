@@ -60,7 +60,8 @@ public class UserService {
     public UserWithUniversityResponse update(User user, UserUpdateRequest request){
         user.updateNickname(request.getNickname());
         user.updateProfileImageUrl(request.getProfileImageUrl());
-        University university = universityRepository.findById(user.getUniversity().getId())
+        userRepository.save(user);  //영속성 컨텍스트 진입하지 못해 변경감지 안됨
+        University university = universityRepository.findById(user.getUniversity().getId()) //LazyInitializationException 발생
                 .orElse(null);
         return userMapper.toUserWithUniversityResponseDto(userMapper.toUserResponseDto(user),
                 universityMapper.toUniversityResponseDto(university));
