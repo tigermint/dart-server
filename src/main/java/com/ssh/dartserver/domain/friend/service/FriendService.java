@@ -54,7 +54,7 @@ public class FriendService {
     public List<FriendResponse> listFriend(User user) {
         List<Friend> friends = friendRepository.findAllByUserId(user.getId());
         List<FriendResponse> friendResponses = new ArrayList<>();
-        friends.forEach(friend -> friendResponses.add(getFriendResponseDto(friend.getUser())));
+        friends.forEach(friend -> friendResponses.add(getFriendResponseDto(friend.getFriendUser())));
         return friendResponses;
     }
 
