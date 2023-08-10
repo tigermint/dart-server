@@ -1,10 +1,8 @@
 package com.ssh.dartserver.domain.user.presentation;
 
-import com.ssh.dartserver.domain.user.dto.UserNextVoteResponse;
-import com.ssh.dartserver.domain.user.dto.UserSignupRequest;
-import com.ssh.dartserver.domain.user.dto.UserUpdateRequest;
-import com.ssh.dartserver.domain.user.dto.UserWithUniversityResponse;
+import com.ssh.dartserver.domain.user.dto.*;
 import com.ssh.dartserver.domain.user.service.NextVoteService;
+import com.ssh.dartserver.domain.user.service.StudentIdCardVerificationService;
 import com.ssh.dartserver.domain.user.service.UserService;
 import com.ssh.dartserver.global.auth.service.oauth.PrincipalDetails;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +18,7 @@ import javax.validation.Valid;
 public class UserController {
     private final UserService userService;
     private final NextVoteService nextVoteService;
+    private final StudentIdCardVerificationService studentIdCardVerificationService;
 
     @PostMapping("/signup")
     public ResponseEntity<UserWithUniversityResponse> signup(Authentication authentication, @Valid @RequestBody UserSignupRequest request) {
@@ -56,6 +55,13 @@ public class UserController {
     public ResponseEntity<UserNextVoteResponse> updateNextVoteAvailableDateTime(Authentication authentication) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         return ResponseEntity.ok(nextVoteService.updateNextVoteAvailableDateTime(principal.getUser()));
+    }
+
+    @PostMapping("/me/verify-student-id-card")
+    public ResponseEntity<UserWithUniversityResponse> updateStudentIdCardVerificationStatus(
+            Authentication authentication, @Valid @RequestBody UserStudentIdCardVerificationRequest request) {
+        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
+        return ResponseEntity.ok(studentIdCardVerificationService.updateStudentIdCardVerificationStatus(principal.getUser(), request));
     }
 
 }
