@@ -45,7 +45,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'com.auth0:java-jwt:4.3.0'
     implementation 'com.fasterxml.jackson.core:jackson-core'
-
+    implementation 'org.flywaydb:flyway-core'
+    implementation 'org.flywaydb:flyway-mysql'
 
     runtimeOnly 'com.mysql:mysql-connector-j'
 

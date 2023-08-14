@@ -44,4 +44,7 @@ out/
 .github/
 
 ### Gradle ###
-src/main/resources/
+src/main/resources/*.yml
+
+### Seed ###
+src/main/resources/db/seed
