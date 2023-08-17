@@ -106,9 +106,9 @@ public class VoteService {
         Optional<User> optionalUser = Optional.ofNullable(vote.getUser());
         return voteMapper.toReceivedVoteResponseDto(
                 questionMapper.toDto(vote.getQuestion()),
-                userMapper.toUserWithUniversityResponseDto(
-                        userMapper.toUserResponseDto(optionalUser.orElse(null)),
-                        universityMapper.toUniversityResponseDto(optionalUser.map(User::getUniversity).orElse(null))
+                userMapper.toUserWithUniversityResponse(
+                        userMapper.toUserResponse(optionalUser.orElse(null)),
+                        universityMapper.toUniversityResponse(optionalUser.map(User::getUniversity).orElse(null))
                 ),
                 vote
         );

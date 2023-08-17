@@ -15,7 +15,7 @@ public interface UserMapper {
 
     @Mapping(target = "userResponseDto", source = "userResponseDto")
     @Mapping(target = "universityResponseDto", source = "universityResponseDto")
-    UserWithUniversityResponse toUserWithUniversityResponseDto(UserResponse userResponseDto, UniversityResponse universityResponseDto);
+    UserWithUniversityResponse toUserWithUniversityResponse(UserResponse userResponseDto, UniversityResponse universityResponseDto);
 
     @Mapping(target = "name", source = "user.personalInfo.name.value")
     @Mapping(target = "nickname", source = "user.personalInfo.nickname.value")
@@ -28,7 +28,7 @@ public interface UserMapper {
     @Mapping(target = "point", source = "user.point.value")
     @Mapping(target = "studentIdCardImageUrl", source = "user.studentVerificationInfo.studentIdCardImageUrl.value")
     @Mapping(target = "studentIdCardVerificationStatus", source = "user.studentVerificationInfo.studentIdCardVerificationStatus")
-    UserResponse toUserResponseDto(User user);
+    UserResponse toUserResponse(User user);
 
     @Mapping(target = "nextVoteAvailableDateTime", source = "nextVoteAvailableDateTime")
     UserNextVoteResponse toUserNextVoteResponseDto(LocalDateTime nextVoteAvailableDateTime);

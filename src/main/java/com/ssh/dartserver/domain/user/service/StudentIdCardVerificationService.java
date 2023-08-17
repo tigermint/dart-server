@@ -27,7 +27,7 @@ public class StudentIdCardVerificationService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 대학입니다."));
         userRepository.save(user);
         //TODO: Slack webhook API 요청
-        return userMapper.toUserWithUniversityResponseDto(userMapper.toUserResponseDto(user),
-                universityMapper.toUniversityResponseDto(university));
+        return userMapper.toUserWithUniversityResponse(userMapper.toUserResponse(user),
+                universityMapper.toUniversityResponse(university));
     }
 }

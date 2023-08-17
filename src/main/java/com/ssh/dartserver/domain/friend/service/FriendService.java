@@ -100,7 +100,7 @@ public class FriendService {
 
     private FriendResponse getFriendResponseDto(User friend) {
         return friendMapper.toFriendResponseDto(
-                userMapper.toUserResponseDto(friend), universityMapper.toUniversityResponseDto(friend.getUniversity())
+                userMapper.toUserResponse(friend), universityMapper.toUniversityResponse(friend.getUniversity())
         );
     }
 
