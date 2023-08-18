@@ -21,6 +21,7 @@ import com.ssh.dartserver.domain.user.domain.User;
 import com.ssh.dartserver.domain.user.domain.personalinfo.Gender;
 import com.ssh.dartserver.domain.user.domain.personalinfo.PersonalInfo;
 import com.ssh.dartserver.domain.user.infra.UserRepository;
+import com.ssh.dartserver.global.error.KakaoLoginFailedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -47,8 +48,8 @@ public class OAuthService {
     public TokenResponse createTokenForKakao(KakaoTokenRequest request) {
         return oauthRestTemplate.getKakaoUserInfo(request.getAccessToken()).map(userInfo -> {
             OAuthUserInfo kakaoUser = new KakaoUser(userInfo);
-            User userEntity = userRepository.findByUsername(kakaoUser.getProvider() + "_" + kakaoUser.getProviderId());
-
+            User userEntity = userRepository.findByUsername(kakaoUser.getProvider() + "_" + kakaoUser.getProviderId())
+                    .orElseThrow(() -> new KakaoLoginFailedException("카카오 로그인에 실패하였습니다."));
             return getTokenResponseDto(kakaoUser, userEntity);
         }).orElse(null);
     }
@@ -80,7 +81,8 @@ public class OAuthService {
             JWT.require(algorithm).build().verify(idToken);
 
             OAuthUserInfo appleUser = new AppleUser(payload);
-            User userEntity = userRepository.findByUsername("apple_" + payload.get("sub"));
+            User userEntity = userRepository.findByUsername("apple_" + payload.get("sub"))
+                    .orElseThrow(() -> new AppleLoginFailedException("Apple 로그인에 실패하였습니다."));
 
             return getTokenResponseDto(appleUser, userEntity);
         } catch (ApplePublicKeyNotFoundException | AppleLoginFailedException e) {

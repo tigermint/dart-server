@@ -5,6 +5,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.ssh.dartserver.domain.user.domain.User;
 import com.ssh.dartserver.domain.user.infra.UserRepository;
 import com.ssh.dartserver.global.auth.service.oauth.PrincipalDetails;
+import com.ssh.dartserver.global.error.CertificationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -40,8 +41,8 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                 .getClaim("username").asString();
 
         if (username != null) {
-            User user = userRepository.findByUsername(username);
-
+            User user = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new CertificationException("존재하지 않는 유저입니다."));
             PrincipalDetails principalDetails = new PrincipalDetails(user);
             Authentication authentication = new UsernamePasswordAuthenticationToken(principalDetails,
                     null,

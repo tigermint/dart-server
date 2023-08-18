@@ -2,6 +2,7 @@ package com.ssh.dartserver.global.auth.service.oauth;
 
 import com.ssh.dartserver.domain.user.domain.User;
 import com.ssh.dartserver.domain.user.infra.UserRepository;
+import com.ssh.dartserver.global.error.CertificationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -15,7 +16,8 @@ public class PrincipalDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username);
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new CertificationException("존재하지 않는 유저입니다."));
         return new PrincipalDetails(user);
     }
 }
