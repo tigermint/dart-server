@@ -48,9 +48,9 @@ public class MyTeamService {
         List<Long> userIds = request.getUserIds();
         userIds.add(user.getId());
 
-        validateTeamSize(userIds);
-        validateUserDuplicate(userIds);
-        validateUserCombinationExists(userIds);
+        validateTeamUserSize(userIds);
+        validateTeamUserDuplicate(userIds);
+        validateTeamUserCombinationExists(userIds);
 
         Team team = Team.builder()
                 .name(request.getName())
@@ -62,6 +62,10 @@ public class MyTeamService {
         List<TeamRegion> teamRegions = getTeamRegions(request.getRegionIds(), team);
         List<TeamUser> teamUsers = getTeamUsers(userIds, team);
 
+        validateTeamUserAreSameGender(teamUsers.stream()
+                .map(TeamUser::getUser)
+                .collect(Collectors.toList()));
+
         teamRegionRepository.saveAll(teamRegions);
         teamUserRepository.saveAll(teamUsers);
         teamRepository.save(team);
@@ -70,13 +74,14 @@ public class MyTeamService {
     }
 
 
+
     public TeamResponse readTeam(User user, Long teamId) {
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 팀입니다."));
         List<TeamUser> teamUsers = teamUserRepository.findAllByTeam(team);
         List<TeamRegion> teamRegions = teamRegionRepository.findAllByTeam(team);
 
-        validateUserIsPartOfTeam(user, teamUsers);
+        validateTeamUserIsPartOfTeam(user, teamUsers);
 
         return getTeamResponse(team, teamRegions, teamUsers);
     }
@@ -100,17 +105,17 @@ public class MyTeamService {
     public TeamResponse updateTeam(User user, Long teamId, TeamRequest request) {
         List<Long> userIds = request.getUserIds();
         userIds.add(user.getId());
-        validateTeamSize(userIds);
-        validateUserDuplicate(userIds);
+        validateTeamUserSize(userIds);
+        validateTeamUserDuplicate(userIds);
 
         List<TeamRegion> teamRegions = teamRegionRepository.findAllByTeamId(teamId);
         List<TeamUser> teamUsers = teamUserRepository.findAllByTeamId(teamId);
 
-        validateUserIsPartOfTeam(user, teamUsers);
-        validateAllUserAreSameUniversity(teamUsers.stream()
+        validateTeamUserIsPartOfTeam(user, teamUsers);
+        validateTeamUserAreSameUniversity(teamUsers.stream()
                         .map(TeamUser::getUser)
                         .collect(Collectors.toList()));
-        validateUserCombinationExists(userIds);
+        validateTeamUserCombinationExists(userIds);
 
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 팀입니다."));
@@ -129,7 +134,7 @@ public class MyTeamService {
 
     @Transactional
     public void deleteTeam(User user, Long teamId) {
-        validateUserIsPartOfTeam(user, teamUserRepository.findAllByTeamId(teamId));
+        validateTeamUserIsPartOfTeam(user, teamUserRepository.findAllByTeamId(teamId));
         teamUserRepository.deleteAllByTeamId(teamId);
         teamRegionRepository.deleteAllByTeamId(teamId);
         teamRepository.deleteById(teamId);
@@ -162,7 +167,7 @@ public class MyTeamService {
                         .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다.")))
                 .collect(Collectors.toList());
 
-        validateAllUserAreSameUniversity(users);
+        validateTeamUserAreSameUniversity(users);
 
         return users.stream()
                 .map(user -> TeamUser.builder()
@@ -184,34 +189,34 @@ public class MyTeamService {
                 .collect(Collectors.toList());
     }
 
-    private void validateAllUserAreSameUniversity(List<User> users) {
-        List<Long> universityIds = users.stream()
+    private void validateTeamUserAreSameUniversity(List<User> users) {
+        List<String> universityNames = users.stream()
                 .map(User::getUniversity)
-                .map(University::getId)
+                .map(University::getName)
                 .collect(Collectors.toList());
 
-        if (universityIds.stream().distinct().count() != 1) {
+        if (universityNames.stream().distinct().count() != 1) {
             throw new IllegalArgumentException("유저들이 모두 같은 학교가 아닙니다.");
         }
     }
-    private void validateUserCombinationExists(List<Long> userIds) {
+    private void validateTeamUserCombinationExists(List<Long> userIds) {
         TeamUsersCombinationHash teamUsersCombinationHash = TeamUsersCombinationHash.of(userIds);
 
         if (userIds.size() > 1 && teamRepository.findByTeamUsersCombinationHash(teamUsersCombinationHash).isPresent()) {
             throw new IllegalArgumentException("이미 존재하는 팀입니다.");
         }
     }
-    private void validateTeamSize(List<Long> userIds) {
+    private void validateTeamUserSize(List<Long> userIds) {
         if (userIds.size() > 3) {
             throw new IllegalArgumentException("팀원은 최대 3명까지만 가능합니다.");
         }
     }
-    private void validateUserDuplicate(List<Long> userIds) {
+    private void validateTeamUserDuplicate(List<Long> userIds) {
         if(userIds.size() != userIds.stream().distinct().count()) {
             throw new IllegalArgumentException("중복된 유저가 존재합니다.");
         }
     }
-    private void validateUserIsPartOfTeam(User user, List<TeamUser> teamUsers) {
+    private void validateTeamUserIsPartOfTeam(User user, List<TeamUser> teamUsers) {
 
         List<Long> teamUserIds = teamUsers.stream()
                 .map(TeamUser::getUser)
@@ -222,5 +227,14 @@ public class MyTeamService {
             throw new IllegalArgumentException("팀에 속해있지 않은 유저입니다.");
         }
     }
+    private void validateTeamUserAreSameGender(List<User> users) {
+        long count = users.stream()
+                .map(user -> user.getPersonalInfo().getGender())
+                .distinct()
+                .count();
 
+        if(count != 1) {
+            throw new IllegalArgumentException("팀원들의 성별이 모두 같지 않습니다.");
+        }
+    }
 }
