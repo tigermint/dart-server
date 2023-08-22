@@ -1,5 +1,6 @@
 package com.ssh.dartserver.domain.team.service;
 
+import com.ssh.dartserver.domain.question.dto.mapper.QuestionMapper;
 import com.ssh.dartserver.domain.team.domain.Team;
 import com.ssh.dartserver.domain.team.domain.TeamRegion;
 import com.ssh.dartserver.domain.team.domain.TeamUser;
@@ -15,10 +16,12 @@ import com.ssh.dartserver.domain.team.infra.TeamRepository;
 import com.ssh.dartserver.domain.team.infra.TeamUserRepository;
 import com.ssh.dartserver.domain.university.domain.University;
 import com.ssh.dartserver.domain.university.dto.mapper.UniversityMapper;
-import com.ssh.dartserver.domain.university.infra.UniversityRepository;
 import com.ssh.dartserver.domain.user.domain.User;
-import com.ssh.dartserver.domain.user.dto.UserWithUniversityResponse;
+import com.ssh.dartserver.domain.user.domain.profilequestions.ProfileQuestion;
+import com.ssh.dartserver.domain.user.dto.UserProfileResponse;
+import com.ssh.dartserver.domain.user.dto.mapper.ProfileQuestionMapper;
 import com.ssh.dartserver.domain.user.dto.mapper.UserMapper;
+import com.ssh.dartserver.domain.user.infra.ProfileQuestionRepository;
 import com.ssh.dartserver.domain.user.infra.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -36,12 +39,14 @@ public class MyTeamService {
     private final TeamRepository teamRepository;
     private final TeamRegionRepository teamRegionRepository;
     private final TeamUserRepository teamUserRepository;
-    private final UniversityRepository universityRepository;
+    private final ProfileQuestionRepository profileQuestionRepository;
 
     private final UserMapper userMapper;
     private final TeamMapper teamMapper;
     private final RegionMapper regionMapper;
     private final UniversityMapper universityMapper;
+    private final ProfileQuestionMapper profileQuestionMapper;
+    private final QuestionMapper questionMapper;
 
     @Transactional
     public TeamResponse createTeam(User user, TeamRequest request) {
@@ -147,18 +152,28 @@ public class MyTeamService {
                 .map(regionMapper::toRegionResponse)
                 .collect(Collectors.toList());
 
-        List<UserWithUniversityResponse> userWithUniversityResponses = teamUsers.stream()
+        List<UserProfileResponse> userProfileResponse = teamUsers.stream()
                 .map(TeamUser::getUser)
-                .map(this::getUserWithUniversityResponse)
+                .map(this::getUserProfileResponse)
                 .collect(Collectors.toList());
 
-        return teamMapper.toTeamResponse(team, regionResponses, userWithUniversityResponses);
+        return teamMapper.toTeamResponse(team, regionResponses, userProfileResponse);
     }
-    private UserWithUniversityResponse getUserWithUniversityResponse(User user) {
-        University university = universityRepository.findById(user.getUniversity().getId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 학교입니다."));
+    private UserProfileResponse getUserProfileResponse(User user) {
 
-        return userMapper.toUserWithUniversityResponse(userMapper.toUserResponse(user), universityMapper.toUniversityResponse(university));
+        List<ProfileQuestion> profileQuestions = profileQuestionRepository.findAllByUser(user);
+
+        return userMapper.toUserProfileResponse(
+                userMapper.toUserResponse(user),
+                universityMapper.toUniversityResponse(user.getUniversity()),
+                profileQuestions.stream()
+                        .map(profileQuestion ->
+                                profileQuestionMapper.toProfileQuestionResponse(
+                                        questionMapper.toQuestionResponse(profileQuestion.getQuestion()),
+                                        profileQuestion.getCount()
+                                ))
+                        .collect(Collectors.toList())
+        );
     }
 
     private List<TeamUser> getTeamUsers(List<Long> userIds, Team team) {

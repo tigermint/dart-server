@@ -6,9 +6,11 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Entity
 @Getter
-@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Vote{
@@ -16,28 +18,43 @@ public class Vote{
     @Column(name = "vote_id")
     private Long id;
 
-    //list로 관리 but 순서 필요 index로 관리
-    private Long firstUserId;
-    private Long secondUserId;
-    private Long thirdUserId;
-    private Long fourthUserId;
-
+    @Column(name = "picked_time")
     private LocalDateTime pickedTime;
+
+    @Embedded
+    private Candidates candidates;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "question_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Question question;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
-    private User user;
+    @JoinColumn(name = "picking_user_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private User pickingUser;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "picked_user_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private User pickedUser;
 
 
+    @Builder
+    public Vote(List<User> candidates,LocalDateTime pickedTime, Question question, User pickingUser, User pickedUser) {
+        this.candidates = Candidates.of(
+                candidates.stream()
+                      .map(user -> Candidate.builder()
+                              .vote(this)
+                              .user(user)
+                              .build()
+                      )
+                      .collect(Collectors.toList())
+        );
+        this.pickedTime = pickedTime;
+        this.question = question;
+        this.pickingUser = pickingUser;
+        this.pickedUser = pickedUser;
+    }
+
     public void updateUser(Object o) {
-        this.user = (User) o;
+        this.pickingUser = (User) o;
     }
 }
