@@ -37,19 +37,22 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         }
 
         String token = request.getHeader(JwtProperties.HEADER_STRING.getValue()).replace(JwtProperties.TOKEN_PREFIX.getValue(), "");
+
         String username = JWT.require(Algorithm.HMAC512(JwtProperties.SECRET.getValue())).build().verify(token)
                 .getClaim("username").asString();
 
-        if (username != null) {
-            User user = userRepository.findByUsername(username)
-                    .orElseThrow(() -> new CertificationException("존재하지 않는 유저입니다."));
-            PrincipalDetails principalDetails = new PrincipalDetails(user);
-            Authentication authentication = new UsernamePasswordAuthenticationToken(principalDetails,
-                    null,
-                    principalDetails.getAuthorities());
-
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+        if (username == null) {
+            throw new CertificationException("유효하지 않은 토큰입니다.");
         }
+
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new CertificationException("존재하지 않는 유저입니다."));
+        PrincipalDetails principalDetails = new PrincipalDetails(user);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(principalDetails,
+                null,
+                principalDetails.getAuthorities());
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
 
         chain.doFilter(request, response);
     }
