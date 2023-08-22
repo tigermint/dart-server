@@ -6,5 +6,5 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface UniversityMapper {
-    UniversityResponse toUniversityResponseDto(University university);
+    UniversityResponse toUniversityResponse(University university);
 }

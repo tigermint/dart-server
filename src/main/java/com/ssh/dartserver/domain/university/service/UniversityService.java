@@ -18,7 +18,7 @@ public class UniversityService {
 
     public List<UniversityResponse> list() {
         return universityRepository.findAll(Sort.by(Sort.Direction.ASC, "name")).stream()
-                .map(universityMapper::toUniversityResponseDto)
+                .map(universityMapper::toUniversityResponse)
                 .collect(Collectors.toList());
     }
 }

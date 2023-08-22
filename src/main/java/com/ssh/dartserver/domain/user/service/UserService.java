@@ -45,15 +45,15 @@ public class UserService {
                 Point.from(DEFAULT_POINT)
         );
         userRepository.save(user);
-        return userMapper.toUserWithUniversityResponseDto(userMapper.toUserResponseDto(user),
-                universityMapper.toUniversityResponseDto(user.getUniversity()));
+        return userMapper.toUserWithUniversityResponse(userMapper.toUserResponse(user),
+                universityMapper.toUniversityResponse(user.getUniversity()));
     }
 
     public UserWithUniversityResponse read(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
-        return userMapper.toUserWithUniversityResponseDto(userMapper.toUserResponseDto(user),
-                universityMapper.toUniversityResponseDto(user.getUniversity()));
+        return userMapper.toUserWithUniversityResponse(userMapper.toUserResponse(user),
+                universityMapper.toUniversityResponse(user.getUniversity()));
     }
   
     @Transactional
@@ -64,8 +64,8 @@ public class UserService {
         University university = universityRepository.findById(user.getUniversity().getId()) //LazyInitializationException 발생
                 .orElse(null);
         userRepository.save(user);
-        return userMapper.toUserWithUniversityResponseDto(userMapper.toUserResponseDto(user),
-                universityMapper.toUniversityResponseDto(university));
+        return userMapper.toUserWithUniversityResponse(userMapper.toUserResponse(user),
+                universityMapper.toUniversityResponse(university));
     }
 
     @Transactional
