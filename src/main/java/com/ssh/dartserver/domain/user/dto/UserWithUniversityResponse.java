@@ -7,8 +7,8 @@ import lombok.Data;
 @Data
 public class UserWithUniversityResponse {
     @JsonProperty("user")
-    private UserResponse userResponseDto;
+    private UserResponse userResponse;
 
     @JsonProperty("university")
-    private UniversityResponse universityResponseDto;
+    private UniversityResponse universityResponse;
 }

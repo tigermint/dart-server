@@ -1,6 +1,6 @@
 package com.ssh.dartserver.domain.team.dto;
 
-import com.ssh.dartserver.domain.user.dto.UserWithUniversityResponse;
+import com.ssh.dartserver.domain.user.dto.UserProfileResponse;
 import lombok.Data;
 
 import java.util.List;
@@ -11,5 +11,5 @@ public class TeamResponse {
     private String name;
     private Boolean isVisibleToSameUniversity;
     private List<RegionResponse> teamRegions;
-    private List<UserWithUniversityResponse> teamUsers;
+    private List<UserProfileResponse> teamUsers;
 }
