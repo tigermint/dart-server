@@ -49,9 +49,9 @@ public class OAuthService {
         return oauthRestTemplate.getKakaoUserInfo(request.getAccessToken()).map(userInfo -> {
             OAuthUserInfo kakaoUser = new KakaoUser(userInfo);
             User userEntity = userRepository.findByUsername(kakaoUser.getProvider() + "_" + kakaoUser.getProviderId())
-                    .orElseThrow(() -> new KakaoLoginFailedException("카카오 로그인에 실패하였습니다."));
+                    .orElse(null);
             return getTokenResponseDto(kakaoUser, userEntity);
-        }).orElse(null);
+        }).orElseThrow(() -> new KakaoLoginFailedException("카카오 로그인에 실패하였습니다."));
     }
 
     public TokenResponse createTokenForApple(AppleTokenRequest request) {
@@ -69,6 +69,7 @@ public class OAuthService {
             Map<String, Object> header = objectMapper.readValue(headerString, Map.class);
             Map<String, Object> payload = objectMapper.readValue(payloadString, Map.class);
 
+            //apple 공개키 가져오기
             ApplePublicKey possibleApplePublicKey = applePublicKeys.getKeys().stream()
                     .filter(key -> key.getKid().equals(header.get("kid")))
                     .findFirst()
@@ -77,28 +78,32 @@ public class OAuthService {
             RSAPublicKey publicKey = getPublicKey(possibleApplePublicKey.getN(), possibleApplePublicKey.getE())
                     .orElseThrow(() -> new ApplePublicKeyNotFoundException("일치하는 Apple Public Key가 없습니다."));
 
+            //apple id token 검증
             Algorithm algorithm = Algorithm.RSA256(publicKey, null);
-            JWT.require(algorithm).build().verify(idToken);
+            String possiblePayload = new String(decoder.decode(JWT.require(algorithm).build().verify(idToken).getPayload()), StandardCharsets.UTF_8);
+            Map<String, Object> possiblePayloadMap = objectMapper.readValue(possiblePayload, Map.class);
 
-            OAuthUserInfo appleUser = new AppleUser(payload);
+            OAuthUserInfo appleUser = new AppleUser(possiblePayloadMap);
+
+            //apple username 검색을 통한 기존 유저 확인
             User userEntity = userRepository.findByUsername("apple_" + payload.get("sub"))
-                    .orElseThrow(() -> new AppleLoginFailedException("Apple 로그인에 실패하였습니다."));
+                    .orElse(null);
 
             return getTokenResponseDto(appleUser, userEntity);
         } catch (ApplePublicKeyNotFoundException | AppleLoginFailedException e) {
             throw e;
         } catch (Exception e) {
-            throw new AppleLoginFailedException("Apple 로그인에 실패하였습니다.", e);
+            throw new AppleLoginFailedException("유효하지 않은 Apple 토큰입니다", e);
         }
     }
 
-    private TokenResponse getTokenResponseDto(OAuthUserInfo appleUser, User userEntity) {
+    private TokenResponse getTokenResponseDto(OAuthUserInfo oauthUser, User userEntity) {
         if (userEntity == null) {
             User userRequest = User.builder()
-                    .username(appleUser.getProvider() + "_" + appleUser.getProviderId())
+                    .username(oauthUser.getProvider() + "_" + oauthUser.getProviderId())
                     .password(bCryptPasswordEncoder.encode(JwtProperties.SECRET.getValue()))
-                    .provider(appleUser.getProvider())
-                    .providerId(appleUser.getProviderId())
+                    .provider(oauthUser.getProvider())
+                    .providerId(oauthUser.getProviderId())
                     .role(Role.USER)
                     .personalInfo(PersonalInfo.builder()
                             .gender(Gender.UNKNOWN)
