@@ -30,8 +30,21 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleSignatureVerificationException(SignatureVerificationException ex) {
         return ResponseEntity.badRequest().body(ex.getMessage());
     }
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<String> handleRuntimeException(RuntimeException ex) {
+
+    @ExceptionHandler(AppleLoginFailedException.class)
+    public ResponseEntity<String> handleAppleLoginFailedException(AppleLoginFailedException ex) {
+        return ResponseEntity.badRequest().body(ex.getMessage());
+    }
+    @ExceptionHandler(ApplePublicKeyNotFoundException.class)
+    public ResponseEntity<String> handleApplePublicKeyNotFoundException(ApplePublicKeyNotFoundException ex) {
+        return ResponseEntity.badRequest().body(ex.getMessage());
+    }
+    @ExceptionHandler(KakaoLoginFailedException.class)
+    public ResponseEntity<String> handleKakaoLoginFailedException(KakaoLoginFailedException ex) {
+        return ResponseEntity.badRequest().body(ex.getMessage());
+    }
+    @ExceptionHandler(CertificationException.class)
+    public ResponseEntity<String> handleCertificationException(CertificationException ex) {
         return ResponseEntity.badRequest().body(ex.getMessage());
     }
 }
