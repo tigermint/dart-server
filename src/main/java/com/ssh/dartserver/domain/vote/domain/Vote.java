@@ -54,7 +54,7 @@ public class Vote{
         this.pickedUser = pickedUser;
     }
 
-    public void updateUser(Object o) {
+    public void updatePickingUser(Object o) {
         this.pickingUser = (User) o;
     }
 }
