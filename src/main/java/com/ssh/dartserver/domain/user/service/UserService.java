@@ -117,7 +117,7 @@ public class UserService {
         //내가 투표를 받은 유저인 경우: 투표 테이블 삭제 + 후보 데이터 관련 투표 모두 삭제
         List<Vote> pickedUserVotes = voteRepository.findAllByPickedUser(user);
         candidateRepository.deleteAllByVoteIn(pickedUserVotes);
-        voteRepository.deleteAllIn(pickedUserVotes);
+        voteRepository.deleteAll(pickedUserVotes);
 
         //내가 투표를 한 유저인 경우: 투표에 pickingUser 데이터 null
         voteRepository.findAllByPickingUser(user)
