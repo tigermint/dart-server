@@ -1,6 +1,7 @@
 package com.ssh.dartserver.domain.friend.infra;
 
 import com.ssh.dartserver.domain.friend.domain.Friend;
+import com.ssh.dartserver.domain.user.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -11,6 +12,6 @@ import java.util.Optional;
 public interface FriendRepository extends JpaRepository<Friend, Long>{
     Optional<Friend> findByUserIdAndFriendUserId(Long userId, Long friendUserId);
     List<Friend> findAllByUserId(Long userId);
-    void deleteAllByUserIdOrFriendUserId(Long userId, Long friendUserId);
+    void deleteAllByUserOrFriendUser(User user, User friendUser);
 
 }

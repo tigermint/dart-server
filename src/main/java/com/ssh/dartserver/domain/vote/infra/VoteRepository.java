@@ -11,11 +11,8 @@ import java.util.Optional;
 @Repository
 public interface VoteRepository extends JpaRepository<Vote, Long> {
     Optional<Vote> findByPickedUserAndId(User pickedUser, Long voteId);
-    List<Vote> findAllByPickingUserId(Long id);
-    List<Vote> findAllByPickedUserId(Long id);
-
+    List<Vote> findAllByPickingUser(User pickingUser);
     List<Vote> findAllByPickedUser(User pickedUser);
-
-    void deleteAllByPickedUserId(Long id);
+    void deleteAllIn(List<Vote> votes);
 
 }
