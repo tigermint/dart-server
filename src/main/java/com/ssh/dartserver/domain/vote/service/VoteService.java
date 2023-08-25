@@ -82,7 +82,7 @@ public class VoteService {
 
     public List<ReceivedVoteResponse> listReceivedVote(User user) {
         List<ReceivedVoteResponse> dtos = new ArrayList<>();
-        List<Vote> votes = voteRepository.findAllByPickedUserId(user.getId());
+        List<Vote> votes = voteRepository.findAllByPickedUser(user);
         votes.forEach(vote -> {
             ReceivedVoteResponse dto = getReceivedVoteResponse(vote);
             dtos.add(dto);
