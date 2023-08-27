@@ -1,0 +1,25 @@
+version: '3'
+services:
+  dart-db-local:
+    container_name: dart-db-local
+    image: mysql:8.0
+    restart: always
+    ports:
+      - '3307:3306'
+    environment:
+      MYSQL_DATABASE: dartdb
+      MYSQL_USER: dart
+      MYSQL_PASSWORD: dart
+      MYSQL_ROOT_PASSWORD: dart
+  dart-server-local:
+    container_name: dart-server-local
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
+    depends_on:
+      - dart-db-local
+    restart: always
+    volumes:
+      - .:/dart
+    ports:
+      - '8081:8080'
