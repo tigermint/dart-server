@@ -13,26 +13,27 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @RequiredArgsConstructor
 public class SwaggerConfig {
+    private static final String SECURITY_SCHEME_NAME = "AccessToken";
+
     private final SwaggerProperty swaggerProperty;
 
     @Bean
     public OpenAPI openAPI() {
-        final String securitySchemeName = "AccessToken";
 
         Info info = new Info()
                 .title(swaggerProperty.getInfo().getTitle())
                 .version(swaggerProperty.getInfo().getVersion())
                 .description(swaggerProperty.getInfo().getDescription());
 
-        SecurityRequirement securityRequirement = new SecurityRequirement().addList(securitySchemeName);
+        SecurityRequirement securityRequirement = new SecurityRequirement().addList(SECURITY_SCHEME_NAME);
 
         return new OpenAPI()
                 .addSecurityItem(securityRequirement)
                 .components(
                         new Components()
-                                .addSecuritySchemes(securitySchemeName,
+                                .addSecuritySchemes(SECURITY_SCHEME_NAME,
                                         new SecurityScheme()
-                                                .name(securitySchemeName)
+                                                .name(SECURITY_SCHEME_NAME)
                                                 .type(SecurityScheme.Type.HTTP)
                                                 .scheme("bearer")
                                                 .bearerFormat("JWT")
