@@ -9,9 +9,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -29,8 +31,12 @@ public class FriendController {
     @PostMapping
     public ResponseEntity<String> create(Authentication authentication, @RequestBody @Valid FriendRequest request){
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
-        friendService.createFriendById(principal.getUser(), request);
-        return ResponseEntity.ok("친구 추가 성공");
+        Long friendUserId = friendService.createFriendById(principal.getUser(), request);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(friendUserId)
+                .toUri();
+        return ResponseEntity.created(location).build();
     }
 
     /**
@@ -43,7 +49,12 @@ public class FriendController {
     @PostMapping("/invite")
     public ResponseEntity<FriendResponse> createFriendByRecommendationCode(Authentication authentication, @RequestBody @Valid FriendRecommendationCodeRequest request) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
-        return ResponseEntity.ok(friendService.createFriendByRecommendationCode(principal.getUser(), request));
+        Long friendUserId = friendService.createFriendByRecommendationCode(principal.getUser(), request);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(friendUserId)
+                .toUri();
+        return ResponseEntity.created(location).build();
     }
 
     /**
@@ -74,7 +85,7 @@ public class FriendController {
     public ResponseEntity<String> delete(Authentication authentication, @RequestParam @NotNull Long friendUserId ) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         friendService.delete(principal.getUser(), friendUserId);
-        return ResponseEntity.ok("친구 삭제 성공");
+        return ResponseEntity.noContent().build();
     }
 
 }

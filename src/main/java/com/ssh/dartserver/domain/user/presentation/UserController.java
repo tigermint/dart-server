@@ -16,8 +16,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -34,7 +36,12 @@ public class UserController {
     @PostMapping("/signup")
     public ResponseEntity<UserProfileResponse> signup(Authentication authentication, @Valid @RequestBody UserSignupRequest request) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
-        return ResponseEntity.ok(userService.signup(principal.getUser(), request));
+        Long userId = userService.signup(principal.getUser(), request);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(userId)
+                .toUri();
+        return ResponseEntity.created(location).build();
     }
 
     @GetMapping("/me")
@@ -53,7 +60,7 @@ public class UserController {
     public ResponseEntity<String> delete(Authentication authentication) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         userService.delete(principal.getUser());
-        return ResponseEntity.ok("회원 탈퇴가 완료되었습니다.");
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/me/next-voting-time")
@@ -97,7 +104,7 @@ public class UserController {
     public ResponseEntity<String> deleteTeam(Authentication authentication, @PathVariable Long teamId) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         myTeamService.deleteTeam(principal.getUser(), teamId);
-        return ResponseEntity.ok("팀 삭제가 완료되었습니다.");
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/me/votes/{voteId}")

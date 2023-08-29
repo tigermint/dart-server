@@ -47,11 +47,11 @@ public class VoteService {
     private final PlatformNotification notification;
 
     @Transactional
-    public ReceivedVoteResponse create(User pickingUser, VoteResultRequest request) {
+    public Long create(User pickingUser, VoteResultRequest request) {
         Question question = questionRepository.findById(request.getQuestionId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 질문입니다."));
 
-        List<User> candidates = userRepository.findByIdIn(request.getCandidateIds());
+        List<User> candidates = userRepository.findAllByIdIn(request.getCandidateIds());
         User pickedUser = candidates.stream()
                 .filter(user -> user.getId().equals(request.getPickedUserId()))
                 .findFirst()
@@ -65,12 +65,12 @@ public class VoteService {
                 .question(question)
                 .build();
 
-        voteRepository.save(vote);
-        candidateRepository.saveAll(vote.getCandidates().getValues());
+        Vote savedVote = voteRepository.save(vote);
+        candidateRepository.saveAll(savedVote.getCandidates().getValues());
 
         addPoint(pickingUser, pickedUser);
         postNotification(pickingUser,pickedUser);
-        return getReceivedVoteResponse(vote);
+        return savedVote.getId();
     }
 
 
@@ -106,8 +106,9 @@ public class VoteService {
         //예외 발생 시 logger 추가 필요
     }
     private ReceivedVoteResponse getReceivedVoteResponse(Vote vote) {
-
+        //선택한 유저
         Optional<User> optionalPickingUser = Optional.ofNullable(vote.getPickingUser());
+        //투표에 해당하는 후보자 -> n + 1 문제 발생
         List<Optional<User>> optionalCandidateUsers = vote.getCandidates().getValues().stream()
                 .map(Candidate::getUser)
                 .map(Optional::ofNullable)
