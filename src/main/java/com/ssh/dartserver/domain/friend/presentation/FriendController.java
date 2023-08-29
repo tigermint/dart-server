@@ -50,8 +50,8 @@ public class FriendController {
     public ResponseEntity<FriendResponse> createFriendByRecommendationCode(Authentication authentication, @RequestBody @Valid FriendRecommendationCodeRequest request) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         Long friendUserId = friendService.createFriendByRecommendationCode(principal.getUser(), request);
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}")
+        URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("/v1/friends/{id}")
                 .buildAndExpand(friendUserId)
                 .toUri();
         return ResponseEntity.created(location).build();
