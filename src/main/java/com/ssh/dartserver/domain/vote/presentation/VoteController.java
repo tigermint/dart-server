@@ -1,6 +1,5 @@
 package com.ssh.dartserver.domain.vote.presentation;
 
-import com.ssh.dartserver.domain.vote.dto.ReceivedVoteResponse;
 import com.ssh.dartserver.domain.vote.dto.VoteResultRequest;
 import com.ssh.dartserver.domain.vote.service.VoteService;
 import com.ssh.dartserver.global.auth.service.oauth.PrincipalDetails;
@@ -11,8 +10,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
+import java.net.URI;
 
 @Controller
 @RequiredArgsConstructor
@@ -21,8 +22,13 @@ public class VoteController {
     private final VoteService voteService;
 
     @PostMapping
-    public ResponseEntity<ReceivedVoteResponse> create(Authentication authentication, @RequestBody @Valid VoteResultRequest request) {
+    public ResponseEntity<Long> create(Authentication authentication, @RequestBody @Valid VoteResultRequest request) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
-        return ResponseEntity.ok(voteService.create(principal.getUser(), request));
+        Long voteId = voteService.create(principal.getUser(), request);
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(voteId)
+                .toUri();
+        return ResponseEntity.created(location).build();
     }
 }
