@@ -52,17 +52,15 @@ public class UserService {
     private final QuestionMapper questionMapper;
 
     @Transactional
-    public UserProfileResponse signup(User user, UserSignupRequest userSignupRequest) {
+    public Long signup(User user, UserSignupRequest userSignupRequest) {
         user.signup(
                 getPersonalInfo(userSignupRequest),
                 getUniversity(userSignupRequest.getUniversityId()),
                 randomGenerator,
                 Point.from(DEFAULT_POINT)
         );
-        userRepository.save(user);
-        List<ProfileQuestion> profileQuestions = profileQuestionRepository.findAllByUser(user);
-
-        return getUserProfileResponse(user, profileQuestions);
+        User savedUser = userRepository.save(user);
+        return savedUser.getId();
     }
 
 
@@ -104,9 +102,9 @@ public class UserService {
 
         profileQuestionRepository.deleteAllByUser(user);
         profileQuestionRepository.saveAll(profileQuestions);
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);
 
-        return getUserProfileResponse(user, profileQuestions);
+        return getUserProfileResponse(savedUser, profileQuestions);
     }
 
     @Transactional
