@@ -1,7 +1,7 @@
 package com.ssh.dartserver.global.infra.notification;
 
+import com.ssh.dartserver.global.config.properties.OneSignalProperty;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -18,19 +18,14 @@ import java.util.Map;
 @Component
 public class OneSignalNotification implements PlatformNotification{
     private final RestTemplate restTemplate;
+    private final OneSignalProperty oneSignalProperty;
 
-    //환경변수 처리 수정 필요
-    @Value("${onesignal.rest-api-key}")
-    private String oneSignalRestApiKey;
-
-    @Value("${onesignal.app-id}")
-    private String oneSignalAppId;
     @Override
     public void postNotificationSpecificDevice(Long userId, String contents){
         HttpHeaders headers = getHttpHeaders();
 
         Map<String, Object> requestBody = Map.of(
-                "app_id", oneSignalAppId,
+                "app_id", oneSignalProperty.getAppId(),
                 "include_external_user_ids", List.of(String.valueOf(userId)),
                 "contents", Map.of("en", contents)
         );
@@ -49,7 +44,7 @@ public class OneSignalNotification implements PlatformNotification{
         HttpHeaders headers = getHttpHeaders();
 
         Map<String, Object> requestBody = Map.of(
-                "app_id", oneSignalAppId,
+                "app_id", oneSignalProperty.getAppId(),
                 "send_after", dateTime.toString(),
                 "include_external_user_ids", List.of(String.valueOf(userId)),
                 "contents", Map.of("en", contents)
@@ -69,7 +64,7 @@ public class OneSignalNotification implements PlatformNotification{
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.set("Authorization", "Basic " + oneSignalRestApiKey);
+        headers.set("Authorization", "Basic " + oneSignalProperty.getRestApiKey());
         return headers;
     }
 }
