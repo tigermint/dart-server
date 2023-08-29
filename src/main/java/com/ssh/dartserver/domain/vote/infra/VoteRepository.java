@@ -2,6 +2,8 @@ package com.ssh.dartserver.domain.vote.infra;
 
 import com.ssh.dartserver.domain.user.domain.User;
 import com.ssh.dartserver.domain.vote.domain.Vote;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -19,9 +21,14 @@ public interface VoteRepository extends JpaRepository<Vote, Long> {
     Optional<Vote> findByPickedUserAndId(@Param("pickingUser") User pickedUser, @Param("voteId") Long voteId);
 
     List<Vote> findAllByPickingUser(User pickingUser);
+
     @Query("select distinct v " +
             "from Vote v " +
             "join fetch v.candidates.values cv join fetch cv.user u join fetch u.university join fetch v.question " +
             "where v.pickedUser = :pickedUser")
     List<Vote> findAllByPickedUser(@Param("pickedUser") User pickedUser);
+
+    @Query("select v from Vote v where v.pickedUser = :pickedUser")
+    Page<Vote> findAllByPickedUser(@Param("pickedUser") User pickedUser, Pageable pageable);
+
 }

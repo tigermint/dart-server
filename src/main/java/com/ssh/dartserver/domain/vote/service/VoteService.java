@@ -9,6 +9,7 @@ import com.ssh.dartserver.domain.user.dto.mapper.UserMapper;
 import com.ssh.dartserver.domain.user.infra.UserRepository;
 import com.ssh.dartserver.domain.vote.domain.Candidate;
 import com.ssh.dartserver.domain.vote.domain.Vote;
+import com.ssh.dartserver.domain.vote.dto.ReceivedVoteDetailResponse;
 import com.ssh.dartserver.domain.vote.dto.ReceivedVoteResponse;
 import com.ssh.dartserver.domain.vote.dto.VoteResultRequest;
 import com.ssh.dartserver.domain.vote.dto.mapper.VoteMapper;
@@ -17,10 +18,13 @@ import com.ssh.dartserver.domain.vote.infra.VoteRepository;
 import com.ssh.dartserver.global.infra.notification.PlatformNotification;
 import com.ssh.dartserver.global.utils.DateTimeUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -33,6 +37,7 @@ public class VoteService {
 
     private static final int VOTE_PICK_POINT = 2;
     private static final int VOTED_PICKED_POINT = 1;
+    private static final int PAGE_SIZE = 10;
 
     private final VoteRepository voteRepository;
     private final QuestionRepository questionRepository;
@@ -74,20 +79,26 @@ public class VoteService {
     }
 
 
-    public ReceivedVoteResponse readReceivedVote(User user, Long voteId) {
+    public ReceivedVoteDetailResponse readReceivedVote(User user, Long voteId) {
         Vote vote = voteRepository.findByPickedUserAndId(user, voteId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 투표입니다."));
         return getReceivedVoteResponse(vote);
     }
 
-    public List<ReceivedVoteResponse> listReceivedVote(User user) {
-        List<ReceivedVoteResponse> dtos = new ArrayList<>();
-        List<Vote> votes = voteRepository.findAllByPickedUser(user);
-        votes.forEach(vote -> {
-            ReceivedVoteResponse dto = getReceivedVoteResponse(vote);
-            dtos.add(dto);
-        });
-        return dtos;
+    public Page<ReceivedVoteResponse> listReceivedVote(User user, int page, String criteria) {
+        Pageable pageable = PageRequest.of(page, PAGE_SIZE, Sort.by(Sort.Direction.DESC, criteria));
+        Page<Vote> votes = voteRepository.findAllByPickedUser(user, pageable);
+
+        return votes.map(vote ->
+            voteMapper.toReceivedVoteResponse(
+                    vote,
+                    questionMapper.toQuestionResponse(vote.getQuestion()),
+                    userMapper.toUserWithUniversityResponse(
+                            userMapper.toUserResponse(vote.getPickingUser()),
+                            universityMapper.toUniversityResponse(vote.getPickingUser().getUniversity())
+                    )
+
+        ));
     }
 
     private void addPoint(User user, User pickedUser) {
@@ -105,16 +116,14 @@ public class VoteService {
         CompletableFuture.runAsync(() -> notification.postNotificationSpecificDevice(pickedUser.getId(), contents));
         //예외 발생 시 logger 추가 필요
     }
-    private ReceivedVoteResponse getReceivedVoteResponse(Vote vote) {
-        //선택한 유저
+    private ReceivedVoteDetailResponse getReceivedVoteResponse(Vote vote) {
         Optional<User> optionalPickingUser = Optional.ofNullable(vote.getPickingUser());
-        //투표에 해당하는 후보자 -> n + 1 문제 발생
         List<Optional<User>> optionalCandidateUsers = vote.getCandidates().getValues().stream()
                 .map(Candidate::getUser)
                 .map(Optional::ofNullable)
                 .collect(Collectors.toList());
 
-        return voteMapper.toReceivedVoteResponse(
+        return voteMapper.toReceivedVoteDetailResponse(
                 vote,
                 questionMapper.toQuestionResponse(vote.getQuestion()),
                 userMapper.toUserWithUniversityResponse(
