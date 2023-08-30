@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.concurrent.CompletableFuture;
+
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -30,7 +32,11 @@ public class NextVoteService {
     public UserNextVoteResponse updateNextVoteAvailableDateTime(User user) {
         user.updateNextVoteAvailableDateTime(NEXT_VOTE_AVAILABLE_MINUTES);
         userRepository.save(user);
-        notification.postNotificationNextVoteAvailableDateTime(user.getId(), DateTimeUtils.toUTC(user.getNextVoteAvailableDateTime().getValue()), NEXT_VOTE_AVAILABLE_CONTENTS);
+        //TODO: 비동기 처리 -> 예외 처리 로직 필요
+        CompletableFuture.runAsync(() -> notification.postNotificationNextVoteAvailableDateTime(
+                user.getId(),
+                DateTimeUtils.toUTC(user.getNextVoteAvailableDateTime().getValue()),
+                NEXT_VOTE_AVAILABLE_CONTENTS));
         return userMapper.toUserNextVoteResponseDto(user.getNextVoteAvailableDateTime().getValue());
     }
 }

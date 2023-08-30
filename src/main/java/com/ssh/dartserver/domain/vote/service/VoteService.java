@@ -112,9 +112,8 @@ public class VoteService {
                 user.getPersonalInfo().getAdmissionYear().getValue() - 2000,
                 user.getPersonalInfo().getGender().getKorValue(),
                 VOTED_PICKED_POINT);
-
+        //TODO: 비동기 처리 -> 예외처리 로직 필요
         CompletableFuture.runAsync(() -> notification.postNotificationSpecificDevice(pickedUser.getId(), contents));
-        //예외 발생 시 logger 추가 필요
     }
     private ReceivedVoteDetailResponse getReceivedVoteResponse(Vote vote) {
         Optional<User> optionalPickingUser = Optional.ofNullable(vote.getPickingUser());
