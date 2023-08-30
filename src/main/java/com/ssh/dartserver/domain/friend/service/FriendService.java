@@ -34,22 +34,29 @@ public class FriendService {
     public Long createFriendById(User user, FriendRequest request) {
         User friendUser = userRepository.findById(request.getFriendUserId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
-        if(isFriend(user, friendUser)){
-            throw new IllegalArgumentException("이미 친구입니다.");
-        }
+
+        validateIsAlreadyFriend(user, friendUser);
+
         Friend savedFriend = save(user, friendUser);
         return savedFriend.getId();
     }
+
 
     @Transactional
     public Long createFriendByRecommendationCode(User user, FriendRecommendationCodeRequest request) {
         User friendUser = userRepository.findByRecommendationCode(new RecommendationCode(request.getRecommendationCode()))
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 추천인 코드입니다."));
-        if(isFriend(user, friendUser)){
-            throw new IllegalArgumentException("이미 친구입니다.");
-        }
+
+        validateIsAlreadyFriend(user, friendUser);
+
         Friend savedFriend = save(user, friendUser);
         return savedFriend.getId();
+    }
+
+    public FriendResponse readFriend(User user, Long friendId) {
+        Friend friend = friendRepository.findByUserIdAndId(user.getId(), friendId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 친구관계 입니다."));
+        return getFriendResponseDto(friend.getFriendUser());
     }
 
     public List<FriendResponse> listFriend(User user) {
@@ -82,13 +89,8 @@ public class FriendService {
     @Transactional
     public void delete(User user, Long friendUserId) {
         Friend friend = friendRepository.findByUserIdAndFriendUserId(user.getId(), friendUserId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 친구입니다."));
+                .orElseThrow(() -> new IllegalArgumentException("나와 친구 관계가 아닌 유저입니다."));
         friendRepository.deleteById(friend.getId());
-    }
-
-    private boolean isFriend(User user, User friendUser) {
-        return friendRepository.findByUserIdAndFriendUserId(user.getId(), friendUser.getId())
-                .isPresent();
     }
 
     private Friend save(User user, User friendUser) {
@@ -103,6 +105,11 @@ public class FriendService {
         return friendMapper.toFriendResponseDto(
                 userMapper.toUserResponse(friend), universityMapper.toUniversityResponse(friend.getUniversity())
         );
+    }
+    private void validateIsAlreadyFriend(User user, User friendUser) {
+        friendRepository.findByUserIdAndFriendUserId(user.getId(), friendUser.getId()).ifPresent(friend -> {
+            throw new IllegalArgumentException("이미 친구입니다.");
+        });
     }
 
 }
