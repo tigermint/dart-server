@@ -24,11 +24,20 @@ public interface VoteRepository extends JpaRepository<Vote, Long> {
 
     @Query("select distinct v " +
             "from Vote v " +
-            "join fetch v.candidates.values cv join fetch cv.user u join fetch u.university join fetch v.question " +
+            "join fetch v.candidates.values cv " +
+            "join fetch cv.user u " +
+            "join fetch u.university " +
+            "join fetch v.question " +
             "where v.pickedUser = :pickedUser")
     List<Vote> findAllByPickedUser(@Param("pickedUser") User pickedUser);
 
-    @Query("select v from Vote v where v.pickedUser = :pickedUser")
+    @Query(value = "select v " +
+            "from Vote v " +
+            "join fetch v.question " +
+            "join fetch v.pickingUser u " +
+            "join fetch u.university " +
+            "where v.pickedUser = :pickedUser",
+            countQuery = "select count(v) from Vote v where v.pickedUser = :pickedUser")
     Page<Vote> findAllByPickedUser(@Param("pickedUser") User pickedUser, Pageable pageable);
 
 }
