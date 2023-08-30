@@ -31,10 +31,10 @@ public class FriendController {
     @PostMapping
     public ResponseEntity<String> create(Authentication authentication, @RequestBody @Valid FriendRequest request){
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
-        Long friendUserId = friendService.createFriendById(principal.getUser(), request);
+        Long friendId = friendService.createFriendById(principal.getUser(), request);
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(friendUserId)
+                .buildAndExpand(friendId)
                 .toUri();
         return ResponseEntity.created(location).build();
     }
@@ -49,12 +49,24 @@ public class FriendController {
     @PostMapping("/invite")
     public ResponseEntity<FriendResponse> createFriendByRecommendationCode(Authentication authentication, @RequestBody @Valid FriendRecommendationCodeRequest request) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
-        Long friendUserId = friendService.createFriendByRecommendationCode(principal.getUser(), request);
+        Long friendId = friendService.createFriendByRecommendationCode(principal.getUser(), request);
         URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("/v1/friends/{id}")
-                .buildAndExpand(friendUserId)
+                .buildAndExpand(friendId)
                 .toUri();
         return ResponseEntity.created(location).build();
+    }
+
+    /**
+     * 친구 관계의 친구 조회
+     * @param authentication
+     * @param friendId
+     * @return
+     */
+    @GetMapping("/{friendId}")
+    public ResponseEntity<FriendResponse> readFriend(Authentication authentication, @PathVariable Long friendId) {
+        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
+        return ResponseEntity.ok(friendService.readFriend(principal.getUser(), friendId));
     }
 
     /**
@@ -77,7 +89,6 @@ public class FriendController {
     /**
      * 친구 삭제
      * @param authentication
-     * 
      * @param friendUserId
      * @return
      */
