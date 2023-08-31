@@ -5,10 +5,13 @@ import com.ssh.dartserver.domain.user.dto.UserWithUniversityResponse;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
+
 @Data
-public class ReceivedVoteResponse {
+public class ReceivedVoteDetailResponse {
     private Long voteId;
     private LocalDateTime pickedTime;
     private QuestionResponse question;
     private UserWithUniversityResponse pickingUser;
+    private List<UserWithUniversityResponse> candidates;
 }

@@ -18,7 +18,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findById(Long id);
 
-    List<User> findByIdIn(List<Long> ids);
+    @Query(value = "SELECT u FROM User u join fetch u.university WHERE u.id IN :ids")
+    List<User> findAllByIdIn(@Param("ids") List<Long> ids);
 
     @Query(value = "SELECT f.user FROM Friend f WHERE f.friendUser.id = :userId")
     List<User> findAllAddedMeAsFriendByUserId(@Param("userId") Long id);

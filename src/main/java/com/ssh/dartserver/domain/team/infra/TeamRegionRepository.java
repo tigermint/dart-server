@@ -9,6 +9,5 @@ import java.util.List;
 public interface TeamRegionRepository extends JpaRepository<TeamRegion, Long> {
     List<TeamRegion> findAllByTeam(Team team);
     List<TeamRegion> findAllByTeamId(Long teamId);
-
     void deleteAllByTeamId(Long teamId);
 }
