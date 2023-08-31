@@ -9,6 +9,7 @@ import com.ssh.dartserver.domain.user.dto.UserStudentIdCardVerificationRequest;
 import com.ssh.dartserver.domain.user.dto.UserWithUniversityResponse;
 import com.ssh.dartserver.domain.user.dto.mapper.UserMapper;
 import com.ssh.dartserver.domain.user.infra.UserRepository;
+import com.ssh.dartserver.domain.user.infra.VerifyMessageSender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
@@ -17,17 +18,30 @@ public class StudentIdCardVerificationService {
 
     private final UserRepository userRepository;
     private final UniversityRepository universityRepository;
+    private final VerifyMessageSender verifyMessageSender;
     private final UserMapper userMapper;
     private final UniversityMapper universityMapper;
 
     public UserWithUniversityResponse updateStudentIdCardVerificationStatus(User user, UserStudentIdCardVerificationRequest request) {
         user.getStudentVerificationInfo().updateStudentIdCardVerificationStatus(StudentIdCardVerificationStatus.VERIFICATION_IN_PROGRESS);
         user.getStudentVerificationInfo().updateStudentIdCardImageUrl(request.getStudentIdCardImageUrl());
+
+        verifyMessageSender.sendIdCardVerification(user.getId(), request.getName(), request.getStudentIdCardImageUrl());
+        return newUserWithUniversityResponse(user);
+    }
+
+    public UserWithUniversityResponse updateStudentIdCardVerificationStatus(User user, StudentIdCardVerificationStatus status) {
+        user.getStudentVerificationInfo().updateStudentIdCardVerificationStatus(status);
+        return newUserWithUniversityResponse(user);
+    }
+
+    private UserWithUniversityResponse newUserWithUniversityResponse(User user) {
         University university = universityRepository.findById(user.getUniversity().getId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 대학입니다."));
         userRepository.save(user);
-        //TODO: Slack webhook API 요청
-        return userMapper.toUserWithUniversityResponse(userMapper.toUserResponse(user),
+
+        return userMapper.toUserWithUniversityResponse(
+                userMapper.toUserResponse(user),
                 universityMapper.toUniversityResponse(university));
     }
 }
