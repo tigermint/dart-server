@@ -37,11 +37,11 @@ out/
 ### VS Code ###
 .vscode/
 
-### VCS ###
-.github/
-
 ### Gradle ###
 src/main/resources/*.yml
 
 ### Seed ###
 src/main/resources/db/seed/
+
+### Test ###
+src/test/
