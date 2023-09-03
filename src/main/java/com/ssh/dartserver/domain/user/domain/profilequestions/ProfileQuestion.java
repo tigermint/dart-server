@@ -13,7 +13,8 @@ import javax.persistence.*;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Table(name = "profile_question")
 public class ProfileQuestion {
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "profile_question_id")
     private Long id;
 

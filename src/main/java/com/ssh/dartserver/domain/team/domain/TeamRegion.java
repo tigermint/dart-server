@@ -14,7 +14,8 @@ import javax.persistence.*;
 @Builder
 @Table(name = "team_region")
 public class TeamRegion {
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "team_region_id")
     private Long id;
 
