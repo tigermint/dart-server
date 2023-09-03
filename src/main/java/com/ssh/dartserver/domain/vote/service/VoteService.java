@@ -52,15 +52,20 @@ public class VoteService {
     private final PlatformNotification notification;
 
     @Transactional
-    public Long create(User pickingUser, VoteResultRequest request) {
+    public synchronized Long create(User user, VoteResultRequest request) {
+
         Question question = questionRepository.findById(request.getQuestionId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 질문입니다."));
-
         List<User> candidates = userRepository.findAllByIdIn(request.getCandidateIds());
+
+        User pickingUser = userRepository.findByIdForUpdate(user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
+
         User pickedUser = candidates.stream()
-                .filter(user -> user.getId().equals(request.getPickedUserId()))
+                .filter(candidate -> candidate.getId().equals(request.getPickedUserId()))
                 .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("투표받은 유저가 존재하지 않는 후보자입니다."));
+                .orElseThrow(() -> new IllegalArgumentException("투표 받은 유저가 존재하지 않는 후보자입니다."));
+
 
         Vote vote = Vote.builder()
                 .candidates(candidates)
@@ -73,7 +78,8 @@ public class VoteService {
         Vote savedVote = voteRepository.save(vote);
         candidateRepository.saveAll(savedVote.getCandidates().getValues());
 
-        addPoint(pickingUser, pickedUser);
+        pickingUser.addPoint(VOTE_PICK_POINT);
+        pickedUser.addPoint(VOTED_PICKED_POINT);
         postNotification(pickingUser,pickedUser);
         return savedVote.getId();
     }
@@ -90,31 +96,28 @@ public class VoteService {
         Page<Vote> votes = voteRepository.findAllByPickedUser(user, pageable);
 
         return votes.map(vote ->
-            voteMapper.toReceivedVoteResponse(
-                    vote,
-                    questionMapper.toQuestionResponse(vote.getQuestion()),
-                    userMapper.toUserWithUniversityResponse(
-                            userMapper.toUserResponse(vote.getPickingUser()),
-                            universityMapper.toUniversityResponse(vote.getPickingUser().getUniversity())
-                    )
+                voteMapper.toReceivedVoteResponse(
+                        vote,
+                        questionMapper.toQuestionResponse(vote.getQuestion()),
+                        userMapper.toUserWithUniversityResponse(
+                                userMapper.toUserResponse(vote.getPickingUser()),
+                                universityMapper.toUniversityResponse(vote.getPickingUser().getUniversity())
+                        )
 
-        ));
+                ));
     }
 
-    private void addPoint(User user, User pickedUser) {
-        user.addPoint(VOTE_PICK_POINT);
-        pickedUser.addPoint(VOTED_PICKED_POINT);
-        userRepository.saveAll(List.of(user, pickedUser));
-    }
-
-    private void postNotification(User user, User pickedUser) {
+    private void postNotification(User pickingUser, User pickedUser) {
         String contents = String.format("%d학번 %s학생이 당신을 투표했어요. +%d점!",
-                user.getPersonalInfo().getAdmissionYear().getValue() - 2000,
-                user.getPersonalInfo().getGender().getKorValue(),
+                pickingUser.getPersonalInfo().getAdmissionYear().getValue() - 2000,
+                pickingUser.getPersonalInfo().getGender().getKorValue(),
                 VOTED_PICKED_POINT);
-        //TODO: 비동기 처리 -> 예외처리 로직 필요
-        CompletableFuture.runAsync(() -> notification.postNotificationSpecificDevice(pickedUser.getId(), contents));
+        //TODO: 비동기 처리 필요
+        CompletableFuture.runAsync(() ->
+            notification.postNotificationSpecificDevice(pickedUser.getId(), contents)
+        );
     }
+
     private ReceivedVoteDetailResponse getReceivedVoteResponse(Vote vote) {
         Optional<User> optionalPickingUser = Optional.ofNullable(vote.getPickingUser());
         List<Optional<User>> optionalCandidateUsers = vote.getCandidates().getValues().stream()

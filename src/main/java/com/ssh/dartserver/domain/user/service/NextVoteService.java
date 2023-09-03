@@ -29,14 +29,17 @@ public class NextVoteService {
     }
 
     @Transactional
-    public UserNextVoteResponse updateNextVoteAvailableDateTime(User user) {
-        user.updateNextVoteAvailableDateTime(NEXT_VOTE_AVAILABLE_MINUTES);
-        userRepository.save(user);
-        //TODO: 비동기 처리 -> 예외 처리 로직 필요
-        CompletableFuture.runAsync(() -> notification.postNotificationNextVoteAvailableDateTime(
-                user.getId(),
-                DateTimeUtils.toUTC(user.getNextVoteAvailableDateTime().getValue()),
-                NEXT_VOTE_AVAILABLE_CONTENTS));
-        return userMapper.toUserNextVoteResponseDto(user.getNextVoteAvailableDateTime().getValue());
+    public synchronized UserNextVoteResponse updateNextVoteAvailableDateTime(User user) {
+        User pickingUser = userRepository.findByIdForUpdate(user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
+        pickingUser.updateNextVoteAvailableDateTime(NEXT_VOTE_AVAILABLE_MINUTES);
+        //TODO: 비동기 처리 필요
+        CompletableFuture.runAsync(() ->
+            notification.postNotificationNextVoteAvailableDateTime(
+                    user.getId(),
+                    DateTimeUtils.toUTC(user.getNextVoteAvailableDateTime().getValue()),
+                    NEXT_VOTE_AVAILABLE_CONTENTS)
+        );
+        return userMapper.toUserNextVoteResponseDto(pickingUser.getNextVoteAvailableDateTime().getValue());
     }
 }
