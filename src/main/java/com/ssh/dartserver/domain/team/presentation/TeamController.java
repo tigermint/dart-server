@@ -59,7 +59,6 @@ public class TeamController {
         long universityId = principal.getUser().getUniversity().getId();
         Gender userGender = principal.getUser().getPersonalInfo().getGender();
 
-//        Pageable pageable = PageRequest.of(page, size, Sort.by("id").descending());  // TODO sort 필요!
         Pageable pageable = PageRequest.of(page, size);
         Page<BlindDateTeamResponse> teamResponses = teamService.listVisibleTeams(universityId, userGender, regionId, pageable);
 
