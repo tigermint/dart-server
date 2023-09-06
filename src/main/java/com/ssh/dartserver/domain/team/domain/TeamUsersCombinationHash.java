@@ -1,5 +1,6 @@
 package com.ssh.dartserver.domain.team.domain;
 
+import java.util.Arrays;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -13,6 +14,8 @@ import java.util.stream.Collectors;
 @Getter
 @NoArgsConstructor
 public class TeamUsersCombinationHash {
+    private static final String SEPARATOR = "-";
+
     @Column(name = "team_users_combination_hash", unique = true)
     private String value;
 
@@ -27,5 +30,11 @@ public class TeamUsersCombinationHash {
                         .map(String::valueOf)
                         .collect(Collectors.joining("-"))
         );
+    }
+
+    public List<Long> getUsersId() {
+        return Arrays.stream(value.split(SEPARATOR))
+                .map(Long::parseLong)
+                .collect(Collectors.toList());
     }
 }
