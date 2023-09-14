@@ -1,5 +1,10 @@
 package com.ssh.dartserver.domain.user.presentation;
 
+import com.ssh.dartserver.domain.chat.dto.ChatRoomResponse;
+import com.ssh.dartserver.domain.chat.service.ChatRoomService;
+import com.ssh.dartserver.domain.proposal.dto.ProposalRequest;
+import com.ssh.dartserver.domain.proposal.dto.ProposalResponse;
+import com.ssh.dartserver.domain.proposal.service.ProposalService;
 import com.ssh.dartserver.domain.question.dto.ReceivedQuestionResponse;
 import com.ssh.dartserver.domain.question.service.QuestionService;
 import com.ssh.dartserver.domain.team.dto.TeamRequest;
@@ -34,6 +39,8 @@ public class UserController {
     private final StudentIdCardVerificationService studentIdCardVerificationService;
     private final MyTeamService myTeamService;
     private final QuestionService questionService;
+    private final ChatRoomService chatRoomService;
+    private final ProposalService proposalService;
 
     @PostMapping("/signup")
     public ResponseEntity<UserProfileResponse> signup(Authentication authentication, @Valid @RequestBody UserSignupRequest request) {
@@ -129,5 +136,36 @@ public class UserController {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         return ResponseEntity.ok(questionService.listReceivedVoteQuestion(principal.getUser()));
     }
+
+    @GetMapping("/me/chat/rooms/{chatRoomId}")
+    public ResponseEntity<ChatRoomResponse.ReadDto> readChatRoom(@PathVariable Long chatRoomId, Authentication authentication) {
+        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
+        return ResponseEntity.ok(chatRoomService.readChatRoom(chatRoomId, principal.getUser()));
+    }
+
+    @GetMapping("/me/chat/rooms")
+    public ResponseEntity<List<ChatRoomResponse.ListDto>> listChatRoom(Authentication authentication) {
+        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
+        return ResponseEntity.ok(chatRoomService.listChatRoom(principal.getUser()));
+    }
+
+    @GetMapping("/me/proposals")
+    public ResponseEntity<List<ProposalResponse.ListDto>> listProposal(Authentication authentication, @RequestParam(defaultValue = "sent") String type) {
+        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
+        if (type.equals("sent")) {
+            return ResponseEntity.ok(proposalService.listSentProposal(principal.getUser()));
+        }
+        if (type.equals("received")) {
+            return ResponseEntity.ok(proposalService.listReceivedProposal(principal.getUser()));
+        }
+        return ResponseEntity.badRequest().build();
+    }
+
+    @PatchMapping("/me/proposals/{proposalId}")
+    public ResponseEntity<ProposalResponse.UpdateDto> updateProposal(Authentication authentication, @PathVariable Long proposalId, @RequestBody ProposalRequest.Update request) {
+        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
+        return ResponseEntity.ok(proposalService.updateProposal(principal.getUser(), proposalId, request));
+    }
+
 
 }
