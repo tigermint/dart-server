@@ -11,6 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class TeamService {
     private final TeamRepository teamRepository;
     public Long countAllTeams() {
-        return teamRepository.count() * 2 + 1;
+        return teamRepository.count() * 2 + 50;
     }
 }
