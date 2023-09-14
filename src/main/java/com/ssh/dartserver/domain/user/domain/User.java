@@ -83,5 +83,8 @@ public class User extends BaseTimeEntity {
     public void addPoint(int value) {
         this.point = this.point.add(value);
     }
+    public void subtractPoint(int value) {
+        this.point = this.point.subtract(value);
+    }
 
 }
