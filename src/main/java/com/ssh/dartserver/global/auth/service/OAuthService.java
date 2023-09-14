@@ -4,23 +4,20 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ssh.dartserver.global.auth.dto.ApplePublicKey;
-import com.ssh.dartserver.global.auth.dto.GetApplePublicKeyResponse;
-import com.ssh.dartserver.global.auth.dto.TokenResponse;
-import com.ssh.dartserver.global.auth.service.jwt.JwtProperties;
-import com.ssh.dartserver.global.auth.domain.AppleUser;
-import com.ssh.dartserver.global.auth.domain.KakaoUser;
-import com.ssh.dartserver.global.auth.domain.OAuthUserInfo;
-import com.ssh.dartserver.global.auth.dto.AppleTokenRequest;
-import com.ssh.dartserver.global.auth.dto.KakaoTokenRequest;
-import com.ssh.dartserver.global.auth.infra.OAuthRestTemplate;
-import com.ssh.dartserver.global.common.Role;
-import com.ssh.dartserver.global.error.AppleLoginFailedException;
-import com.ssh.dartserver.global.error.ApplePublicKeyNotFoundException;
 import com.ssh.dartserver.domain.user.domain.User;
 import com.ssh.dartserver.domain.user.domain.personalinfo.Gender;
 import com.ssh.dartserver.domain.user.domain.personalinfo.PersonalInfo;
 import com.ssh.dartserver.domain.user.infra.UserRepository;
+import com.ssh.dartserver.global.auth.domain.AppleUser;
+import com.ssh.dartserver.global.auth.domain.KakaoUser;
+import com.ssh.dartserver.global.auth.domain.OAuthUserInfo;
+import com.ssh.dartserver.global.auth.dto.*;
+import com.ssh.dartserver.global.auth.infra.OAuthRestTemplate;
+import com.ssh.dartserver.global.auth.service.jwt.JwtProperties;
+import com.ssh.dartserver.global.auth.service.jwt.JwtTokenProvider;
+import com.ssh.dartserver.global.common.Role;
+import com.ssh.dartserver.global.error.AppleLoginFailedException;
+import com.ssh.dartserver.global.error.ApplePublicKeyNotFoundException;
 import com.ssh.dartserver.global.error.KakaoLoginFailedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -34,7 +31,6 @@ import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
 import java.util.Base64;
-import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 
@@ -44,6 +40,7 @@ public class OAuthService {
     private final OAuthRestTemplate oauthRestTemplate;
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final JwtTokenProvider jwtTokenProvider;
 
     public TokenResponse createTokenForKakao(KakaoTokenRequest request) {
         return oauthRestTemplate.getKakaoUserInfo(request.getAccessToken()).map(userInfo -> {
@@ -112,12 +109,8 @@ public class OAuthService {
             userEntity = userRepository.save(userRequest);
         }
 
-        String jwtToken = JWT.create()
-                .withSubject(userEntity.getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis() + Integer.parseInt(JwtProperties.EXPIRATION_TIME.getValue())))
-                .withClaim("id", userEntity.getId())
-                .withClaim("username", userEntity.getUsername())
-                .sign(Algorithm.HMAC512(JwtProperties.SECRET.getValue()));
+        //jwt 토큰 생성
+        String jwtToken = jwtTokenProvider.createToken(userEntity);
         return new TokenResponse(jwtToken, userEntity.getProviderId());
     }
 

@@ -1,8 +1,8 @@
 package com.ssh.dartserver.global.config;
 
-import com.ssh.dartserver.domain.user.infra.UserRepository;
 import com.ssh.dartserver.global.auth.service.jwt.JwtAuthenticationFilter;
 import com.ssh.dartserver.global.auth.service.jwt.JwtAuthorizationFilter;
+import com.ssh.dartserver.global.auth.service.jwt.JwtTokenProvider;
 import com.ssh.dartserver.global.error.ExceptionHandlerFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -17,8 +17,8 @@ import org.springframework.security.web.SecurityFilterChain;
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final CorsConfig corsConfig;
-    private final UserRepository userRepository;
     private final AuthenticationConfiguration authenticationConfiguration;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -35,7 +35,7 @@ public class SecurityConfig {
         http
                 .addFilter(corsConfig.corsFilter())
                 .addFilter(new JwtAuthenticationFilter(authenticationConfiguration.getAuthenticationManager()))
-                .addFilter(new JwtAuthorizationFilter(authenticationConfiguration.getAuthenticationManager(), userRepository))
+                .addFilter(new JwtAuthorizationFilter(authenticationConfiguration.getAuthenticationManager(), jwtTokenProvider))
                 .addFilterBefore(new ExceptionHandlerFilter(), JwtAuthenticationFilter.class);
         http
                 .authorizeRequests()
