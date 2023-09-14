@@ -24,4 +24,15 @@ public class Point {
     public Point add(int amount) {
         return new Point(this.value + amount);
     }
+
+    public Point subtract(int amount) {
+        validateRemainPoint(amount);
+        return new Point(this.value - amount);
+    }
+
+    private void validateRemainPoint(int amount) {
+        if (this.value - amount < 0) {
+            throw new IllegalArgumentException("포인트가 부족합니다.");
+        }
+    }
 }
