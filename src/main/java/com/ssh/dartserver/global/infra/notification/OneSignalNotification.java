@@ -16,17 +16,21 @@ import java.util.Map;
 
 @RequiredArgsConstructor
 @Component
-public class OneSignalNotification implements PlatformNotification{
+public class OneSignalNotification implements PlatformNotification {
     private final RestTemplate restTemplate;
     private final OneSignalProperty oneSignalProperty;
 
     @Override
-    public void postNotificationSpecificDevice(Long userId, String contents){
+    public void postNotificationSpecificDevice(List<String> userIds, String headings, String contents) {
         HttpHeaders headers = getHttpHeaders();
+
+        //TODO: method 분리 필요
+        if(headings == null) headings = "엔대생";
 
         Map<String, Object> requestBody = Map.of(
                 "app_id", oneSignalProperty.getAppId(),
-                "include_external_user_ids", List.of(String.valueOf(userId)),
+                "include_external_user_ids", userIds,
+                "headings", Map.of("en", headings),
                 "contents", Map.of("en", contents)
         );
 
