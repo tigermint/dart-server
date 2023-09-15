@@ -5,10 +5,10 @@ import lombok.Data;
 import java.time.LocalDateTime;
 @Data
 public class ChatMessageResponse {
+    private String chatMessageType;
     private Long chatMessageId;
     private Long senderId;
     private Long chatRoomId;
-    private String chatMessageType;
     private String content;
     private LocalDateTime createdTime;
 }
