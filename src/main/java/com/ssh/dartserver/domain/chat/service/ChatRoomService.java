@@ -68,8 +68,12 @@ public class ChatRoomService {
         chatRoomUserRepository.saveAll(chatRoomUsers);
         return chatRoom.getId();
     }
+
     public ChatRoomResponse.ReadDto readChatRoom(Long chatRoomId, User user) {
-        ChatRoomUser chatRoomUser = chatRoomUserRepository.findByChatRoomIdAndUserId(chatRoomId, user.getId())
+        List<ChatRoomUser> chatRoomUsers = chatRoomUserRepository.findAllByChatRoomId(chatRoomId);
+        ChatRoomUser chatRoomUser = chatRoomUsers.stream()
+                .filter(u -> u.getUser().getId().equals(user.getId()))
+                .findAny()
                 .orElseThrow(() -> new IllegalArgumentException("채팅방에 속해있지 않은 유저입니다."));
 
         ChatRoom chatRoom = chatRoomUser.getChatRoom();
@@ -77,42 +81,57 @@ public class ChatRoomService {
         Team requestingTeam = chatRoom.getProposal().getRequestingTeam();
         Team requestedTeam = chatRoom.getProposal().getRequestedTeam();
 
-        List<TeamUser> requestingTeamUser = teamUserRepository.findAllByTeam(requestingTeam);
-        List<TeamUser> requestedTeamUser = teamUserRepository.findAllByTeam(requestedTeam);
+        List<TeamUser> requestingTeamUsers = teamUserRepository.findAllByTeam(requestingTeam);
+        List<TeamUser> requestedTeamUsers = teamUserRepository.findAllByTeam(requestedTeam);
 
-        List<TeamRegion> requestingTeamRegion = teamRegionRepository.findAllByTeam(requestingTeam);
-        List<TeamRegion> requestedTeamRegion = teamRegionRepository.findAllByTeam(requestedTeam);
+        List<TeamRegion> requestingTeamRegions = teamRegionRepository.findAllByTeam(requestingTeam);
+        List<TeamRegion> requestedTeamRegions = teamRegionRepository.findAllByTeam(requestedTeam);
 
         return chatRoomMapper.toReadDto(
                 chatRoom,
-                getReadTeamDto(requestingTeam, requestingTeamUser, requestingTeamRegion),
-                getReadTeamDto(requestedTeam, requestedTeamUser, requestedTeamRegion)
+                getReadTeamDto(
+                        requestingTeam,
+                        getTeamUsersInChatRoom(chatRoomUsers, requestingTeamUsers),
+                        requestingTeamRegions
+                ),
+                getReadTeamDto(
+                        requestedTeam,
+                        getTeamUsersInChatRoom(chatRoomUsers, requestedTeamUsers),
+                        requestedTeamRegions
+                )
         );
     }
+
+
     public List<ChatRoomResponse.ListDto> listChatRoom(User user) {
-        List<ChatRoomUser> chatRoomUsers = chatRoomUserRepository.findAllByUser(user);
-        List<ChatRoom> chatRooms = chatRoomUsers.stream()
+        List<ChatRoomUser> myChatRoomUsers = chatRoomUserRepository.findAllByUser(user);
+        List<ChatRoom> myChatRooms = myChatRoomUsers.stream()
                 .map(ChatRoomUser::getChatRoom)
                 .distinct()
                 .collect(Collectors.toList());
 
-        //TODO: 리스트에서 TeamUser를 반환하면 안됨, 같은 팀이라도 유저가 채팅방만 나갈 경우
-
-        return chatRooms.stream()
+        return myChatRooms.stream()
                 .map(chatRoom -> {
                     Team requestingTeam = chatRoom.getProposal().getRequestingTeam();
                     Team requestedTeam = chatRoom.getProposal().getRequestedTeam();
 
+                    List<ChatRoomUser> chatRoomUsers = chatRoomUserRepository.findAllByChatRoomId(chatRoom.getId());
+
                     return chatRoomMapper.toListDto(
                             chatRoom,
-                            getListTeamDto(requestingTeam, teamUserRepository.findAllByTeam(requestingTeam), teamRegionRepository.findAllByTeam(requestingTeam)),
-                            getListTeamDto(requestedTeam, teamUserRepository.findAllByTeam(requestedTeam), teamRegionRepository.findAllByTeam(requestedTeam))
+                            getListTeamDto(
+                                    requestingTeam,
+                                    getTeamUsersInChatRoom(chatRoomUsers, teamUserRepository.findAllByTeam(requestingTeam)),
+                                    teamRegionRepository.findAllByTeam(requestingTeam)),
+                            getListTeamDto(
+                                    requestedTeam,
+                                    getTeamUsersInChatRoom(chatRoomUsers, teamUserRepository.findAllByTeam(requestedTeam)),
+                                    teamRegionRepository.findAllByTeam(requestedTeam)
+                            )
                     );
                 })
                 .collect(Collectors.toList());
     }
-
-
 
 
     private static boolean isStudentIdCardVerified(List<TeamUser> requestedTeamUsers) {
@@ -122,6 +141,7 @@ public class ChatRoomService {
                 .map(StudentVerificationInfo::getStudentIdCardVerificationStatus)
                 .anyMatch(predicate -> predicate == StudentIdCardVerificationStatus.VERIFICATION_SUCCESS);
     }
+
     private ChatRoomResponse.ReadDto.TeamDto getReadTeamDto(Team team, List<TeamUser> teamUsers, List<TeamRegion> teamRegions) {
         return chatRoomMapper.toReadTeamDto(
                 team,
@@ -144,6 +164,7 @@ public class ChatRoomService {
                         .collect(Collectors.toList())
         );
     }
+
     private ChatRoomResponse.ListDto.TeamDto getListTeamDto(Team team, List<TeamUser> teamUsers, List<TeamRegion> teamRegions) {
         return chatRoomMapper.toListTeamDto(
                 team,
@@ -158,6 +179,15 @@ public class ChatRoomService {
                         .map(chatRoomMapper::toListRegionDto)
                         .collect(Collectors.toList())
         );
+    }
+    private static List<TeamUser> getTeamUsersInChatRoom(List<ChatRoomUser> chatRoomUsers, List<TeamUser> requestingTeamUsers) {
+        List<Long> chatRoomUserIds = chatRoomUsers.stream()
+                .map(ChatRoomUser::getUser)
+                .map(User::getId)
+                .collect(Collectors.toList());
+        return requestingTeamUsers.stream()
+                .filter(teamUser -> chatRoomUserIds.contains(teamUser.getUser().getId()))
+                .collect(Collectors.toList());
     }
 
     private void validateMeetStatus(Proposal proposal) {
