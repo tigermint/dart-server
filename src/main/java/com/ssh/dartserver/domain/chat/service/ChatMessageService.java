@@ -32,6 +32,8 @@ public class ChatMessageService {
     private final ChatRoomUserRepository chatRoomUserRepository;
     private final ChatMessageRepository chatMessageRepository;
 
+    private final ChatRoomUserService chatRoomUserService;
+
     private final ChatMessageMapper chatMessageMapper;
 
     private final PlatformNotification notification;
@@ -53,8 +55,10 @@ public class ChatMessageService {
 
         if (ChatMessageType.valueOf(request.getChatMessageType()).equals(ChatMessageType.QUIT)) {
             request.setContent(user.getPersonalInfo().getNickname().getValue() + "님이 나갔습니다.");
+            chatRoomUserService.deleteChatRoomUser(request.getSenderId(), request.getChatRoomId());
         }
 
+        //메시지 저장 로직
         ChatMessage chatMessage = ChatMessage.builder()
                 .chatMessageType(ChatMessageType.valueOf(request.getChatMessageType()))
                 .content(ChatContent.from(request.getContent()))
@@ -63,6 +67,21 @@ public class ChatMessageService {
                 .build();
 
         ChatMessage savedChatMessage = chatMessageRepository.save(chatMessage);
+
+        if (ChatMessageType.valueOf(request.getChatMessageType()).equals(ChatMessageType.TALK)) {
+            sendChatMessageNotification(request, user, chatRoomUsers);
+            chatRoom.updateLastMessage(savedChatMessage.getContent().getValue(), savedChatMessage.getCreatedTime());
+        }
+        return chatMessageMapper.toResponseDto(savedChatMessage);
+    }
+
+    public Page<ChatMessageResponse> listChatMessage(Long chatRoomId, int page, String criteria) {
+        Pageable pageable = PageRequest.of(page, PAGE_SIZE, Sort.by(Sort.Direction.DESC, criteria));
+        Page<ChatMessage> chatMessages = chatMessageRepository.findAllByChatRoomId(chatRoomId, pageable);
+        return chatMessages.map(chatMessageMapper::toResponseDto);
+    }
+
+    private void sendChatMessageNotification(ChatMessageRequest request, User user, List<ChatRoomUser> chatRoomUsers) {
 
         //메시지 전송 알림
         String heading = user.getPersonalInfo().getNickname().getValue();
@@ -79,16 +98,6 @@ public class ChatMessageService {
         CompletableFuture.runAsync(() ->
                 notification.postNotificationSpecificDevice(userIds, heading, content)
         );
-
-        //채팅방 마지막 메시지 업데이트
-        chatRoom.updateLastMessage(savedChatMessage.getContent().getValue(), savedChatMessage.getCreatedTime());
-        return chatMessageMapper.toResponseDto(savedChatMessage);
-    }
-
-    public Page<ChatMessageResponse> listChatMessage(Long chatRoomId, int page, String criteria) {
-        Pageable pageable = PageRequest.of(page, PAGE_SIZE, Sort.by(Sort.Direction.DESC, criteria));
-        Page<ChatMessage> chatMessages = chatMessageRepository.findAllByChatRoomId(chatRoomId, pageable);
-        return chatMessages.map(chatMessageMapper::toResponseDto);
     }
 
 }
