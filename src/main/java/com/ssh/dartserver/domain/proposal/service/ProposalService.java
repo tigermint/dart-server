@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -127,10 +126,10 @@ public class ProposalService {
         return DateTimeUtils.nowFromZone().getYear() - user.getPersonalInfo().getBirthYear().getValue();
     }
     private void validateAlreadySentProposal(Long requestingTeamId, Long requestedTeamId) {
-        Optional<Proposal> proposal = proposalRepository.findByRequestingTeamIdAndRequestedTeamId(requestingTeamId, requestedTeamId);
-        if(proposal.isPresent()) {
-            throw new IllegalArgumentException("이미 매칭 제안 요청을 보냈습니다.");
-        }
+        proposalRepository.findByRequestingTeamIdAndRequestedTeamId(requestingTeamId, requestedTeamId)
+                .ifPresent(p -> {
+                    throw new IllegalArgumentException("이미 매칭 제안 요청을 보냈습니다.");
+                });
     }
 
     private void validateUserInTeam(User user, List<TeamUser> requestingTeamUsers) {
