@@ -8,7 +8,6 @@ import com.ssh.dartserver.domain.chat.dto.mapper.ChatRoomMapper;
 import com.ssh.dartserver.domain.chat.infra.ChatRoomRepository;
 import com.ssh.dartserver.domain.chat.presentation.ChatRoomUserRepository;
 import com.ssh.dartserver.domain.proposal.domain.Proposal;
-import com.ssh.dartserver.domain.proposal.domain.ProposalStatus;
 import com.ssh.dartserver.domain.proposal.infra.ProposalRepository;
 import com.ssh.dartserver.domain.team.domain.Team;
 import com.ssh.dartserver.domain.team.domain.TeamRegion;
@@ -191,10 +190,10 @@ public class ChatRoomService {
     }
 
     private void validateMeetStatus(Proposal proposal) {
-        if (proposal.getProposalStatus() == ProposalStatus.PROPOSAL_SUCCESS) {
+        if (proposal.getProposalStatus().isSuccess()) {
             throw new IllegalArgumentException("완료되지 않은 매칭입니다.");
         }
-        if (proposal.getProposalStatus() == ProposalStatus.PROPOSAL_FAILED) {
+        if (proposal.getProposalStatus().isFailed()) {
             throw new IllegalArgumentException("실패한 매칭입니다.");
         }
     }
