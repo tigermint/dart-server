@@ -114,7 +114,7 @@ public class VoteService {
                 VOTED_PICKED_POINT);
         //TODO: 비동기 처리 필요
         CompletableFuture.runAsync(() ->
-            notification.postNotificationSpecificDevice(List.of(String.valueOf(pickedUser.getId())), null, contents)
+            notification.postNotificationSpecificDevice(pickedUser.getId(), contents)
         );
     }
 

@@ -33,11 +33,11 @@ public class AdminIdCardService {
 
     private void successNotification(Long userId) {
         final String contents = "학생증 인증이 완료되었어요! 😆";
-        CompletableFuture.runAsync(() -> notification.postNotificationSpecificDevice(List.of(String.valueOf(userId)),null, contents));
+        CompletableFuture.runAsync(() -> notification.postNotificationSpecificDevice(userId, contents));
     }
 
     private void failedNotification(Long userId) {
         final String contents = "학생증 인증이 실패했어요... 😢";
-        CompletableFuture.runAsync(() -> notification.postNotificationSpecificDevice(List.of(String.valueOf(userId)), null, contents));
+        CompletableFuture.runAsync(() -> notification.postNotificationSpecificDevice(userId, contents));
     }
 }
