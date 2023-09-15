@@ -1,6 +1,7 @@
 package com.ssh.dartserver.global.error;
 
 import com.auth0.jwt.exceptions.SignatureVerificationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -33,19 +34,19 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AppleLoginFailedException.class)
     public ResponseEntity<String> handleAppleLoginFailedException(AppleLoginFailedException ex) {
-        return ResponseEntity.badRequest().body(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
     }
     @ExceptionHandler(ApplePublicKeyNotFoundException.class)
     public ResponseEntity<String> handleApplePublicKeyNotFoundException(ApplePublicKeyNotFoundException ex) {
-        return ResponseEntity.badRequest().body(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
     }
     @ExceptionHandler(KakaoLoginFailedException.class)
     public ResponseEntity<String> handleKakaoLoginFailedException(KakaoLoginFailedException ex) {
-        return ResponseEntity.badRequest().body(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
     }
     @ExceptionHandler(CertificationException.class)
     public ResponseEntity<String> handleCertificationException(CertificationException ex) {
-        return ResponseEntity.badRequest().body(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
     }
 
     @ExceptionHandler(TeamNotFoundException.class)

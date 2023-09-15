@@ -45,3 +45,6 @@ src/main/resources/db/seed/
 
 ### Test ###
 src/test/
+
+### generated files ###
+src/main/generated/

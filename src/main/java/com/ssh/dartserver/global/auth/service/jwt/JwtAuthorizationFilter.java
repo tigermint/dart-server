@@ -1,13 +1,7 @@
 package com.ssh.dartserver.global.auth.service.jwt;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.ssh.dartserver.domain.user.domain.User;
-import com.ssh.dartserver.domain.user.infra.UserRepository;
-import com.ssh.dartserver.global.auth.service.oauth.PrincipalDetails;
 import com.ssh.dartserver.global.error.CertificationException;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
@@ -20,40 +14,32 @@ import java.io.IOException;
 
 
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
-    private final UserRepository userRepository;
+    private final JwtTokenProvider jwtTokenProvider;
 
-    public JwtAuthorizationFilter(AuthenticationManager authenticationManager, UserRepository userRepository) {
+    public JwtAuthorizationFilter(AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider) {
         super(authenticationManager);
-        this.userRepository = userRepository;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
-        String header = request.getHeader(JwtProperties.HEADER_STRING.getValue());
-
-        if (header == null || !header.startsWith(JwtProperties.TOKEN_PREFIX.getValue())) {
+        //resolveToken - 토큰 추출
+        String token = jwtTokenProvider.resolveToken(request);
+        if(token == null) {
             chain.doFilter(request, response);
             return;
         }
 
-        String token = request.getHeader(JwtProperties.HEADER_STRING.getValue()).replace(JwtProperties.TOKEN_PREFIX.getValue(), "");
-
-        String username = JWT.require(Algorithm.HMAC512(JwtProperties.SECRET.getValue())).build().verify(token)
-                .getClaim("username").asString();
-
-        if (username == null) {
+        //validateToken - 토큰 유효성 검사
+        if (jwtTokenProvider.validateToken(token)) {
             throw new CertificationException("유효하지 않은 토큰입니다.");
         }
 
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new CertificationException("존재하지 않는 유저입니다."));
-        PrincipalDetails principalDetails = new PrincipalDetails(user);
-        Authentication authentication = new UsernamePasswordAuthenticationToken(principalDetails,
-                null,
-                principalDetails.getAuthorities());
+        //getAuthentication - 인증 정보 조회
+        Authentication authentication = jwtTokenProvider.getAuthentication(token);
 
+        //SecurityContextHolder.getContext().setAuthentication - SecurityContext에 Authentication 객체 저장
         SecurityContextHolder.getContext().setAuthentication(authentication);
-
         chain.doFilter(request, response);
     }
 }

@@ -5,6 +5,8 @@ import com.ssh.dartserver.domain.user.domain.studentverificationinfo.StudentIdCa
 import com.ssh.dartserver.domain.user.infra.UserRepository;
 import com.ssh.dartserver.domain.user.service.StudentIdCardVerificationService;
 import com.ssh.dartserver.global.infra.notification.PlatformNotification;
+
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

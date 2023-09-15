@@ -46,7 +46,7 @@ public class TeamService {
     private final TeamMapper teamMapper;
 
     public Long countAllTeams() {
-        return teamRepository.count() * 2 + 1;
+        return teamRepository.count() * 2 + 50;
     }
 
     public Page<BlindDateTeamResponse> listVisibleTeams(long universityId, Gender myGender, long regionId, Pageable pageable) {
