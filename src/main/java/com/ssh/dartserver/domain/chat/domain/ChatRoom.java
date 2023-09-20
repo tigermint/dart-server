@@ -23,7 +23,7 @@ public class ChatRoom {
     private LocalDateTime latestChatMessageTime;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "proposal_id")
+    @JoinColumn(name = "proposal_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Proposal proposal;
 
     public void updateLastMessage(String latestChatMessageContent, LocalDateTime latestChatMessageTime) {
