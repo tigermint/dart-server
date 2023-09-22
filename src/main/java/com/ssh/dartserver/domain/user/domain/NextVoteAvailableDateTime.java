@@ -1,6 +1,6 @@
 package com.ssh.dartserver.domain.user.domain;
 
-import com.ssh.dartserver.global.utils.DateTimeUtils;
+import com.ssh.dartserver.global.util.DateTimeUtil;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -22,12 +22,12 @@ public class NextVoteAvailableDateTime {
     }
 
     public static NextVoteAvailableDateTime newInstance() {
-        return new NextVoteAvailableDateTime(DateTimeUtils.nowFromZone());
+        return new NextVoteAvailableDateTime(DateTimeUtil.nowFromZone());
     }
 
     public static NextVoteAvailableDateTime plusMinutes(int value) {
         return new NextVoteAvailableDateTime(
-                DateTimeUtils.nowFromZone()
+                DateTimeUtil.nowFromZone()
                         .plusMinutes(value)
                         .truncatedTo(ChronoUnit.SECONDS));
     }
