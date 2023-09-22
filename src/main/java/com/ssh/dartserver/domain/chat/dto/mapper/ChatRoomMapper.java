@@ -26,10 +26,11 @@ public interface ChatRoomMapper {
     @Mapping(target = "teamId", source = "team.id")
     @Mapping(target = "name", source = "team.name.value")
     @Mapping(target = "isStudentIdCardVerified", source = "isStudentIdCardVerified")
+    @Mapping(target = "averageAge", source = "averageAge")
     @Mapping(target = "university", source = "team.university")
     @Mapping(target = "teamUsers", source = "teamUsers")
     @Mapping(target = "teamRegions", source = "teamRegions")
-    ChatRoomResponse.ReadDto.TeamDto toReadTeamDto(Team team, Boolean isStudentIdCardVerified, List<ChatRoomResponse.ReadDto.UserDto> teamUsers, List<ChatRoomResponse.ReadDto.RegionDto> teamRegions);
+    ChatRoomResponse.ReadDto.TeamDto toReadTeamDto(Team team, Boolean isStudentIdCardVerified, Double averageAge, List<ChatRoomResponse.ReadDto.UserDto> teamUsers, List<ChatRoomResponse.ReadDto.RegionDto> teamRegions);
 
     @Mapping(target = "userId", source = "user.id")
     @Mapping(target = "nickname", source = "user.personalInfo.nickname.value")
