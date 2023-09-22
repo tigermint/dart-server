@@ -7,9 +7,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class BlindDateTeamResponse {
-    private long id;
+    private Long id;
     private String name;
-    private double averageBirthYear;
+    private Double averageAge;
     private List<RegionResponse> regions;
     private String universityName;
     private Boolean isCertifiedTeam;

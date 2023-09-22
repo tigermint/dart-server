@@ -16,7 +16,7 @@ import com.ssh.dartserver.domain.vote.dto.mapper.VoteMapper;
 import com.ssh.dartserver.domain.vote.infra.CandidateRepository;
 import com.ssh.dartserver.domain.vote.infra.VoteRepository;
 import com.ssh.dartserver.global.infra.notification.PlatformNotification;
-import com.ssh.dartserver.global.utils.DateTimeUtils;
+import com.ssh.dartserver.global.util.DateTimeUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -69,7 +69,7 @@ public class VoteService {
 
         Vote vote = Vote.builder()
                 .candidates(candidates)
-                .pickedTime(DateTimeUtils.nowFromZone())
+                .pickedTime(DateTimeUtil.nowFromZone())
                 .pickingUser(pickingUser)
                 .pickedUser(pickedUser)
                 .question(question)

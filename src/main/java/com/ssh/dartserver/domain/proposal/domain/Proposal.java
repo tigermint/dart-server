@@ -21,11 +21,11 @@ public class Proposal extends BaseTimeEntity {
     private ProposalStatus proposalStatus;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "requesting_team_id")
+    @JoinColumn(name = "requesting_team_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Team requestingTeam;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "requested_team_id")
+    @JoinColumn(name = "requested_team_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Team requestedTeam;
 
     public void updateProposalStatus(ProposalStatus proposalStatus) {

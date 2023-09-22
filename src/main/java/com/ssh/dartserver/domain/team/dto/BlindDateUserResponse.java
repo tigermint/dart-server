@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 @Builder
 public class BlindDateUserResponse {
-    private long id;
+    private Long id;
     private String name;
     private String profileImageUrl;
     private String department;

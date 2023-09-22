@@ -14,7 +14,14 @@ public class Nickname {
     private String value;
 
     public Nickname(String value) {
+        validateLength(value);
         this.value = value;
+    }
+
+    private void validateLength(String value) {
+7        if (value.length() > 7) {
+            throw new IllegalArgumentException("닉네임은 7글자 이하만 가능합니다.");
+        }
     }
 
     public static Nickname from(String value) {

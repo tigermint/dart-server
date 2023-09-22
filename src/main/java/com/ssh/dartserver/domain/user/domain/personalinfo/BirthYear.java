@@ -15,8 +15,16 @@ public class BirthYear {
     private int value;
 
     public BirthYear(int value) {
+        validateBirthYear(value);
         this.value = value;
     }
+
+    private void validateBirthYear(int value) {
+        if (value < 1995 || value > 2004) {
+            throw new IllegalArgumentException("생년은 1995 ~ 2004 사이의 값이어야 합니다.");
+        }
+    }
+
 
     public static BirthYear from(int value) {
         return new BirthYear(value);

@@ -7,11 +7,12 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class BlindDateTeamDetailResponse {
-    private long id;
+    private Long id;
     private String name;
-    private double averageBirthYear;
+    private Double averageAge;
     private List<RegionResponse> regions;
     private String universityName;
     private Boolean isCertifiedTeam;
     private List<BlindDateUserDetailResponse> teamUsers;
+    private Boolean isAlreadyProposalTeam;
 }

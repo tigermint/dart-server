@@ -5,7 +5,7 @@ import com.ssh.dartserver.domain.user.dto.UserNextVoteResponse;
 import com.ssh.dartserver.domain.user.dto.mapper.UserMapper;
 import com.ssh.dartserver.domain.user.infra.UserRepository;
 import com.ssh.dartserver.global.infra.notification.PlatformNotification;
-import com.ssh.dartserver.global.utils.DateTimeUtils;
+import com.ssh.dartserver.global.util.DateTimeUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,7 +37,7 @@ public class NextVoteService {
         CompletableFuture.runAsync(() ->
             notification.postNotificationNextVoteAvailableDateTime(
                     user.getId(),
-                    DateTimeUtils.toUTC(user.getNextVoteAvailableDateTime().getValue()),
+                    DateTimeUtil.toUTC(user.getNextVoteAvailableDateTime().getValue()),
                     NEXT_VOTE_AVAILABLE_CONTENTS)
         );
         return userMapper.toUserNextVoteResponseDto(pickingUser.getNextVoteAvailableDateTime().getValue());

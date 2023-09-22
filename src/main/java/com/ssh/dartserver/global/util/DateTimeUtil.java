@@ -1,12 +1,12 @@
-package com.ssh.dartserver.global.utils;
+package com.ssh.dartserver.global.util;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
-public class DateTimeUtils {
+public class DateTimeUtil {
 
-    private DateTimeUtils() {
+    private DateTimeUtil() {
         throw new IllegalStateException("Utility class");
     }
 

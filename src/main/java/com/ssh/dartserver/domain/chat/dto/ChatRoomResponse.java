@@ -24,6 +24,7 @@ public class ChatRoomResponse {
             private String name;
             private Boolean isStudentIdCardVerified;
             private UniversityDto university;
+            private double averageAge;
             private List<UserDto> teamUsers;
             private List<RegionDto> teamRegions;
         }

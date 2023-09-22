@@ -24,7 +24,7 @@ public class ChatMessage extends BaseTimeEntity{
     private ChatContent content;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "chat_room_id")
+    @JoinColumn(name = "chat_room_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private ChatRoom chatRoom;
 
 }

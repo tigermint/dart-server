@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Component
@@ -28,13 +29,32 @@ public class OneSignalNotification implements PlatformNotification {
     private final OneSignalProperty oneSignalProperty;
 
     @Override
-    public void postNotificationSpecificDevice(List<String> userIds, String headings, String contents) {
+    public void postNotificationSpecificDevice(List<Long> userIds, String headings, String contents) {
         HttpHeaders headers = getHttpHeaders();
 
         Map<String, Object> requestBody = Map.of(
                 ONESIGNAL_APP_ID, oneSignalProperty.getAppId(),
-                ONESIGNAL_INCLUDE_EXTERNAL_USER_IDS, userIds,
+                ONESIGNAL_INCLUDE_EXTERNAL_USER_IDS, userIds.stream().map(String::valueOf).collect(Collectors.toList()),
                 ONESIGNAL_HEADINGS, Map.of("en", headings),
+                ONESIGNAL_CONTENTS, Map.of("en", contents)
+        );
+
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
+
+        restTemplate.exchange(
+                ONESIGNAL_API_URL,
+                HttpMethod.POST,
+                entity,
+                String.class);
+    }
+
+    @Override
+    public void postNotificationSpecificDevice(List<Long> userIds, String contents) {
+        HttpHeaders headers = getHttpHeaders();
+
+        Map<String, Object> requestBody = Map.of(
+                ONESIGNAL_APP_ID, oneSignalProperty.getAppId(),
+                ONESIGNAL_INCLUDE_EXTERNAL_USER_IDS, userIds.stream().map(String::valueOf).collect(Collectors.toList()),
                 ONESIGNAL_CONTENTS, Map.of("en", contents)
         );
 
