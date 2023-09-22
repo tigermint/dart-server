@@ -19,8 +19,8 @@ public class Name {
     }
 
     private void validateLength(String value) {
-        if (value.length() > 4) {
-            throw new IllegalArgumentException("이름은 4글자 이하만 가능합니다");
+        if (value.length() > 5) {
+            throw new IllegalArgumentException("이름은 5글자 이하만 가능합니다");
         }
     }
 
