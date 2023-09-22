@@ -87,11 +87,10 @@ public class ChatMessageService {
         String heading = user.getPersonalInfo().getNickname().getValue();
         String content = request.getContent();
 
-        List<String> userIds = chatRoomUsers.stream()
+        List<Long> userIds = chatRoomUsers.stream()
                 .map(ChatRoomUser::getUser)
                 .map(User::getId)
                 .filter(id -> !id.equals(request.getSenderId()))
-                .map(String::valueOf)
                 .collect(Collectors.toList());
 
         //TODO: 비동기 처리 필요
