@@ -3,9 +3,11 @@ package com.ssh.dartserver.domain.team.domain;
 import com.ssh.dartserver.domain.university.domain.University;
 import com.ssh.dartserver.domain.user.domain.personalinfo.BirthYear;
 import com.ssh.dartserver.domain.user.domain.personalinfo.Nickname;
+import com.ssh.dartserver.domain.user.domain.personalinfo.ProfileImageUrl;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.Optional;
 
 @Entity
 @Getter
@@ -23,7 +25,7 @@ public class SingleTeamFriend {
     private BirthYear birthYear;
 
     @Column(name = "profile_image_url")
-    private String profileImageUrl;
+    private ProfileImageUrl profileImageUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
@@ -37,7 +39,9 @@ public class SingleTeamFriend {
     public SingleTeamFriend(String nickname, int birthYear, String profileImageUrl, Team team, University university) {
         this.nickname = Nickname.from(nickname);
         this.birthYear = BirthYear.from(birthYear);
-        this.profileImageUrl = profileImageUrl;
+        this.profileImageUrl = Optional.ofNullable(profileImageUrl)
+                .map(ProfileImageUrl::from)
+                .orElse(ProfileImageUrl.from("DEFAULT"));
         this.team = team;
         this.university = university;
     }
