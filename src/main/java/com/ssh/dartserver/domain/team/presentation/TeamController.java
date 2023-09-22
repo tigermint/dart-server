@@ -1,7 +1,7 @@
 package com.ssh.dartserver.domain.team.presentation;
 
-import com.ssh.dartserver.domain.team.dto.BlindDateTeamResponse;
 import com.ssh.dartserver.domain.team.dto.BlindDateTeamDetailResponse;
+import com.ssh.dartserver.domain.team.dto.BlindDateTeamResponse;
 import com.ssh.dartserver.domain.team.dto.TeamRequest;
 import com.ssh.dartserver.domain.team.dto.TeamResponse;
 import com.ssh.dartserver.domain.team.service.MyTeamService;
@@ -14,17 +14,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
-import org.springframework.web.bind.annotation.RestController;
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -37,7 +33,12 @@ public class TeamController {
     @PostMapping
     public ResponseEntity<TeamResponse> createTeam(Authentication authentication, @Valid @RequestBody TeamRequest request) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
-        Long teamId = myTeamService.createTeam(principal.getUser(), request);
+
+        Long teamId = Optional.of(request.getUserIds())
+                .filter(List::isEmpty)
+                .map(userId -> myTeamService.createSingleTeam(principal.getUser(), request))
+                .orElseGet(() -> myTeamService.createMultipleTeam(principal.getUser(), request));
+
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(teamId)
@@ -50,7 +51,7 @@ public class TeamController {
         return ResponseEntity.ok(teamService.countAllTeams());
     }
 
-    @GetMapping("")
+    @GetMapping
     public ResponseEntity<Page<BlindDateTeamResponse>> getTeams(Authentication authentication,
                                                                 @RequestParam(value = "page", required = false, defaultValue = "0") int page,
                                                                 @RequestParam(value = "size", required = false, defaultValue = "10") int size,
@@ -66,7 +67,8 @@ public class TeamController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<BlindDateTeamDetailResponse> getTeam(@PathVariable("id") long id) {
-        return ResponseEntity.ok(teamService.readTeam(id));
+    public ResponseEntity<BlindDateTeamDetailResponse> getTeam(Authentication authentication, @PathVariable("id") long id) {
+        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
+        return ResponseEntity.ok(teamService.readTeam(principal.getUser(), id));
     }
 }

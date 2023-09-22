@@ -1,9 +1,5 @@
 package com.ssh.dartserver.domain.team.infra;
 
-import static com.ssh.dartserver.domain.team.domain.QTeam.team;
-import static com.ssh.dartserver.domain.team.domain.QTeamRegion.teamRegion;
-import static com.ssh.dartserver.domain.team.domain.QTeamUser.teamUser;
-
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Predicate;
@@ -11,11 +7,15 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.ssh.dartserver.domain.team.domain.QTeam;
 import com.ssh.dartserver.domain.team.domain.Team;
 import com.ssh.dartserver.domain.user.domain.personalinfo.Gender;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+
+import java.util.List;
+
+import static com.ssh.dartserver.domain.team.domain.QTeamRegion.teamRegion;
+import static com.ssh.dartserver.domain.team.domain.QTeamUser.teamUser;
 
 @RequiredArgsConstructor
 public class TeamRepositoryImpl implements TeamRepositoryCustom {
