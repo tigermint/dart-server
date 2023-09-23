@@ -217,6 +217,7 @@ public class MyTeamService {
 
         List<Proposal> proposalsOfTeam = proposalRepository.findAllByRequestingTeamIdOrRequestedTeamId(teamId, teamId);
         proposalsOfTeam.forEach(proposal -> proposal.updateProposalOnTeamDeletion(teamId));
+        singleTeamFriendRepository.deleteAllByTeamId(teamId);
 
         teamUserRepository.deleteAllByTeamId(teamId);
         teamRegionRepository.deleteAllByTeamId(teamId);
