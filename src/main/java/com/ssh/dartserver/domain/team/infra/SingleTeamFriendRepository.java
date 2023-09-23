@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface SingleTeamFriendRepository extends JpaRepository<SingleTeamFriend, Long> {
     List<SingleTeamFriend> findAllByTeam(Team team);
+
+    void deleteAllByTeamId(Long teamId);
 }

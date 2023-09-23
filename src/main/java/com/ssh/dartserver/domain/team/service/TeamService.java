@@ -128,7 +128,7 @@ public class TeamService {
                 .distinct()
                 .collect(Collectors.toList());
 
-        List<Proposal> proposals = proposalRepository.findByRequestingTeamOrRequestedTeam(team, team);
+        List<Proposal> proposals = proposalRepository.findAllByRequestingTeamOrRequestedTeam(team, team);
 
         List<Proposal> proposalsInMyTeams = proposals.stream()
                 .filter(proposal -> myTeams.contains(proposal.getRequestedTeam()) || myTeams.contains(proposal.getRequestingTeam()))
