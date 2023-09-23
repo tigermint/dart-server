@@ -12,7 +12,10 @@ import java.util.Optional;
 
 public interface ProposalRepository extends JpaRepository<Proposal, Long> {
     Optional<Proposal> findByRequestingTeamIdAndRequestedTeamId(Long requestingTeamId, Long requestedTeamId);
-    List<Proposal> findByRequestingTeamOrRequestedTeam(Team team1, Team team2);
+
+    List<Proposal> findAllByRequestingTeamIdOrRequestedTeamId(Long requestingTeamId, Long requestedTeamId);
+
+    List<Proposal> findAllByRequestingTeamOrRequestedTeam(Team team1, Team team2);
 
     @Query("select p from Proposal p join fetch p.requestingTeam rt " +
             "where concat('-', rt.teamUsersCombinationHash.value, '-') like :userIdPattern " +

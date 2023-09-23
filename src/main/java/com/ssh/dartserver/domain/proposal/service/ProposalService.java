@@ -98,7 +98,7 @@ public class ProposalService {
 
     private List<ProposalResponse.ListDto> getListDtos(List<Proposal> proposals) {
         return proposals.stream()
-                .map(proposal -> {
+                .flatMap(proposal -> {
                     //팀 가져오기
                     Team requestingTeam = proposal.getRequestingTeam();
                     Team requestedTeam = proposal.getRequestedTeam();
@@ -111,28 +111,35 @@ public class ProposalService {
                     List<TeamRegion> requestingTeamRegions = teamRegionRepository.findAllByTeam(requestingTeam);
                     List<TeamRegion> requestedTeamRegions = teamRegionRepository.findAllByTeam(requestedTeam);
 
+                    ProposalResponse.ListDto.TeamDto requestingTeamDto = getListTeamDto(requestingTeam, requestingTeamUsers, requestingTeamRegions);
+                    ProposalResponse.ListDto.TeamDto requestedTeamDto = getListTeamDto(requestedTeam, requestedTeamUsers, requestedTeamRegions);
 
-                    return proposalMapper.toListDto(
+                    if (requestingTeamDto == null || requestedTeamDto == null) {
+                        return Stream.empty();
+                    }
+                    return Stream.of(proposalMapper.toListDto(
                             proposal,
-                            getListTeamDto(requestingTeam, requestingTeamUsers, requestingTeamRegions),
-                            getListTeamDto(requestedTeam, requestedTeamUsers, requestedTeamRegions)
-                    );
+                            requestingTeamDto,
+                            requestedTeamDto
+                    ));
                 })
                 .collect(Collectors.toList());
     }
 
     private ProposalResponse.ListDto.TeamDto getListTeamDto(Team team, List<TeamUser> teamUsers, List<TeamRegion> teamRegions) {
-        return proposalMapper.toListTeamDto(
-                team,
-                teamAverageAgeCalculator.getAverageAge(teamUsers),
-                Optional.of(teamUsers)
-                        .filter(users -> users.size() == 1)
-                        .map(users -> getListSingleTeamUserDto(team, users))
-                        .orElseGet(() -> getListMultipleTeamUserDto(teamUsers)),
-                teamRegions.stream()
-                        .map(teamRegion -> proposalMapper.toListRegionDto(teamRegion.getRegion()))
-                        .collect(Collectors.toList())
-        );
+        return Optional.ofNullable(team)
+                .map(t -> proposalMapper.toListTeamDto(
+                        t,
+                        teamAverageAgeCalculator.getAverageAge(teamUsers),
+                        Optional.of(teamUsers)
+                                .filter(users -> users.size() == 1)
+                                .map(users -> getListSingleTeamUserDto(team, users))
+                                .orElseGet(() -> getListMultipleTeamUserDto(teamUsers)),
+                        teamRegions.stream()
+                                .map(teamRegion -> proposalMapper.toListRegionDto(teamRegion.getRegion()))
+                                .collect(Collectors.toList())
+                ))
+                .orElse(null);
     }
     private List<ProposalResponse.ListDto.UserDto> getListSingleTeamUserDto(Team team, List<TeamUser> teamUsers) {
         return Stream.concat(
