@@ -31,4 +31,13 @@ public class Proposal extends BaseTimeEntity {
     public void updateProposalStatus(ProposalStatus proposalStatus) {
         this.proposalStatus = proposalStatus;
     }
+
+    public void updateProposalOnTeamDeletion(Long teamId) {
+        if(this.requestingTeam.getId().equals(teamId)) {
+            this.requestingTeam = null;
+        }
+        if(this.requestedTeam.getId().equals(teamId)) {
+            this.requestedTeam = null;
+        }
+    }
 }
