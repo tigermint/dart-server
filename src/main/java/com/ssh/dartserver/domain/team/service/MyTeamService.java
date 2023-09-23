@@ -2,6 +2,7 @@ package com.ssh.dartserver.domain.team.service;
 
 import com.ssh.dartserver.domain.chat.domain.ChatRoomUser;
 import com.ssh.dartserver.domain.chat.presentation.ChatRoomUserRepository;
+import com.ssh.dartserver.domain.proposal.domain.Proposal;
 import com.ssh.dartserver.domain.proposal.infra.ProposalRepository;
 import com.ssh.dartserver.domain.question.dto.mapper.QuestionMapper;
 import com.ssh.dartserver.domain.team.domain.*;
@@ -41,8 +42,8 @@ public class MyTeamService {
     private final TeamUserRepository teamUserRepository;
     private final UniversityRepository universityRepository;
     private final SingleTeamFriendRepository singleTeamFriendRepository;
-    private final ChatRoomUserRepository chatRoomUserRepository;
     private final ProposalRepository proposalRepository;
+    private final ChatRoomUserRepository chatRoomUserRepository;
 
     private final UserMapper userMapper;
     private final TeamMapper teamMapper;
@@ -214,8 +215,8 @@ public class MyTeamService {
                 .collect(Collectors.toList());
         chatRoomUserRepository.deleteAll(chatRoomUsersInTeamUsers);
 
-        //TODO: 호감 제안 삭제
-        proposalRepository.deleteAllByRequestingTeamOrRequestedTeam(teamUsers.get(0).getTeam(), teamUsers.get(0).getTeam());
+        List<Proposal> proposalsOfTeam = proposalRepository.findAllByRequestingTeamIdOrRequestedTeamId(teamId, teamId);
+        proposalsOfTeam.forEach(proposal -> proposal.updateProposalOnTeamDeletion(teamId));
 
         teamUserRepository.deleteAllByTeamId(teamId);
         teamRegionRepository.deleteAllByTeamId(teamId);
