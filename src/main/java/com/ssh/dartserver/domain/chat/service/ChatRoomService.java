@@ -159,36 +159,40 @@ public class ChatRoomService {
 
 
     private ChatRoomResponse.ReadDto.TeamDto getReadTeamDto(Team team, List<TeamUser> teamUsers, List<TeamRegion> teamRegions) {
-        return chatRoomMapper.toReadTeamDto(
-                team,
-                isStudentIdCardVerified(teamUsers),
-                teamAverageAgeCalculator.getAverageAge(teamUsers),
-                Optional.of(teamUsers)
-                        .filter(users -> users.size() == 1)
-                        .map(users -> getReadSingleTeamUserDto(team, users))
-                        .orElseGet(() -> getReadMultipleTeamUserDto(teamUsers)),
-                teamRegions.stream()
-                        .map(TeamRegion::getRegion)
-                        .map(chatRoomMapper::toReadRegionDto)
-                        .collect(Collectors.toList())
-        );
+        return Optional.ofNullable(team)
+                .map(t -> chatRoomMapper.toReadTeamDto(
+                        t,
+                        isStudentIdCardVerified(teamUsers),
+                        teamAverageAgeCalculator.getAverageAge(teamUsers),
+                        Optional.of(teamUsers)
+                                .filter(users -> users.size() == 1)
+                                .map(users -> getReadSingleTeamUserDto(t, users))
+                                .orElseGet(() -> getReadMultipleTeamUserDto(teamUsers)),
+                        teamRegions.stream()
+                                .map(TeamRegion::getRegion)
+                                .map(chatRoomMapper::toReadRegionDto)
+                                .collect(Collectors.toList())
+                ))
+                .orElse(null);
     }
 
 
     private ChatRoomResponse.ListDto.TeamDto getListTeamDto(Team team, List<TeamUser> teamUsers, List<TeamRegion> teamRegions) {
-        return chatRoomMapper.toListTeamDto(
-                team,
-                isStudentIdCardVerified(teamUsers),
-                chatRoomMapper.toListUniversityDto(team.getUniversity()),
-                Optional.of(teamUsers)
-                        .filter(users -> users.size() == 1)
-                        .map(users -> getListSingleTeamUserDto(team, users))
-                        .orElseGet(() -> getListMultipleTeamUserDto(teamUsers)),
-                teamRegions.stream()
-                        .map(TeamRegion::getRegion)
-                        .map(chatRoomMapper::toListRegionDto)
-                        .collect(Collectors.toList())
-        );
+        return Optional.ofNullable(team)
+                .map(t -> chatRoomMapper.toListTeamDto(
+                        t,
+                        isStudentIdCardVerified(teamUsers),
+                        chatRoomMapper.toListUniversityDto(t.getUniversity()),
+                        Optional.of(teamUsers)
+                                .filter(users -> users.size() == 1)
+                                .map(users -> getListSingleTeamUserDto(t, users))
+                                .orElseGet(() -> getListMultipleTeamUserDto(teamUsers)),
+                        teamRegions.stream()
+                                .map(TeamRegion::getRegion)
+                                .map(chatRoomMapper::toListRegionDto)
+                                .collect(Collectors.toList())
+                ))
+                .orElse(null);
     }
 
     private List<ChatRoomResponse.ReadDto.UserDto> getReadSingleTeamUserDto(Team team, List<TeamUser> teamUsers) {
