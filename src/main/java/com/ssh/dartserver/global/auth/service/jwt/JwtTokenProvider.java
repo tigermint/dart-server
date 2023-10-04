@@ -31,7 +31,7 @@ public class JwtTokenProvider {
 
     //인증 정보 조회
     public Authentication getAuthentication(String token) {
-        PrincipalDetails principalDetails = (PrincipalDetails) principalDetailsService.loadUserByUsername(getUsername(token));
+        PrincipalDetails principalDetails = principalDetailsService.loadUserByUsername(getUsername(token));
         return new UsernamePasswordAuthenticationToken(
                 principalDetails,
                 null,
