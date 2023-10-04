@@ -10,10 +10,12 @@ jib{
         image='adoptopenjdk/openjdk11:jre-11.0.2.9-alpine'
     }
     to{
-        image='asia-northeast3-docker.pkg.dev/dart-388516/cloud-run-source-deploy/dart-server:latest'
+//        image='asia-northeast3-docker.pkg.dev/dart-388516/cloud-run-source-deploy/dart-server:latest'
+        image = 'asia-northeast3-docker.pkg.dev/dart-400112/cloud-run-source-deploy/dart-server:latest'
         auth {
             username = '_json_key'
-            password = new String(Base64.getDecoder().decode(System.getenv("GOOGLE_AR_CLIENT_SECRET")))
+//            password = new String(Base64.getDecoder().decode(System.getenv("GOOGLE_AR_CLIENT_SECRET_SSH_TEAM")))
+            password = new String(Base64.getDecoder().decode(System.getenv("GOOGLE_AR_CLIENT_SECRET_SSH_SERVER")))
         }
     }
     container {
