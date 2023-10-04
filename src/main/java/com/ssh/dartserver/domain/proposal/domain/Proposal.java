@@ -33,11 +33,10 @@ public class Proposal extends BaseTimeEntity {
     }
 
     public void updateProposalOnTeamDeletion(Long teamId) {
-        if(this.requestingTeam.getId().equals(teamId)) {
-            this.requestingTeam = null;
-        }
-        if(this.requestedTeam.getId().equals(teamId)) {
-            this.requestedTeam = null;
-        }
+        this.requestingTeam = getNullIfIdMatches(this.requestingTeam, teamId);
+        this.requestedTeam = getNullIfIdMatches(this.requestedTeam, teamId);
+    }
+    private Team getNullIfIdMatches(Team team, Long id) {
+        return (team != null && team.getId().equals(id)) ? null : team;
     }
 }
