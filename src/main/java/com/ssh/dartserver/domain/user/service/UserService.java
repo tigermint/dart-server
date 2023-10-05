@@ -3,6 +3,9 @@ package com.ssh.dartserver.domain.user.service;
 import com.ssh.dartserver.domain.friend.infra.FriendRepository;
 import com.ssh.dartserver.domain.question.domain.Question;
 import com.ssh.dartserver.domain.question.dto.mapper.QuestionMapper;
+import com.ssh.dartserver.domain.team.domain.TeamUser;
+import com.ssh.dartserver.domain.team.infra.TeamUserRepository;
+import com.ssh.dartserver.domain.team.service.MyTeamService;
 import com.ssh.dartserver.domain.university.domain.University;
 import com.ssh.dartserver.domain.university.dto.mapper.UniversityMapper;
 import com.ssh.dartserver.domain.university.infra.UniversityRepository;
@@ -45,6 +48,10 @@ public class UserService {
     private final VoteRepository voteRepository;
     private final ProfileQuestionRepository profileQuestionRepository;
     private final CandidateRepository candidateRepository;
+    private final TeamUserRepository teamUserRepository;
+
+    private final MyTeamService myTeamService;
+
 
     private final UserMapper userMapper;
     private final UniversityMapper universityMapper;
@@ -71,9 +78,9 @@ public class UserService {
 
         return getUserProfileResponse(user, profileQuestions);
     }
-  
+
     @Transactional
-    public UserProfileResponse update(User user, UserUpdateRequest request){
+    public UserProfileResponse update(User user, UserUpdateRequest request) {
 
         user.updateNickname(request.getNickname());
         user.updateProfileImageUrl(request.getProfileImageUrl());
@@ -123,7 +130,14 @@ public class UserService {
 
         //내가 후보인데 투표 받은 건 아닐 경우:  null
         candidateRepository.findAllByUser(user)
-                        .forEach(candidate -> candidate.updateUser(null));
+                .forEach(candidate -> candidate.updateUser(null));
+
+        //내가 포함된 모든 팀 조회
+        teamUserRepository.findAllByUser(user).stream()
+                .map(TeamUser::getTeam)
+                .distinct()
+                .collect(Collectors.toList())
+                .forEach(team -> myTeamService.deleteTeam(user, team.getId()));
 
         userRepository.delete(user);
     }
@@ -154,25 +168,25 @@ public class UserService {
                 .build();
     }
 
-    private University getUniversity(Long universityId){
+    private University getUniversity(Long universityId) {
         return universityRepository.findById(universityId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 대학교입니다."));
     }
 
     private static void validateReceivedQuestion(UserUpdateRequest request, Map<Question, Long> receivedVoteQuestionCountMap) {
-        if(receivedVoteQuestionCountMap.size() != request.getProfileQuestionIds().size()){
+        if (receivedVoteQuestionCountMap.size() != request.getProfileQuestionIds().size()) {
             throw new IllegalArgumentException("내가 받은 프로필 질문이 아닙니다.");
         }
     }
 
     private void validateDuplicateQuestion(List<Long> profileQuestionIds) {
-        if(profileQuestionIds.size() != profileQuestionIds.stream().distinct().count()){
+        if (profileQuestionIds.size() != profileQuestionIds.stream().distinct().count()) {
             throw new IllegalArgumentException("중복된 프로필 질문이 있습니다.");
         }
     }
 
     private void validateReceivedQuestionSize(List<Long> profileQuestionIds) {
-        if(profileQuestionIds.size() > 3){
+        if (profileQuestionIds.size() > 3) {
             throw new IllegalArgumentException("프로필 질문은 3개 이하여야 합니다.");
         }
     }
