@@ -40,6 +40,7 @@ public class SecurityConfig {
         http
                 .authorizeRequests()
                 .antMatchers("/v1/auth/**",
+                        "/v1/ws/**",
                         "/v1/health/**",
                         "/swagger-ui/**",
                         "/swagger-resources/**",
