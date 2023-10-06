@@ -39,8 +39,8 @@ public class SecurityConfig {
                 .addFilterBefore(new ExceptionHandlerFilter(), JwtAuthenticationFilter.class);
         http
                 .authorizeRequests()
-                .antMatchers("/v1/user/**").authenticated()
-                .anyRequest().permitAll();
+                .antMatchers("/v1/auth/**", "/v1/health/**").permitAll()
+                .anyRequest().authenticated();
         return http.build();
     }
 }
