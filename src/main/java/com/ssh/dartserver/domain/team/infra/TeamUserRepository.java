@@ -16,8 +16,6 @@ public interface TeamUserRepository extends JpaRepository<TeamUser, Long> {
             "join fetch tu.team t " +
             "join fetch tu.user u " +
             "join fetch u.university uni " +
-            "join fetch u.profileQuestions.values pqv " +
-            "join fetch pqv.question q " +
             "where t.id = :teamId")
     List<TeamUser> findAllByTeamId(@Param("teamId") Long teamId);
 
@@ -27,8 +25,6 @@ public interface TeamUserRepository extends JpaRepository<TeamUser, Long> {
             "join fetch tu.team t " +
             "join fetch tu.user u " +
             "join fetch u.university uni " +
-            "join fetch u.profileQuestions.values pqv " +
-            "join fetch pqv.question q " +
             "where t in :teams")
     List<TeamUser> findAllByTeamIn(@Param("teams") List<Team> teams);
 
