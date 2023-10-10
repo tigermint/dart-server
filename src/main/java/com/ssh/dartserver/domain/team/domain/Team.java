@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -28,10 +30,15 @@ public class Team extends BaseTimeEntity {
     @Column(name = "is_visible_to_same_university")
     private Boolean isVisibleToSameUniversity;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "university_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private University university;
+
+    @OneToMany(mappedBy = "team", cascade = CascadeType.ALL)
+    private List<TeamUser> teamUsers = new ArrayList<>();
+
+    @OneToMany(mappedBy = "team", cascade = CascadeType.ALL)
+    private List<TeamRegion> teamRegions = new ArrayList<>();
 
     @Builder
     public Team(String name, Boolean isVisibleToSameUniversity, University university, TeamUsersCombinationHash teamUsersCombinationHash) {
