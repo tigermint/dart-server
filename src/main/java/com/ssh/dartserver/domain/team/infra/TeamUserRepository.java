@@ -14,9 +14,10 @@ public interface TeamUserRepository extends JpaRepository<TeamUser, Long> {
 
     List<TeamUser> findAllByTeam(Team team);
 
-    @Query("select tu from TeamUser tu " +
+    @Query("select distinct tu from TeamUser tu " +
             "join fetch tu.team t " +
             "join fetch tu.user u " +
+            "join fetch u.university " +
             "join fetch u.profileQuestions pqs " +
             "join fetch pqs.values pq " +
             "join fetch pq.question q " +
