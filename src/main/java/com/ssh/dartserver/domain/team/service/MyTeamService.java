@@ -129,17 +129,18 @@ public class MyTeamService {
 
 
     public TeamResponse readTeam(User user, Long teamId) {
-        Team team = teamRepository.findById(teamId)
+
+        List<TeamUser> teamUsers = teamUserRepository.findAllByTeamId(teamId);
+        List<TeamRegion> teamRegions = teamRegionRepository.findAllByTeamId(teamId);
+        Team team = teamUsers.stream()
+                .map(TeamUser::getTeam)
+                .findAny()
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 팀입니다."));
-        List<TeamUser> teamUsers = teamUserRepository.findAllByTeam(team);
-        List<TeamRegion> teamRegions = teamRegionRepository.findAllByTeam(team);
 
         validateTeamUserIsPartOfTeam(user, teamUsers);
 
         return getTeamResponse(team, teamRegions, teamUsers);
     }
-
-    //TODO: 목록 조회 분기 필요
 
     public List<TeamResponse> listTeam(User user) {
         List<TeamUser> teamUsers = teamUserRepository.findAllByUser(user);
@@ -225,7 +226,6 @@ public class MyTeamService {
     }
 
     private TeamResponse getTeamResponse(Team team, List<TeamRegion> teamRegions, List<TeamUser> teamUsers) {
-
         List<RegionResponse> regionResponses = teamRegions.stream()
                 .map(TeamRegion::getRegion)
                 .map(regionMapper::toRegionResponse)
@@ -347,7 +347,6 @@ public class MyTeamService {
     }
 
     private void validateTeamUserIsPartOfTeam(User user, List<TeamUser> teamUsers) {
-
         List<Long> teamUserIds = teamUsers.stream()
                 .map(TeamUser::getUser)
                 .map(User::getId)
