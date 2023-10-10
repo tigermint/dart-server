@@ -9,11 +9,20 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface TeamRegionRepository extends JpaRepository<TeamRegion, Long> {
-    List<TeamRegion> findAllByTeam(Team team);
+
     @Query("select distinct tr from TeamRegion tr " +
             "join fetch tr.team t " +
             "join fetch tr.region " +
             "where t.id = :teamId")
     List<TeamRegion> findAllByTeamId(@Param("teamId") Long teamId);
+
+    List<TeamRegion> findAllByTeam(Team team);
+
+    @Query("select distinct tr from TeamRegion tr " +
+            "join fetch tr.team t " +
+            "join fetch tr.region " +
+            "where t in :teams")
+    List<TeamRegion> findAllByTeamIn(@Param("teams") List<Team> teams);
+
     void deleteAllByTeamId(Long teamId);
 }
