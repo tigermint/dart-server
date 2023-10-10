@@ -12,18 +12,25 @@ import java.util.List;
 public interface TeamUserRepository extends JpaRepository<TeamUser, Long> {
     List<TeamUser> findAllByUser(User user);
 
+    @Query("select distinct tu from TeamUser tu " +
+            "join fetch tu.team t " +
+            "join fetch tu.user u " +
+            "join fetch u.university uni " +
+            "join fetch u.profileQuestions.values pqv " +
+            "join fetch pqv.question q " +
+            "where t.id = :teamId")
+    List<TeamUser> findAllByTeamId(@Param("teamId") Long teamId);
+
     List<TeamUser> findAllByTeam(Team team);
 
     @Query("select distinct tu from TeamUser tu " +
             "join fetch tu.team t " +
             "join fetch tu.user u " +
-            "join fetch u.university " +
-            "join fetch u.profileQuestions pqs " +
-            "join fetch pqs.values pq " +
-            "join fetch pq.question q " +
-            "where t.id = :teamId")
-    List<TeamUser> findAllByTeamId(@Param("teamId") Long teamId);
+            "join fetch u.university uni " +
+            "join fetch u.profileQuestions.values pqv " +
+            "join fetch pqv.question q " +
+            "where t in :teams")
+    List<TeamUser> findAllByTeamIn(@Param("teams") List<Team> teams);
 
-    List<TeamUser> findAllByTeamIn(List<Team> teams);
     void deleteAllByTeamId(Long teamId);
 }
