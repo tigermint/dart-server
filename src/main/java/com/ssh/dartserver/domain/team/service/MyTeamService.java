@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -143,17 +144,18 @@ public class MyTeamService {
     }
 
     public List<TeamResponse> listTeam(User user) {
-        List<TeamUser> teamUsers = teamUserRepository.findAllByUser(user);
-        List<Team> myTeams = teamUsers.stream()
-                .map(TeamUser::getTeam)
-                .distinct()
-                .collect(Collectors.toList());
+        List<Team> myTeams = teamRepository.findAllTeamByUserIdPattern("%-" + user.getId() + "-%");
+
+        Map<Team, List<TeamUser>> teamUsersMap = teamUserRepository.findAllByTeamIn(myTeams).stream()
+                .collect(Collectors.groupingBy(TeamUser::getTeam));
+        Map<Team, List<TeamRegion>> teamRegionsMap = teamRegionRepository.findAllByTeamIn(myTeams).stream()
+                .collect(Collectors.groupingBy(TeamRegion::getTeam));
 
         return myTeams.stream()
                 .map(myTeam -> {
-                    List<TeamRegion> myTeamRegions = teamRegionRepository.findAllByTeam(myTeam);
-                    List<TeamUser> myTeamUsers = teamUserRepository.findAllByTeam(myTeam);
-                    return getTeamResponse(myTeam, myTeamRegions, myTeamUsers);
+                    List<TeamUser> teamUsers = teamUsersMap.getOrDefault(myTeam, Collections.emptyList());
+                    List<TeamRegion> teamRegions =  teamRegionsMap.getOrDefault(myTeam, Collections.emptyList());
+                    return getTeamResponse(myTeam, teamRegions, teamUsers);
                 })
                 .collect(Collectors.toList());
     }
