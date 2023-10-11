@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -39,6 +40,10 @@ public class Team extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "team", cascade = CascadeType.ALL)
     private List<TeamRegion> teamRegions = new ArrayList<>();
+
+    @OneToMany(mappedBy = "team", cascade = CascadeType.ALL)
+    @BatchSize(size = 500)
+    private List<SingleTeamFriend> singleTeamFriends = new ArrayList<>();
 
     @Builder
     public Team(String name, Boolean isVisibleToSameUniversity, University university, TeamUsersCombinationHash teamUsersCombinationHash) {
