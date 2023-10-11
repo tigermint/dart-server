@@ -9,7 +9,6 @@ import com.ssh.dartserver.domain.team.domain.TeamUser;
 import com.ssh.dartserver.domain.team.dto.*;
 import com.ssh.dartserver.domain.team.dto.mapper.RegionMapper;
 import com.ssh.dartserver.domain.team.dto.mapper.TeamMapper;
-import com.ssh.dartserver.domain.team.infra.SingleTeamFriendRepository;
 import com.ssh.dartserver.domain.team.infra.TeamRegionRepository;
 import com.ssh.dartserver.domain.team.infra.TeamRepository;
 import com.ssh.dartserver.domain.team.infra.TeamUserRepository;
@@ -18,8 +17,6 @@ import com.ssh.dartserver.domain.user.domain.personalinfo.Gender;
 import com.ssh.dartserver.domain.user.domain.profilequestions.ProfileQuestions;
 import com.ssh.dartserver.domain.user.dto.ProfileQuestionResponse;
 import com.ssh.dartserver.domain.user.dto.mapper.ProfileQuestionMapper;
-import com.ssh.dartserver.domain.user.infra.UserRepository;
-import com.ssh.dartserver.global.error.TeamNotFoundException;
 import com.ssh.dartserver.global.util.DateTimeUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -28,10 +25,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -45,8 +39,6 @@ public class TeamService {
 
     private final TeamRepository teamRepository;
     private final TeamRegionRepository teamRegionRepository;
-    private final UserRepository userRepository;
-    private final SingleTeamFriendRepository singleTeamFriendRepository;
     private final TeamUserRepository teamUserRepository;
     private final ProposalRepository proposalRepository;
 
@@ -59,89 +51,104 @@ public class TeamService {
         return teamRepository.count() * 2 + 50;
     }
 
-    public Page<BlindDateTeamResponse> listVisibleTeams(long universityId, Gender myGender, long regionId, Pageable pageable) {
-        Page<Team> allVisibleTeams = getTeams(universityId, myGender, regionId, pageable);
+    public BlindDateTeamDetailResponse readTeam(User user, long teamId) {
+        List<TeamUser> teamUsers = teamUserRepository.findAllByTeamId(teamId);
+        List<TeamRegion> teamRegions = teamRegionRepository.findAllByTeamId(teamId);
+        Team team = teamUsers.stream()
+                .map(TeamUser::getTeam)
+                .findAny()
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 팀입니다."));
+        return getBlindDateTeamDetail(user, team, teamUsers, teamRegions);
+    }
 
-        List<BlindDateTeamResponse> visibleTeams = allVisibleTeams.getContent()
-                .stream()
-                .map(this::getBlindDateTeam)
+    public Page<BlindDateTeamResponse> listVisibleTeam(long universityId, Gender myGender, long regionId, Pageable pageable) {
+        Page<Team> allVisibleTeamPages = getTeamPages(universityId, myGender, regionId, pageable);
+
+        List<Team> visibleTeams = allVisibleTeamPages.getContent();
+        Map<Team, List<TeamUser>> visibleTeamUsersMap = teamUserRepository.findAllByTeamIn(visibleTeams).stream()
+                .collect(Collectors.groupingBy(TeamUser::getTeam));
+        Map<Team, List<TeamRegion>> visibleTeamRegionsMap = teamRegionRepository.findAllByTeamIn(visibleTeams).stream()
+                .collect(Collectors.groupingBy(TeamRegion::getTeam));
+
+        List<BlindDateTeamResponse> blindDateTeamResponses = visibleTeams.stream()
+                .map(visibleTeam -> {
+                    List<TeamUser> teamUsers = visibleTeamUsersMap.getOrDefault(visibleTeam, Collections.emptyList());
+                    List<TeamRegion> teamRegions = visibleTeamRegionsMap.getOrDefault(visibleTeam, Collections.emptyList());
+                    return getBlindDateTeam(visibleTeam, teamUsers, teamRegions);
+                })
                 .collect(Collectors.toList());
 
-        return new PageImpl<>(visibleTeams, pageable, allVisibleTeams.getTotalElements());
+        return new PageImpl<>(blindDateTeamResponses, pageable, allVisibleTeamPages.getTotalElements());
     }
 
-    public BlindDateTeamDetailResponse readTeam(User user, long teamId) {
-        Team team = teamRepository.findById(teamId).orElseThrow(() -> new TeamNotFoundException("존재하지 않는 팀입니다."));
-        return getBlindDateTeamDetail(user, team);
-    }
-
-    private BlindDateTeamResponse getBlindDateTeam(Team team) {
+    private BlindDateTeamResponse getBlindDateTeam(Team team, List<TeamUser> teamUsers, List<TeamRegion> teamRegions) {
         List<Integer> userAges = new ArrayList<>();
-        List<BlindDateUserResponse> users = new ArrayList<>();
+        List<BlindDateUserResponse> blindDateUserResponses = new ArrayList<>();
         AtomicBoolean anyoneCertified = new AtomicBoolean(false);
         AtomicReference<String> universityName = new AtomicReference<>("");
 
-        List<User> teamUsers = Optional.of(team.getTeamUsersCombinationHash().getUsersId())
-                .filter(teamUserIds -> teamUserIds.size() == 1)
-                .map(teamUserIds -> getSingleTeamUserProfileResponse(team, teamUserIds))
-                .orElseGet(() -> getMultipleTeamUserProfileResponse(team.getTeamUsersCombinationHash().getUsersId()));
+        List<User> usersInTeam = Optional.of(teamUsers)
+                .filter(users -> users.size() == 1)
+                .map(users -> getSingleTeamUserProfileResponse(team, teamUsers))
+                .orElseGet(() -> getMultipleTeamUserProfileResponse(teamUsers));
 
-        teamUsers.forEach(user -> {
-            userAges.add(user.getPersonalInfo().getBirthYear().getValue());
-            universityName.set(user.getUniversity().getName());
-            if (!anyoneCertified.get() && user.getStudentVerificationInfo()
+        usersInTeam.forEach(userInTeam -> {
+            userAges.add(userInTeam.getPersonalInfo().getBirthYear().getValue());
+            universityName.set(userInTeam.getUniversity().getName());
+            if (!anyoneCertified.get() && userInTeam.getStudentVerificationInfo()
                     .getStudentIdCardVerificationStatus().isVerificationSuccess()) {
                 anyoneCertified.set(true);
             }
-            BlindDateUserResponse blindDateUserResponse = getTeamUserSimple(user);
-            users.add(blindDateUserResponse);
+            BlindDateUserResponse blindDateUserResponse = getTeamUserSimple(userInTeam);
+            blindDateUserResponses.add(blindDateUserResponse);
         });
 
-        List<RegionResponse> regionResponses = getTeamRegionResponses(team);
-        return teamMapper.toBlindDateTeamResponse(team, getAverageAge(userAges), regionResponses, universityName.get(), anyoneCertified.get(), users);
+        return teamMapper.toBlindDateTeamResponse(
+                team,
+                getAverageAge(userAges),
+                getTeamRegionResponses(teamRegions),
+                universityName.get(),
+                anyoneCertified.get(),
+                blindDateUserResponses);
     }
 
-    private BlindDateTeamDetailResponse getBlindDateTeamDetail(User user, Team team) {
+    private BlindDateTeamDetailResponse getBlindDateTeamDetail(User user, Team team, List<TeamUser> teamUsers, List<TeamRegion> teamRegions) {
         List<Integer> userAges = new ArrayList<>();
-        List<BlindDateUserDetailResponse> users = new ArrayList<>();
+        List<BlindDateUserDetailResponse> blindDateUserDetailResponses = new ArrayList<>();
         AtomicBoolean anyoneCertified = new AtomicBoolean(false);
         AtomicReference<String> universityName = new AtomicReference<>("");
 
-        List<User> teamUsers = Optional.of(team.getTeamUsersCombinationHash().getUsersId())
-                .filter(teamUserIds -> teamUserIds.size() == 1)
-                .map(teamUserIds -> getSingleTeamUserProfileResponse(team, teamUserIds))
-                .orElseGet(() -> getMultipleTeamUserProfileResponse(team.getTeamUsersCombinationHash().getUsersId()));
+        List<User> usersInTeam = Optional.of(teamUsers)
+                .filter(users -> users.size() == 1)
+                .map(users -> getSingleTeamUserProfileResponse(team, teamUsers))
+                .orElseGet(() -> getMultipleTeamUserProfileResponse(teamUsers));
 
-        teamUsers.forEach(teamUser -> {
-            userAges.add(teamUser.getPersonalInfo().getBirthYear().getValue());
-            universityName.set(teamUser.getUniversity().getName());
-            if (!anyoneCertified.get() && teamUser.getStudentVerificationInfo().getStudentIdCardVerificationStatus().isVerificationSuccess()) {
+        usersInTeam.forEach(userInTeam -> {
+            userAges.add(userInTeam.getPersonalInfo().getBirthYear().getValue());
+            universityName.set(userInTeam.getUniversity().getName());
+            if (!anyoneCertified.get() && userInTeam.getStudentVerificationInfo().getStudentIdCardVerificationStatus().isVerificationSuccess()) {
                 anyoneCertified.set(true);
             }
-            BlindDateUserDetailResponse blindDateUserDetailResponse = getTeamUserDetail(teamUser);
-            users.add(blindDateUserDetailResponse);
+            BlindDateUserDetailResponse blindDateUserDetailResponse = getTeamUserDetail(userInTeam);
+            blindDateUserDetailResponses.add(blindDateUserDetailResponse);
         });
 
-        // 내가 속한 팀 가져오기
-        List<Team> myTeams = teamUserRepository.findAllByUser(user).stream()
-                .map(TeamUser::getTeam)
-                .distinct()
-                .collect(Collectors.toList());
-
-        List<Proposal> proposals = proposalRepository.findAllByRequestingTeamOrRequestedTeam(team, team);
-
-        List<Proposal> proposalsInMyTeams = proposals.stream()
-                .filter(proposal -> myTeams.contains(proposal.getRequestedTeam()) || myTeams.contains(proposal.getRequestingTeam()))
-                .collect(Collectors.toList());
-
-        List<RegionResponse> regionResponses = getTeamRegionResponses(team);
-        return teamMapper.toBlindDateTeamDetailResponse(team, getAverageAge(userAges), regionResponses, universityName.get(), anyoneCertified.get(), users, !proposalsInMyTeams.isEmpty());
+        return teamMapper.toBlindDateTeamDetailResponse(
+                team,
+                getAverageAge(userAges),
+                getTeamRegionResponses(teamRegions),
+                universityName.get(),
+                anyoneCertified.get(),
+                blindDateUserDetailResponses,
+                hasProposalsForMyTeams(user, team)
+        );
     }
 
-    private List<User> getSingleTeamUserProfileResponse(Team team, List<Long> teamUserIds) {
+    private List<User> getSingleTeamUserProfileResponse(Team team, List<TeamUser> teamUsers) {
         return Stream.concat(
-                        userRepository.findAllByIdIn(teamUserIds).stream(),
-                        singleTeamFriendRepository.findAllByTeam(team).stream()
+                        teamUsers.stream()
+                                .map(TeamUser::getUser),
+                        team.getSingleTeamFriends().stream()
                                 .map(singleTeamFriend ->
                                         User.createSingleTeamFriendUser(
                                                 singleTeamFriend.getNickname().getValue(),
@@ -154,8 +161,10 @@ public class TeamService {
                 .collect(Collectors.toList());
     }
 
-    private List<User> getMultipleTeamUserProfileResponse(List<Long> teamUserIds) {
-        return userRepository.findAllByIdIn(teamUserIds);
+    private List<User> getMultipleTeamUserProfileResponse(List<TeamUser> teamUsers) {
+        return teamUsers.stream()
+                .map(TeamUser::getUser)
+                .collect(Collectors.toList());
     }
 
 
@@ -186,20 +195,30 @@ public class TeamService {
         );
     }
 
-    private Page<Team> getTeams(long universityId, Gender myGender, long regionId, Pageable pageable) {
+    private Page<Team> getTeamPages(long universityId, Gender myGender, long regionId, Pageable pageable) {
         if (regionId == ALL_REGIONS) {
             return teamRepository.findAllVisibleTeams(universityId, myGender, pageable);
         }
         return teamRepository.findAllVisibleTeamsByRegionId(universityId, myGender, regionId, pageable);
     }
 
-    private List<RegionResponse> getTeamRegionResponses(Team team) {
-        return teamRegionRepository.findAllByTeam(team)
-                .stream()
+    private List<RegionResponse> getTeamRegionResponses(List<TeamRegion> teamRegions) {
+        return teamRegions.stream()
                 .map((TeamRegion::getRegion))
                 .map(regionMapper::toRegionResponse)
                 .collect(Collectors.toList());
     }
+
+    private Boolean hasProposalsForMyTeams(User user, Team team) {
+        Set<Team> myTeams = teamUserRepository.findAllByUser(user).stream()
+                .map(TeamUser::getTeam)
+                .collect(Collectors.toSet());
+        List<Proposal> proposals = proposalRepository.findAllByRequestingTeamOrRequestedTeam(team, team);
+
+        return proposals.stream()
+                .anyMatch(proposal -> myTeams.contains(proposal.getRequestedTeam()) || myTeams.contains(proposal.getRequestingTeam()));
+    }
+
 
     private static double getAverageAge(List<Integer> userBirthYears) {
         return userBirthYears.stream()
@@ -210,7 +229,7 @@ public class TeamService {
     }
 
     private static int getAge(int value) {
-        return DateTimeUtil.nowFromZone().getYear() - value;
+        return DateTimeUtil.nowFromZone().getYear() - value + 1;
     }
 
 }
