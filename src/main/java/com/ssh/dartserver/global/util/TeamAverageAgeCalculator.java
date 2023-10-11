@@ -33,6 +33,6 @@ public class TeamAverageAgeCalculator {
     }
 
     private int getAge(int value) {
-        return DateTimeUtil.nowFromZone().getYear() - value;
+        return DateTimeUtil.nowFromZone().getYear() - value + 1;
     }
 }
