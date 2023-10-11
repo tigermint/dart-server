@@ -51,8 +51,14 @@ public class TeamController {
         return ResponseEntity.ok(teamService.countAllTeams());
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<BlindDateTeamDetailResponse> readTeam(Authentication authentication, @PathVariable("id") long id) {
+        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
+        return ResponseEntity.ok(teamService.readTeam(principal.getUser(), id));
+    }
+
     @GetMapping
-    public ResponseEntity<Page<BlindDateTeamResponse>> getTeams(Authentication authentication,
+    public ResponseEntity<Page<BlindDateTeamResponse>> listTeam(Authentication authentication,
                                                                 @RequestParam(value = "page", required = false, defaultValue = "0") int page,
                                                                 @RequestParam(value = "size", required = false, defaultValue = "10") int size,
                                                                 @RequestParam(value = "regionId", required = false, defaultValue = "0") long regionId) {
@@ -61,14 +67,9 @@ public class TeamController {
         Gender userGender = principal.getUser().getPersonalInfo().getGender();
 
         Pageable pageable = PageRequest.of(page, size);
-        Page<BlindDateTeamResponse> teamResponses = teamService.listVisibleTeams(universityId, userGender, regionId, pageable);
+        Page<BlindDateTeamResponse> teamResponses = teamService.listVisibleTeam(universityId, userGender, regionId, pageable);
 
         return ResponseEntity.ok(teamResponses);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<BlindDateTeamDetailResponse> getTeam(Authentication authentication, @PathVariable("id") long id) {
-        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
-        return ResponseEntity.ok(teamService.readTeam(principal.getUser(), id));
-    }
 }
