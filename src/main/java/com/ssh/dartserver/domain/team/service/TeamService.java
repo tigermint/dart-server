@@ -17,7 +17,7 @@ import com.ssh.dartserver.domain.user.domain.personalinfo.Gender;
 import com.ssh.dartserver.domain.user.domain.profilequestions.ProfileQuestions;
 import com.ssh.dartserver.domain.user.dto.ProfileQuestionResponse;
 import com.ssh.dartserver.domain.user.dto.mapper.ProfileQuestionMapper;
-import com.ssh.dartserver.global.util.DateTimeUtil;
+import com.ssh.dartserver.global.util.TeamAverageAgeCalculator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -46,6 +46,8 @@ public class TeamService {
     private final ProfileQuestionMapper profileQuestionMapper;
     private final QuestionMapper questionMapper;
     private final TeamMapper teamMapper;
+
+    private final TeamAverageAgeCalculator teamAverageAgeCalculator;
 
     public Long countAllTeams() {
         return teamRepository.count() * 2 + 50;
@@ -105,7 +107,7 @@ public class TeamService {
 
         return teamMapper.toBlindDateTeamResponse(
                 team,
-                getAverageAge(userAges),
+                teamAverageAgeCalculator.getAverageAge(userAges),
                 getTeamRegionResponses(teamRegions),
                 universityName.get(),
                 anyoneCertified.get(),
@@ -135,7 +137,7 @@ public class TeamService {
 
         return teamMapper.toBlindDateTeamDetailResponse(
                 team,
-                getAverageAge(userAges),
+                teamAverageAgeCalculator.getAverageAge(userAges),
                 getTeamRegionResponses(teamRegions),
                 universityName.get(),
                 anyoneCertified.get(),
@@ -217,19 +219,6 @@ public class TeamService {
 
         return proposals.stream()
                 .anyMatch(proposal -> myTeams.contains(proposal.getRequestedTeam()) || myTeams.contains(proposal.getRequestingTeam()));
-    }
-
-
-    private static double getAverageAge(List<Integer> userBirthYears) {
-        return userBirthYears.stream()
-                .map(TeamService::getAge)
-                .mapToInt(Integer::intValue)
-                .average()
-                .orElse(0.0);
-    }
-
-    private static int getAge(int value) {
-        return DateTimeUtil.nowFromZone().getYear() - value + 1;
     }
 
 }
