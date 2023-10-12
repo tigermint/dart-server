@@ -5,6 +5,8 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -25,6 +27,9 @@ public class ChatRoom {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "proposal_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Proposal proposal;
+
+    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
+    private List<ChatRoomUser> chatRoomUsers = new ArrayList<>();
 
     public void updateLastMessage(String latestChatMessageContent, LocalDateTime latestChatMessageTime) {
         this.latestChatMessageContent = latestChatMessageContent;
