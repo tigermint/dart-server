@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class ChatMessageService {
-    private static final int PAGE_SIZE = 10;
+    private static final int PAGE_SIZE = 20;
 
     private final ChatRoomUserRepository chatRoomUserRepository;
     private final ChatMessageRepository chatMessageRepository;
@@ -40,11 +40,8 @@ public class ChatMessageService {
 
     @Transactional
     public ChatMessageResponse createChatMessage(ChatMessageRequest request) {
-
-        //전체 방 인원 조회
         List<ChatRoomUser> chatRoomUsers = chatRoomUserRepository.findAllByChatRoomId(request.getChatRoomId());
 
-        //sender가 채팅방에 속한 인원인지 판단
         ChatRoomUser chatRoomUser = chatRoomUsers.stream()
                 .filter(s -> s.getUser().getId().equals(request.getSenderId()))
                 .findAny()
@@ -58,7 +55,6 @@ public class ChatMessageService {
             chatRoomUserService.deleteChatRoomUser(request.getSenderId(), request.getChatRoomId());
         }
 
-        //메시지 저장 로직
         ChatMessage chatMessage = ChatMessage.builder()
                 .chatMessageType(ChatMessageType.valueOf(request.getChatMessageType()))
                 .content(ChatContent.from(request.getContent()))
@@ -70,7 +66,7 @@ public class ChatMessageService {
 
         if (ChatMessageType.valueOf(request.getChatMessageType()).equals(ChatMessageType.TALK)) {
             sendChatMessageNotification(request, user, chatRoomUsers);
-            chatRoom.updateLastMessage(savedChatMessage.getContent().getValue(), savedChatMessage.getCreatedTime());
+            chatRoom.updateLastMessage(savedChatMessage.getContent().getValue());
         }
         return chatMessageMapper.toResponseDto(savedChatMessage);
     }
@@ -83,7 +79,6 @@ public class ChatMessageService {
 
     private void sendChatMessageNotification(ChatMessageRequest request, User user, List<ChatRoomUser> chatRoomUsers) {
 
-        //메시지 전송 알림
         String heading = user.getPersonalInfo().getNickname().getValue();
         String content = request.getContent();
 
