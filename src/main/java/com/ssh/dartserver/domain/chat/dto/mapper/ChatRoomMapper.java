@@ -18,7 +18,7 @@ public interface ChatRoomMapper {
     //Read
     @Mapping(target = "chatRoomId", source = "chatRoom.id")
     @Mapping(target = "latestChatMessageContent", source = "chatRoom.latestChatMessageContent")
-    @Mapping(target = "latestChatMessageTime", source = "chatRoom.latestChatMessageTime")
+    @Mapping(target = "latestChatMessageTime", source = "chatRoom.lastModifiedTime")
     @Mapping(target = "requestingTeam", source = "requestingTeam")
     @Mapping(target = "requestedTeam", source = "requestedTeam")
     ChatRoomResponse.ReadDto toReadDto(ChatRoom chatRoom, ChatRoomResponse.ReadDto.TeamDto requestingTeam, ChatRoomResponse.ReadDto.TeamDto requestedTeam);
@@ -61,7 +61,7 @@ public interface ChatRoomMapper {
     //List
     @Mapping(target = "chatRoomId", source = "chatRoom.id")
     @Mapping(target = "latestChatMessageContent", source = "chatRoom.latestChatMessageContent")
-    @Mapping(target = "latestChatMessageTime", source = "chatRoom.latestChatMessageTime")
+    @Mapping(target = "latestChatMessageTime", source = "chatRoom.lastModifiedTime")
     @Mapping(target = "requestingTeam", source = "requestingTeam")
     @Mapping(target = "requestedTeam", source = "requestedTeam")
     ChatRoomResponse.ListDto toListDto(ChatRoom chatRoom, ChatRoomResponse.ListDto.TeamDto requestingTeam, ChatRoomResponse.ListDto.TeamDto requestedTeam);

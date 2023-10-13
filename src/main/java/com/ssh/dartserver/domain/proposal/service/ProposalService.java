@@ -6,13 +6,13 @@ import com.ssh.dartserver.domain.proposal.dto.ProposalRequest;
 import com.ssh.dartserver.domain.proposal.dto.ProposalResponse;
 import com.ssh.dartserver.domain.proposal.dto.mapper.ProposalMapper;
 import com.ssh.dartserver.domain.proposal.infra.ProposalRepository;
+import com.ssh.dartserver.domain.team.domain.SingleTeamFriend;
 import com.ssh.dartserver.domain.team.domain.Team;
 import com.ssh.dartserver.domain.team.domain.TeamRegion;
 import com.ssh.dartserver.domain.team.domain.TeamUser;
-import com.ssh.dartserver.domain.team.infra.SingleTeamFriendRepository;
-import com.ssh.dartserver.domain.team.infra.TeamRegionRepository;
 import com.ssh.dartserver.domain.team.infra.TeamUserRepository;
 import com.ssh.dartserver.domain.user.domain.User;
+import com.ssh.dartserver.domain.user.domain.personalinfo.BirthYear;
 import com.ssh.dartserver.domain.user.infra.UserRepository;
 import com.ssh.dartserver.global.infra.notification.PlatformNotification;
 import com.ssh.dartserver.global.util.TeamAverageAgeCalculator;
@@ -20,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -35,14 +36,12 @@ public class ProposalService {
 
     private final ProposalRepository proposalRepository;
     private final TeamUserRepository teamUserRepository;
-    private final TeamRegionRepository teamRegionRepository;
     private final UserRepository userRepository;
-    private final SingleTeamFriendRepository singleTeamFriendRepository;
-    private final TeamAverageAgeCalculator teamAverageAgeCalculator;
-
-    private final PlatformNotification notification;
 
     private final ProposalMapper proposalMapper;
+
+    private final PlatformNotification notification;
+    private final TeamAverageAgeCalculator teamAverageAgeCalculator;
 
     @Transactional
     public Long createProposal(User user, ProposalRequest.Create request) {
@@ -98,29 +97,19 @@ public class ProposalService {
 
     private List<ProposalResponse.ListDto> getListDtos(List<Proposal> proposals) {
         return proposals.stream()
+                .sorted(Comparator.comparing(Proposal::getCreatedTime).reversed())
                 .flatMap(proposal -> {
-                    //팀 가져오기
                     Team requestingTeam = proposal.getRequestingTeam();
                     Team requestedTeam = proposal.getRequestedTeam();
 
-                    //팀 유저 가져오기
-                    List<TeamUser> requestingTeamUsers = teamUserRepository.findAllByTeam(requestingTeam);
-                    List<TeamUser> requestedTeamUsers = teamUserRepository.findAllByTeam(requestedTeam);
-
-                    //팀 지역 가져오기
-                    List<TeamRegion> requestingTeamRegions = teamRegionRepository.findAllByTeam(requestingTeam);
-                    List<TeamRegion> requestedTeamRegions = teamRegionRepository.findAllByTeam(requestedTeam);
-
-                    ProposalResponse.ListDto.TeamDto requestingTeamDto = getListTeamDto(requestingTeam, requestingTeamUsers, requestingTeamRegions);
-                    ProposalResponse.ListDto.TeamDto requestedTeamDto = getListTeamDto(requestedTeam, requestedTeamUsers, requestedTeamRegions);
-
-                    if (requestingTeamDto == null || requestedTeamDto == null) {
+                    if(requestingTeam == null || requestedTeam == null) {
                         return Stream.empty();
                     }
+
                     return Stream.of(proposalMapper.toListDto(
                             proposal,
-                            requestingTeamDto,
-                            requestedTeamDto
+                            getListTeamDto(requestingTeam, requestingTeam.getTeamUsers(), requestingTeam.getTeamRegions()),
+                            getListTeamDto(requestedTeam, requestedTeam.getTeamUsers(), requestedTeam.getTeamRegions())
                     ));
                 })
                 .collect(Collectors.toList());
@@ -130,7 +119,10 @@ public class ProposalService {
         return Optional.ofNullable(team)
                 .map(t -> proposalMapper.toListTeamDto(
                         t,
-                        teamAverageAgeCalculator.getAverageAge(teamUsers),
+                        Optional.of(teamUsers)
+                                .filter(users -> users.size() == 1)
+                                .map(this::getAverageAgeOfSingleTeamUsers)
+                                .orElseGet(() -> getAverageAgeOfMultipleTeamUsers(teamUsers)),
                         Optional.of(teamUsers)
                                 .filter(users -> users.size() == 1)
                                 .map(users -> getListSingleTeamUserDto(team, users))
@@ -141,11 +133,12 @@ public class ProposalService {
                 ))
                 .orElse(null);
     }
+
     private List<ProposalResponse.ListDto.UserDto> getListSingleTeamUserDto(Team team, List<TeamUser> teamUsers) {
         return Stream.concat(
                         teamUsers.stream()
                                 .map(TeamUser::getUser),
-                        singleTeamFriendRepository.findAllByTeam(team).stream()
+                        team.getSingleTeamFriends().stream()
                                 .map(singleTeamFriend ->
                                         User.createSingleTeamFriendUser(
                                                 singleTeamFriend.getNickname().getValue(),
@@ -166,6 +159,26 @@ public class ProposalService {
                 .collect(Collectors.toList());
     }
 
+    private Double getAverageAgeOfMultipleTeamUsers(List<TeamUser> teamUsers) {
+        return teamAverageAgeCalculator.getAverageAge(
+                teamUsers.stream()
+                        .map(TeamUser::getUser)
+                        .map(user -> user.getPersonalInfo().getBirthYear().getValue())
+                        .collect(Collectors.toList())
+        );
+    }
+
+    private Double getAverageAgeOfSingleTeamUsers(List<TeamUser> teamUsers) {
+        return teamAverageAgeCalculator.getAverageAge(
+                Stream.concat(
+                                teamUsers.get(0).getTeam().getSingleTeamFriends().stream()
+                                        .map(SingleTeamFriend::getBirthYear)
+                                        .map(BirthYear::getValue),
+                                Stream.of(teamUsers.get(0).getUser().getPersonalInfo().getBirthYear().getValue())
+                        )
+                        .collect(Collectors.toList())
+        );
+    }
 
     private void validateAlreadySentProposal(Long requestingTeamId, Long requestedTeamId) {
         proposalRepository.findByRequestingTeamIdAndRequestedTeamId(requestingTeamId, requestedTeamId)
