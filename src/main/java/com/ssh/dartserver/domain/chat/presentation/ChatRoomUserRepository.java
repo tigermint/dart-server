@@ -9,9 +9,20 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface ChatRoomUserRepository extends JpaRepository<ChatRoomUser, Long> {
-    List<ChatRoomUser> findAllByUser(User user);
 
-    List<ChatRoomUser> findAllByChatRoomId(Long chatRoomId);
+    @Query("select cru " +
+            "from ChatRoomUser cru " +
+            "join fetch cru.chatRoom cr " +
+            "join fetch cru.user u " +
+            "where u = :user")
+    List<ChatRoomUser> findAllByUser(@Param("user") User user);
+
+    @Query("select cru " +
+            "from ChatRoomUser cru " +
+            "join fetch cru.chatRoom cr " +
+            "join fetch cru.user u " +
+            "where cr.id = :chatRoomId")
+    List<ChatRoomUser> findAllByChatRoomId(@Param("chatRoomId") Long chatRoomId);
 
     @Query("select cru " +
             "from ChatRoomUser cru " +
