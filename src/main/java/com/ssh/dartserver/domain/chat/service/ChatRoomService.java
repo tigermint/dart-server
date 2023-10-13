@@ -10,13 +10,13 @@ import com.ssh.dartserver.domain.chat.presentation.ChatRoomUserRepository;
 import com.ssh.dartserver.domain.proposal.domain.Proposal;
 import com.ssh.dartserver.domain.proposal.domain.ProposalStatus;
 import com.ssh.dartserver.domain.proposal.infra.ProposalRepository;
+import com.ssh.dartserver.domain.team.domain.SingleTeamFriend;
 import com.ssh.dartserver.domain.team.domain.Team;
 import com.ssh.dartserver.domain.team.domain.TeamRegion;
 import com.ssh.dartserver.domain.team.domain.TeamUser;
-import com.ssh.dartserver.domain.team.infra.SingleTeamFriendRepository;
-import com.ssh.dartserver.domain.team.infra.TeamRegionRepository;
 import com.ssh.dartserver.domain.team.infra.TeamUserRepository;
 import com.ssh.dartserver.domain.user.domain.User;
+import com.ssh.dartserver.domain.user.domain.personalinfo.BirthYear;
 import com.ssh.dartserver.domain.user.domain.profilequestions.ProfileQuestions;
 import com.ssh.dartserver.domain.user.domain.studentverificationinfo.StudentIdCardVerificationStatus;
 import com.ssh.dartserver.domain.user.domain.studentverificationinfo.StudentVerificationInfo;
@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -43,8 +44,6 @@ public class ChatRoomService {
     private final ChatRoomUserRepository chatRoomUserRepository;
     private final ProposalRepository proposalRepository;
     private final TeamUserRepository teamUserRepository;
-    private final TeamRegionRepository teamRegionRepository;
-    private final SingleTeamFriendRepository singleTeamFriendRepository;
     private final TeamAverageAgeCalculator teamAverageAgeCalculator;
 
     private final PlatformNotification notification;
@@ -67,7 +66,6 @@ public class ChatRoomService {
 
         ChatRoom chatRoom = ChatRoom.builder()
                 .latestChatMessageContent(null)
-                .latestChatMessageTime(null)
                 .proposal(proposal)
                 .build();
 
@@ -105,23 +103,18 @@ public class ChatRoomService {
         Team requestingTeam = chatRoom.getProposal().getRequestingTeam();
         Team requestedTeam = chatRoom.getProposal().getRequestedTeam();
 
-        List<TeamUser> requestingTeamUsers = teamUserRepository.findAllByTeam(requestingTeam);
-        List<TeamUser> requestedTeamUsers = teamUserRepository.findAllByTeam(requestedTeam);
-
-        List<TeamRegion> requestingTeamRegions = teamRegionRepository.findAllByTeam(requestingTeam);
-        List<TeamRegion> requestedTeamRegions = teamRegionRepository.findAllByTeam(requestedTeam);
 
         return chatRoomMapper.toReadDto(
                 chatRoom,
                 getReadTeamDto(
                         requestingTeam,
-                        getTeamUsersInChatRoom(chatRoomUsers, requestingTeamUsers),
-                        requestingTeamRegions
+                        getTeamUsersInChatRoom(chatRoomUsers, requestingTeam.getTeamUsers()),
+                        requestingTeam.getTeamRegions()
                 ),
                 getReadTeamDto(
                         requestedTeam,
-                        getTeamUsersInChatRoom(chatRoomUsers, requestedTeamUsers),
-                        requestedTeamRegions
+                        getTeamUsersInChatRoom(chatRoomUsers, requestedTeam.getTeamUsers()),
+                        requestedTeam.getTeamRegions()
                 )
         );
     }
@@ -135,22 +128,24 @@ public class ChatRoomService {
                 .collect(Collectors.toList());
 
         return myChatRooms.stream()
+                .sorted(Comparator.comparing(ChatRoom::getLastModifiedTime).reversed())
                 .map(chatRoom -> {
                     Team requestingTeam = chatRoom.getProposal().getRequestingTeam();
                     Team requestedTeam = chatRoom.getProposal().getRequestedTeam();
 
-                    List<ChatRoomUser> chatRoomUsers = chatRoomUserRepository.findAllByChatRoomId(chatRoom.getId());
+                    List<ChatRoomUser> chatRoomUsers = chatRoom.getChatRoomUsers();
 
                     return chatRoomMapper.toListDto(
                             chatRoom,
                             getListTeamDto(
                                     requestingTeam,
-                                    getTeamUsersInChatRoom(chatRoomUsers, teamUserRepository.findAllByTeam(requestingTeam)),
-                                    teamRegionRepository.findAllByTeam(requestingTeam)),
+                                    getTeamUsersInChatRoom(chatRoomUsers, requestingTeam.getTeamUsers()),
+                                    requestingTeam.getTeamRegions()
+                            ),
                             getListTeamDto(
                                     requestedTeam,
-                                    getTeamUsersInChatRoom(chatRoomUsers, teamUserRepository.findAllByTeam(requestedTeam)),
-                                    teamRegionRepository.findAllByTeam(requestedTeam)
+                                    getTeamUsersInChatRoom(chatRoomUsers, requestedTeam.getTeamUsers()),
+                                    requestedTeam.getTeamRegions()
                             )
                     );
                 })
@@ -163,7 +158,10 @@ public class ChatRoomService {
                 .map(t -> chatRoomMapper.toReadTeamDto(
                         t,
                         isStudentIdCardVerified(teamUsers),
-                        teamAverageAgeCalculator.getAverageAge(teamUsers),
+                        Optional.of(teamUsers)
+                                .filter(users -> users.size() == 1)
+                                .map(this::getAverageAgeOfSingleTeamUsers)
+                                .orElseGet(() -> getAverageAgeOfMultipleTeamUsers(teamUsers)),
                         Optional.of(teamUsers)
                                 .filter(users -> users.size() == 1)
                                 .map(users -> getReadSingleTeamUserDto(t, users))
@@ -199,7 +197,7 @@ public class ChatRoomService {
         return Stream.concat(
                         teamUsers.stream()
                                 .map(TeamUser::getUser),
-                        singleTeamFriendRepository.findAllByTeam(team).stream()
+                        team.getSingleTeamFriends().stream()
                                 .map(singleTeamFriend ->
                                         User.createSingleTeamFriendUser(
                                                 singleTeamFriend.getNickname().getValue(),
@@ -246,7 +244,7 @@ public class ChatRoomService {
         return Stream.concat(
                         users.stream()
                                 .map(TeamUser::getUser),
-                        singleTeamFriendRepository.findAllByTeam(team).stream()
+                        team.getSingleTeamFriends().stream()
                                 .map(singleTeamFriend ->
                                         User.createSingleTeamFriendUser(
                                                 singleTeamFriend.getNickname().getValue(),
@@ -276,6 +274,27 @@ public class ChatRoomService {
         return requestingTeamUsers.stream()
                 .filter(teamUser -> chatRoomUserIds.contains(teamUser.getUser().getId()))
                 .collect(Collectors.toList());
+    }
+
+    private Double getAverageAgeOfMultipleTeamUsers(List<TeamUser> teamUsers) {
+        return teamAverageAgeCalculator.getAverageAge(
+                teamUsers.stream()
+                        .map(TeamUser::getUser)
+                        .map(user -> user.getPersonalInfo().getBirthYear().getValue())
+                        .collect(Collectors.toList())
+        );
+    }
+
+    private Double getAverageAgeOfSingleTeamUsers(List<TeamUser> teamUsers) {
+        return teamAverageAgeCalculator.getAverageAge(
+                Stream.concat(
+                                teamUsers.get(0).getTeam().getSingleTeamFriends().stream()
+                                        .map(SingleTeamFriend::getBirthYear)
+                                        .map(BirthYear::getValue),
+                                Stream.of(teamUsers.get(0).getUser().getPersonalInfo().getBirthYear().getValue())
+                        )
+                        .collect(Collectors.toList())
+        );
     }
 
     private static boolean isStudentIdCardVerified(List<TeamUser> requestedTeamUsers) {

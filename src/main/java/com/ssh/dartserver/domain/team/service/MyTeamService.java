@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -129,30 +130,32 @@ public class MyTeamService {
 
 
     public TeamResponse readTeam(User user, Long teamId) {
-        Team team = teamRepository.findById(teamId)
+
+        List<TeamUser> teamUsers = teamUserRepository.findAllByTeamId(teamId);
+        List<TeamRegion> teamRegions = teamRegionRepository.findAllByTeamId(teamId);
+        Team team = teamUsers.stream()
+                .map(TeamUser::getTeam)
+                .findAny()
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 팀입니다."));
-        List<TeamUser> teamUsers = teamUserRepository.findAllByTeam(team);
-        List<TeamRegion> teamRegions = teamRegionRepository.findAllByTeam(team);
 
         validateTeamUserIsPartOfTeam(user, teamUsers);
 
         return getTeamResponse(team, teamRegions, teamUsers);
     }
 
-    //TODO: 목록 조회 분기 필요
-
     public List<TeamResponse> listTeam(User user) {
-        List<TeamUser> teamUsers = teamUserRepository.findAllByUser(user);
-        List<Team> myTeams = teamUsers.stream()
-                .map(TeamUser::getTeam)
-                .distinct()
-                .collect(Collectors.toList());
+        List<Team> myTeams = teamRepository.findAllTeamByUserIdPattern("%-" + user.getId() + "-%");
+
+        Map<Team, List<TeamUser>> teamUsersMap = teamUserRepository.findAllByTeamIn(myTeams).stream()
+                .collect(Collectors.groupingBy(TeamUser::getTeam));
+        Map<Team, List<TeamRegion>> teamRegionsMap = teamRegionRepository.findAllByTeamIn(myTeams).stream()
+                .collect(Collectors.groupingBy(TeamRegion::getTeam));
 
         return myTeams.stream()
                 .map(myTeam -> {
-                    List<TeamRegion> myTeamRegions = teamRegionRepository.findAllByTeam(myTeam);
-                    List<TeamUser> myTeamUsers = teamUserRepository.findAllByTeam(myTeam);
-                    return getTeamResponse(myTeam, myTeamRegions, myTeamUsers);
+                    List<TeamUser> teamUsers = teamUsersMap.getOrDefault(myTeam, Collections.emptyList());
+                    List<TeamRegion> teamRegions =  teamRegionsMap.getOrDefault(myTeam, Collections.emptyList());
+                    return getTeamResponse(myTeam, teamRegions, teamUsers);
                 })
                 .collect(Collectors.toList());
     }
@@ -225,7 +228,6 @@ public class MyTeamService {
     }
 
     private TeamResponse getTeamResponse(Team team, List<TeamRegion> teamRegions, List<TeamUser> teamUsers) {
-
         List<RegionResponse> regionResponses = teamRegions.stream()
                 .map(TeamRegion::getRegion)
                 .map(regionMapper::toRegionResponse)
@@ -347,7 +349,6 @@ public class MyTeamService {
     }
 
     private void validateTeamUserIsPartOfTeam(User user, List<TeamUser> teamUsers) {
-
         List<Long> teamUserIds = teamUsers.stream()
                 .map(TeamUser::getUser)
                 .map(User::getId)
