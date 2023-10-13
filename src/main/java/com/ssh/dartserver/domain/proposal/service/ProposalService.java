@@ -109,7 +109,7 @@ public class ProposalService {
                     return Stream.of(proposalMapper.toListDto(
                             proposal,
                             getListTeamDto(requestingTeam, requestingTeam.getTeamUsers(), requestingTeam.getTeamRegions()),
-                            getListTeamDto(requestedTeam, requestingTeam.getTeamUsers(), requestedTeam.getTeamRegions())
+                            getListTeamDto(requestedTeam, requestedTeam.getTeamUsers(), requestedTeam.getTeamRegions())
                     ));
                 })
                 .collect(Collectors.toList());
