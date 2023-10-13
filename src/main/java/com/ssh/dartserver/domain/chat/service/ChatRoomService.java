@@ -14,7 +14,6 @@ import com.ssh.dartserver.domain.team.domain.SingleTeamFriend;
 import com.ssh.dartserver.domain.team.domain.Team;
 import com.ssh.dartserver.domain.team.domain.TeamRegion;
 import com.ssh.dartserver.domain.team.domain.TeamUser;
-import com.ssh.dartserver.domain.team.infra.TeamRegionRepository;
 import com.ssh.dartserver.domain.team.infra.TeamUserRepository;
 import com.ssh.dartserver.domain.user.domain.User;
 import com.ssh.dartserver.domain.user.domain.personalinfo.BirthYear;
@@ -28,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -44,7 +44,6 @@ public class ChatRoomService {
     private final ChatRoomUserRepository chatRoomUserRepository;
     private final ProposalRepository proposalRepository;
     private final TeamUserRepository teamUserRepository;
-    private final TeamRegionRepository teamRegionRepository;
     private final TeamAverageAgeCalculator teamAverageAgeCalculator;
 
     private final PlatformNotification notification;
@@ -67,7 +66,6 @@ public class ChatRoomService {
 
         ChatRoom chatRoom = ChatRoom.builder()
                 .latestChatMessageContent(null)
-                .latestChatMessageTime(null)
                 .proposal(proposal)
                 .build();
 
@@ -130,6 +128,7 @@ public class ChatRoomService {
                 .collect(Collectors.toList());
 
         return myChatRooms.stream()
+                .sorted(Comparator.comparing(ChatRoom::getLastModifiedTime).reversed())
                 .map(chatRoom -> {
                     Team requestingTeam = chatRoom.getProposal().getRequestingTeam();
                     Team requestedTeam = chatRoom.getProposal().getRequestedTeam();
