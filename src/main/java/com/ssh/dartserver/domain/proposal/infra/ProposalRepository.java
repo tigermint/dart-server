@@ -32,8 +32,6 @@ public interface ProposalRepository extends JpaRepository<Proposal, Long> {
             "and p.proposalStatus = :proposalStatus " +
             "order by p.createdTime desc")
     List<Proposal> findAllRequestedProposalByUserIdPatternAndProposalStatus(@Param("userIdPattern") String userIdPattern, @Param("proposalStatus") ProposalStatus proposalStatus);
-
-    void deleteAllByRequestingTeamOrRequestedTeam(Team team1, Team team2);
 }
 
 
