@@ -20,7 +20,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -97,7 +96,6 @@ public class ProposalService {
 
     private List<ProposalResponse.ListDto> getListDtos(List<Proposal> proposals) {
         return proposals.stream()
-                .sorted(Comparator.comparing(Proposal::getCreatedTime).reversed())
                 .flatMap(proposal -> {
                     Team requestingTeam = proposal.getRequestingTeam();
                     Team requestedTeam = proposal.getRequestedTeam();

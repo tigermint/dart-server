@@ -21,14 +21,16 @@ public interface ProposalRepository extends JpaRepository<Proposal, Long> {
             "join fetch p.requestingTeam rtg " +
             "join fetch p.requestedTeam rtd " +
             "where concat('-', rtg.teamUsersCombinationHash.value, '-') like :userIdPattern " +
-            "and p.proposalStatus = :proposalStatus ")
+            "and p.proposalStatus = :proposalStatus " +
+            "order by p.createdTime desc")
     List<Proposal> findAllRequestingProposalByUserIdPatternAndProposalStatus(@Param("userIdPattern") String userIdPattern, @Param("proposalStatus") ProposalStatus proposalStatus);
 
     @Query("select p from Proposal p " +
             "join fetch p.requestedTeam rtd " +
             "join fetch p.requestingTeam rtg " +
             "where concat('-', rtd.teamUsersCombinationHash.value, '-') like :userIdPattern " +
-            "and p.proposalStatus = :proposalStatus ")
+            "and p.proposalStatus = :proposalStatus " +
+            "order by p.createdTime desc")
     List<Proposal> findAllRequestedProposalByUserIdPatternAndProposalStatus(@Param("userIdPattern") String userIdPattern, @Param("proposalStatus") ProposalStatus proposalStatus);
 
     void deleteAllByRequestingTeamOrRequestedTeam(Team team1, Team team2);
