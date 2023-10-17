@@ -112,7 +112,7 @@ public class VoteService {
                 pickingUser.getPersonalInfo().getAdmissionYear().getValue() - 2000,
                 pickingUser.getPersonalInfo().getGender().getKorValue(),
                 VOTED_PICKED_POINT);
-        //TODO: 비동기 처리 필요
+
         CompletableFuture.runAsync(() ->
             notification.postNotificationSpecificDevice(pickedUser.getId(), contents)
         );
