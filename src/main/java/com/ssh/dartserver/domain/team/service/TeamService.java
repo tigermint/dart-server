@@ -49,10 +49,11 @@ public class TeamService {
 
     private final TeamAverageAgeCalculator teamAverageAgeCalculator;
 
-    public Long countAllTeams() {
+    public Long countAllTeam() {
         return teamRepository.count() * 2 + 50;
     }
 
+    @Transactional
     public BlindDateTeamDetailResponse readTeam(User user, long teamId) {
         List<TeamUser> teamUsers = teamUserRepository.findAllByTeamId(teamId);
         List<TeamRegion> teamRegions = teamRegionRepository.findAllByTeamId(teamId);
@@ -60,6 +61,9 @@ public class TeamService {
                 .map(TeamUser::getTeam)
                 .findAny()
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 팀입니다."));
+
+        team.increaseViewCount();
+
         return getBlindDateTeamDetail(user, team, teamUsers, teamRegions);
     }
 

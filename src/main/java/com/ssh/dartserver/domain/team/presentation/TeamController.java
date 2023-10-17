@@ -48,7 +48,7 @@ public class TeamController {
 
     @GetMapping("/count")
     ResponseEntity<Long> countAllTeams() {
-        return ResponseEntity.ok(teamService.countAllTeams());
+        return ResponseEntity.ok(teamService.countAllTeam());
     }
 
     @GetMapping("/{id}")
