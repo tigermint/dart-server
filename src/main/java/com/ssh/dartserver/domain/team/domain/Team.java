@@ -31,6 +31,9 @@ public class Team extends BaseTimeEntity {
     @Column(name = "is_visible_to_same_university")
     private Boolean isVisibleToSameUniversity;
 
+    @Embedded
+    private ViewCount viewCount;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "university_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private University university;
@@ -51,11 +54,16 @@ public class Team extends BaseTimeEntity {
         this.isVisibleToSameUniversity = isVisibleToSameUniversity;
         this.university = university;
         this.teamUsersCombinationHash = teamUsersCombinationHash;
+        this.viewCount = ViewCount.from(0);
     }
 
     public void update(String name, Boolean isVisibleToSameUniversity, TeamUsersCombinationHash teamUsersCombinationHash) {
         this.name = Name.from(name);
         this.isVisibleToSameUniversity = isVisibleToSameUniversity;
         this.teamUsersCombinationHash = teamUsersCombinationHash;
+    }
+
+    public void increaseViewCount() {
+        this.viewCount = this.viewCount.increase();
     }
 }
