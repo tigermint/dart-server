@@ -13,6 +13,6 @@ public interface FriendRepository extends JpaRepository<Friend, Long>{
     Optional<Friend> findByUserIdAndFriendUserId(Long userId, Long friendUserId);
     Optional<Friend> findByUserIdAndId(Long userId, Long friendId);
     List<Friend> findAllByUserId(Long userId);
-    void deleteAllByUserOrFriendUser(User user, User friendUser);
+    void deleteAllInBatchByUserOrFriendUser(User user, User friendUser);
 
 }
