@@ -19,8 +19,8 @@ public class Nickname {
     }
 
     private void validateLength(String value) {
-        if (value.length() > 7) {
-            throw new IllegalArgumentException("닉네임은 7글자 이하만 가능합니다.");
+        if (value.length() > 10) {
+            throw new IllegalArgumentException("닉네임은 10글자 이하만 가능합니다.");
         }
     }
 

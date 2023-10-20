@@ -24,6 +24,7 @@ import com.ssh.dartserver.domain.user.infra.UserRepository;
 import com.ssh.dartserver.domain.vote.domain.Vote;
 import com.ssh.dartserver.domain.vote.infra.CandidateRepository;
 import com.ssh.dartserver.domain.vote.infra.VoteRepository;
+import com.ssh.dartserver.global.util.RandomNicknameGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,10 +38,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserService {
     private static final String DEFAULT_PROFILE_IMAGE_URL = "DEFAULT";
-    private static final String DEFAULT_NICKNAME = "DEFAULT";
     private static final int DEFAULT_POINT = 0;
 
-    private final RandomRecommendCodeGenerator randomGenerator;
+    private final RandomRecommendCodeGenerator randomCodeGenerator;
 
     private final UserRepository userRepository;
     private final UniversityRepository universityRepository;
@@ -52,7 +52,6 @@ public class UserService {
 
     private final MyTeamService myTeamService;
 
-
     private final UserMapper userMapper;
     private final UniversityMapper universityMapper;
     private final ProfileQuestionMapper profileQuestionMapper;
@@ -63,7 +62,7 @@ public class UserService {
         user.signup(
                 getPersonalInfo(userSignupRequest),
                 getUniversity(userSignupRequest.getUniversityId()),
-                randomGenerator,
+                randomCodeGenerator,
                 Point.from(DEFAULT_POINT)
         );
         User savedUser = userRepository.save(user);
@@ -152,7 +151,7 @@ public class UserService {
         return PersonalInfo.builder()
                 .phone(Phone.from(request.getPhone()))
                 .name(Name.from(request.getName()))
-                .nickname(Nickname.from(DEFAULT_NICKNAME))
+                .nickname(Nickname.from(RandomNicknameGenerator.create()))
                 .admissionYear(AdmissionYear.from(request.getAdmissionYear()))
                 .birthYear(BirthYear.from(request.getBirthYear()))
                 .gender(request.getGender())
