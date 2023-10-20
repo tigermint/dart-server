@@ -10,7 +10,6 @@ import javax.persistence.Embeddable;
 @Getter
 @NoArgsConstructor
 public class ViewCount {
-    private static final int VIEW_COUNT_INCREMENT = 1;
 
     @Column(name = "view_count")
     private int value;
@@ -23,7 +22,7 @@ public class ViewCount {
         return new ViewCount(value);
     }
 
-    public ViewCount increase() {
-        return new ViewCount(this.value + VIEW_COUNT_INCREMENT);
+    public ViewCount increase(int viewCountIncrement) {
+        return new ViewCount(this.value + viewCountIncrement);
     }
 }
