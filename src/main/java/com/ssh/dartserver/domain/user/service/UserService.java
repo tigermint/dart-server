@@ -24,6 +24,7 @@ import com.ssh.dartserver.domain.user.infra.UserRepository;
 import com.ssh.dartserver.domain.vote.domain.Vote;
 import com.ssh.dartserver.domain.vote.infra.CandidateRepository;
 import com.ssh.dartserver.domain.vote.infra.VoteRepository;
+import com.ssh.dartserver.global.util.RandomNicknameGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,10 +38,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class UserService {
     private static final String DEFAULT_PROFILE_IMAGE_URL = "DEFAULT";
-    private static final String DEFAULT_NICKNAME = "DEFAULT";
     private static final int DEFAULT_POINT = 0;
 
-    private final RandomRecommendCodeGenerator randomGenerator;
+    private final RandomRecommendCodeGenerator randomCodeGenerator;
 
     private final UserRepository userRepository;
     private final UniversityRepository universityRepository;
@@ -52,7 +52,6 @@ public class UserService {
 
     private final MyTeamService myTeamService;
 
-
     private final UserMapper userMapper;
     private final UniversityMapper universityMapper;
     private final ProfileQuestionMapper profileQuestionMapper;
@@ -63,7 +62,7 @@ public class UserService {
         user.signup(
                 getPersonalInfo(userSignupRequest),
                 getUniversity(userSignupRequest.getUniversityId()),
-                randomGenerator,
+                randomCodeGenerator,
                 Point.from(DEFAULT_POINT)
         );
         User savedUser = userRepository.save(user);
@@ -116,23 +115,15 @@ public class UserService {
 
     @Transactional
     public void delete(User user) {
-        //내가 Friend 테이블에서 User이거나 친구이거나 테이블에서 삭제
-        friendRepository.deleteAllByUserOrFriendUser(user, user);
+        friendRepository.deleteAllInBatchByUserOrFriendUser(user, user);
 
-        //내가 투표를 받은 유저인 경우: 투표 테이블 삭제 + 후보 데이터 관련 투표 모두 삭제
         List<Vote> pickedUserVotes = voteRepository.findAllByPickedUser(user);
         candidateRepository.deleteAllByVoteIn(pickedUserVotes);
-        voteRepository.deleteAll(pickedUserVotes);
+        voteRepository.deleteAllByVoteIn(pickedUserVotes);
 
-        //내가 투표를 한 유저인 경우: 투표에 pickingUser 데이터 null
-        voteRepository.findAllByPickingUser(user)
-                .forEach(vote -> vote.updatePickingUser(null));
+        voteRepository.updateAllPickingUserToNull(user);
+        candidateRepository.updateAllUserToNull(user);
 
-        //내가 후보인데 투표 받은 건 아닐 경우:  null
-        candidateRepository.findAllByUser(user)
-                .forEach(candidate -> candidate.updateUser(null));
-
-        //내가 포함된 모든 팀 조회
         teamUserRepository.findAllByUser(user).stream()
                 .map(TeamUser::getTeam)
                 .distinct()
@@ -160,7 +151,7 @@ public class UserService {
         return PersonalInfo.builder()
                 .phone(Phone.from(request.getPhone()))
                 .name(Name.from(request.getName()))
-                .nickname(Nickname.from(DEFAULT_NICKNAME))
+                .nickname(Nickname.from(RandomNicknameGenerator.create()))
                 .admissionYear(AdmissionYear.from(request.getAdmissionYear()))
                 .birthYear(BirthYear.from(request.getBirthYear()))
                 .gender(request.getGender())

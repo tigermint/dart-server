@@ -1,4 +1,4 @@
-package com.ssh.dartserver.domain.chat.presentation;
+package com.ssh.dartserver.domain.chat.infra;
 
 import com.ssh.dartserver.domain.chat.domain.ChatRoomUser;
 import com.ssh.dartserver.domain.user.domain.User;
@@ -14,7 +14,8 @@ public interface ChatRoomUserRepository extends JpaRepository<ChatRoomUser, Long
             "from ChatRoomUser cru " +
             "join fetch cru.chatRoom cr " +
             "join fetch cru.user u " +
-            "where u = :user")
+            "where u = :user " +
+            "order by cr.lastModifiedTime desc")
     List<ChatRoomUser> findAllByUser(@Param("user") User user);
 
     @Query("select cru " +

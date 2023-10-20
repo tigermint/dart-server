@@ -1,6 +1,6 @@
 package com.ssh.dartserver.domain.chat.service;
 
-import com.ssh.dartserver.domain.chat.presentation.ChatRoomUserRepository;
+import com.ssh.dartserver.domain.chat.infra.ChatRoomUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

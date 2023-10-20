@@ -5,11 +5,10 @@ import com.ssh.dartserver.domain.chat.dto.ChatMessageRequest;
 import com.ssh.dartserver.domain.chat.dto.ChatMessageResponse;
 import com.ssh.dartserver.domain.chat.dto.mapper.ChatMessageMapper;
 import com.ssh.dartserver.domain.chat.infra.ChatMessageRepository;
-import com.ssh.dartserver.domain.chat.presentation.ChatRoomUserRepository;
+import com.ssh.dartserver.domain.chat.infra.ChatRoomUserRepository;
 import com.ssh.dartserver.domain.user.domain.User;
 import com.ssh.dartserver.global.infra.notification.PlatformNotification;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -23,7 +22,6 @@ import java.util.stream.Collectors;
 
 
 @Service
-@Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class ChatMessageService {
@@ -33,6 +31,7 @@ public class ChatMessageService {
     private final ChatMessageRepository chatMessageRepository;
 
     private final ChatRoomUserService chatRoomUserService;
+    private final ActiveUserStore activeUserStore;
 
     private final ChatMessageMapper chatMessageMapper;
 
@@ -84,11 +83,11 @@ public class ChatMessageService {
 
         List<Long> userIds = chatRoomUsers.stream()
                 .map(ChatRoomUser::getUser)
+                .filter(userInChatRoom -> !activeUserStore.isUserActive(userInChatRoom.getUsername()))
                 .map(User::getId)
-                .filter(id -> !id.equals(request.getSenderId()))
                 .collect(Collectors.toList());
 
-        //TODO: 비동기 처리 필요
+
         CompletableFuture.runAsync(() ->
                 notification.postNotificationSpecificDevice(userIds, heading, content)
         );
