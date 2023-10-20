@@ -116,23 +116,15 @@ public class UserService {
 
     @Transactional
     public void delete(User user) {
-        //내가 Friend 테이블에서 User이거나 친구이거나 테이블에서 삭제
-        friendRepository.deleteAllByUserOrFriendUser(user, user);
+        friendRepository.deleteAllInBatchByUserOrFriendUser(user, user);
 
-        //내가 투표를 받은 유저인 경우: 투표 테이블 삭제 + 후보 데이터 관련 투표 모두 삭제
         List<Vote> pickedUserVotes = voteRepository.findAllByPickedUser(user);
         candidateRepository.deleteAllByVoteIn(pickedUserVotes);
-        voteRepository.deleteAll(pickedUserVotes);
+        voteRepository.deleteAllByVoteIn(pickedUserVotes);
 
-        //내가 투표를 한 유저인 경우: 투표에 pickingUser 데이터 null
-        voteRepository.findAllByPickingUser(user)
-                .forEach(vote -> vote.updatePickingUser(null));
+        voteRepository.updateAllPickingUserToNull(user);
+        candidateRepository.updateAllUserToNull(user);
 
-        //내가 후보인데 투표 받은 건 아닐 경우:  null
-        candidateRepository.findAllByUser(user)
-                .forEach(candidate -> candidate.updateUser(null));
-
-        //내가 포함된 모든 팀 조회
         teamUserRepository.findAllByUser(user).stream()
                 .map(TeamUser::getTeam)
                 .distinct()
