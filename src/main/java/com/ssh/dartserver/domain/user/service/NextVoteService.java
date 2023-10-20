@@ -33,7 +33,7 @@ public class NextVoteService {
         User pickingUser = userRepository.findByIdForUpdate(user.getId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
         pickingUser.updateNextVoteAvailableDateTime(NEXT_VOTE_AVAILABLE_MINUTES);
-        //TODO: 비동기 처리 필요
+
         CompletableFuture.runAsync(() ->
             notification.postNotificationNextVoteAvailableDateTime(
                     user.getId(),

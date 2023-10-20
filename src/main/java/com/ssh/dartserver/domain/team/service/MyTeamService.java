@@ -1,7 +1,7 @@
 package com.ssh.dartserver.domain.team.service;
 
 import com.ssh.dartserver.domain.chat.domain.ChatRoomUser;
-import com.ssh.dartserver.domain.chat.presentation.ChatRoomUserRepository;
+import com.ssh.dartserver.domain.chat.infra.ChatRoomUserRepository;
 import com.ssh.dartserver.domain.proposal.domain.Proposal;
 import com.ssh.dartserver.domain.proposal.infra.ProposalRepository;
 import com.ssh.dartserver.domain.question.dto.mapper.QuestionMapper;
