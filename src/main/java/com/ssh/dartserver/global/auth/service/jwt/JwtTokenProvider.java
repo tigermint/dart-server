@@ -6,6 +6,8 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.ssh.dartserver.domain.user.domain.User;
 import com.ssh.dartserver.global.auth.service.oauth.PrincipalDetails;
 import com.ssh.dartserver.global.auth.service.oauth.PrincipalDetailsService;
+import com.ssh.dartserver.global.util.DateTypeConverter;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -41,11 +43,16 @@ public class JwtTokenProvider {
 
     //토큰에서 회원 정보 추출
     public String getUsername(String token) {
-        return JWT.require(Algorithm.HMAC512(JwtProperties.SECRET.getValue()))
-                .build()
-                .verify(token)
+        return getDecodedJwt(token)
                 .getClaim("username")
                 .asString();
+    }
+
+    //토큰에서 만료 시간 추출
+    public LocalDateTime getExpiresAt(String token) {
+        return DateTypeConverter.toLocalDateTime(
+                getDecodedJwt(token).getExpiresAt()
+        );
     }
 
     //request header 에서 token 값을 가져옴 "Authorization: "TOKEN"
@@ -58,15 +65,19 @@ public class JwtTokenProvider {
     }
 
     //토큰 유효성 검사 + 만료일자 확인
-    public boolean validateToken(String jwtToken) {
+    public boolean validateToken(String token) {
         try {
-            DecodedJWT jwt = JWT.require(Algorithm.HMAC512(JwtProperties.SECRET.getValue()))
-                    .build()
-                    .verify(jwtToken);
+            DecodedJWT jwt = getDecodedJwt(token);
             return validateTokenExpired(jwt);
         } catch (Exception e) {
             return true;
         }
+    }
+
+    private static DecodedJWT getDecodedJwt(String token) {
+        return JWT.require(Algorithm.HMAC512(JwtProperties.SECRET.getValue()))
+                .build()
+                .verify(token);
     }
 
     private static boolean validateTokenExpired(DecodedJWT jwt) {
