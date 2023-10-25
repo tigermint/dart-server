@@ -1,16 +1,11 @@
 package com.ssh.dartserver.domain.team.presentation;
 
-import com.ssh.dartserver.domain.team.dto.BlindDateTeamDetailResponse;
-import com.ssh.dartserver.domain.team.dto.BlindDateTeamResponse;
-import com.ssh.dartserver.domain.team.dto.TeamRequest;
-import com.ssh.dartserver.domain.team.dto.TeamResponse;
+import com.ssh.dartserver.domain.team.dto.*;
 import com.ssh.dartserver.domain.team.service.MyTeamService;
 import com.ssh.dartserver.domain.team.service.TeamService;
-import com.ssh.dartserver.domain.user.domain.personalinfo.Gender;
 import com.ssh.dartserver.global.auth.service.oauth.PrincipalDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -58,18 +53,9 @@ public class TeamController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<BlindDateTeamResponse>> listTeam(Authentication authentication,
-                                                                @RequestParam(value = "page", required = false, defaultValue = "0") int page,
-                                                                @RequestParam(value = "size", required = false, defaultValue = "10") int size,
-                                                                @RequestParam(value = "regionId", required = false, defaultValue = "0") long regionId) {
+    public ResponseEntity<Page<BlindDateTeamResponse>> listTeam(Authentication authentication, TeamSearchCondition condition, Pageable pageable) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
-        long universityId = principal.getUser().getUniversity().getId();
-        Gender userGender = principal.getUser().getPersonalInfo().getGender();
-
-        Pageable pageable = PageRequest.of(page, size);
-        Page<BlindDateTeamResponse> teamResponses = teamService.listVisibleTeam(universityId, userGender, regionId, pageable);
-
-        return ResponseEntity.ok(teamResponses);
+        return ResponseEntity.ok(teamService.listVisibleTeam(principal.getUser(), condition, pageable));
     }
 
 }

@@ -14,7 +14,6 @@ import com.ssh.dartserver.domain.team.infra.TeamRepository;
 import com.ssh.dartserver.domain.team.infra.TeamUserRepository;
 import com.ssh.dartserver.domain.team.notification.TeamViewCountNotificationUtil;
 import com.ssh.dartserver.domain.user.domain.User;
-import com.ssh.dartserver.domain.user.domain.personalinfo.Gender;
 import com.ssh.dartserver.domain.user.domain.profilequestions.ProfileQuestions;
 import com.ssh.dartserver.domain.user.dto.ProfileQuestionResponse;
 import com.ssh.dartserver.domain.user.dto.mapper.ProfileQuestionMapper;
@@ -36,7 +35,7 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class TeamService {
-    private static final long ALL_REGIONS = 0;
+
     private static final int VIEW_COUNT_INCREMENT = 1;
 
     private final TeamRepository teamRepository;
@@ -55,7 +54,7 @@ public class TeamService {
     public Long countAllTeam() {
         return teamRepository.count() * 2 + 50;
     }
-
+  
     @Transactional
     public BlindDateTeamDetailResponse readTeam(User user, long teamId) {
         List<TeamUser> teamUsers = teamUserRepository.findAllByTeamId(teamId);
@@ -72,8 +71,8 @@ public class TeamService {
     }
 
     @Transactional
-    public Page<BlindDateTeamResponse> listVisibleTeam(long universityId, Gender myGender, long regionId, Pageable pageable) {
-        Page<Team> allVisibleTeamPages = getTeamPages(universityId, myGender, regionId, pageable);
+    public Page<BlindDateTeamResponse> listVisibleTeam(User user, TeamSearchCondition condition, Pageable pageable) {
+        Page<Team> allVisibleTeamPages = teamRepository.findAllVisibleTeam(user, condition, pageable);
 
         List<Team> visibleTeams = allVisibleTeamPages.getContent();
         teamRepository.increaseAllTeamViewCount(visibleTeams, VIEW_COUNT_INCREMENT);
@@ -207,13 +206,6 @@ public class TeamService {
                 nicknameOrName,
                 profileQuestionResponses
         );
-    }
-
-    private Page<Team> getTeamPages(long universityId, Gender myGender, long regionId, Pageable pageable) {
-        if (regionId == ALL_REGIONS) {
-            return teamRepository.findAllVisibleTeams(universityId, myGender, pageable);
-        }
-        return teamRepository.findAllVisibleTeamsByRegionId(universityId, myGender, regionId, pageable);
     }
 
     private List<RegionResponse> getTeamRegionResponses(List<TeamRegion> teamRegions) {
