@@ -67,7 +67,7 @@ public class Team extends BaseTimeEntity {
         this.teamUsersCombinationHash = teamUsersCombinationHash;
     }
 
-    public void increaseViewCount() {
-        this.viewCount = this.viewCount.increase();
+    public void increaseViewCount(int viewCountIncrement) {
+        this.viewCount = this.viewCount.increase(viewCountIncrement);
     }
 }

@@ -12,6 +12,7 @@ import com.ssh.dartserver.domain.team.dto.mapper.TeamMapper;
 import com.ssh.dartserver.domain.team.infra.TeamRegionRepository;
 import com.ssh.dartserver.domain.team.infra.TeamRepository;
 import com.ssh.dartserver.domain.team.infra.TeamUserRepository;
+import com.ssh.dartserver.domain.team.notification.TeamViewCountNotificationUtil;
 import com.ssh.dartserver.domain.user.domain.User;
 import com.ssh.dartserver.domain.user.domain.profilequestions.ProfileQuestions;
 import com.ssh.dartserver.domain.user.dto.ProfileQuestionResponse;
@@ -34,6 +35,9 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class TeamService {
+
+    private static final int VIEW_COUNT_INCREMENT = 1;
+
     private final TeamRepository teamRepository;
     private final TeamRegionRepository teamRegionRepository;
     private final TeamUserRepository teamUserRepository;
@@ -45,10 +49,12 @@ public class TeamService {
     private final TeamMapper teamMapper;
 
     private final TeamAverageAgeCalculator teamAverageAgeCalculator;
+    private final TeamViewCountNotificationUtil teamViewCountNotificationUtil;
 
     public Long countAllTeam() {
         return teamRepository.count() * 2 + 50;
     }
+  
     @Transactional
     public BlindDateTeamDetailResponse readTeam(User user, long teamId) {
         List<TeamUser> teamUsers = teamUserRepository.findAllByTeamId(teamId);
@@ -58,15 +64,20 @@ public class TeamService {
                 .findAny()
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 팀입니다."));
 
-        team.increaseViewCount();
+        team.increaseViewCount(VIEW_COUNT_INCREMENT);
+        teamViewCountNotificationUtil.postNotificationOnViewCountMileStone(List.of(team));
 
         return getBlindDateTeamDetail(user, team, teamUsers, teamRegions);
     }
 
+    @Transactional
     public Page<BlindDateTeamResponse> listVisibleTeam(User user, TeamSearchCondition condition, Pageable pageable) {
         Page<Team> allVisibleTeamPages = teamRepository.findAllVisibleTeam(user, condition, pageable);
 
         List<Team> visibleTeams = allVisibleTeamPages.getContent();
+        teamRepository.increaseAllTeamViewCount(visibleTeams, VIEW_COUNT_INCREMENT);
+        teamViewCountNotificationUtil.postNotificationOnViewCountMileStone(visibleTeams);
+
         Map<Team, List<TeamUser>> visibleTeamUsersMap = teamUserRepository.findAllByTeamIn(visibleTeams).stream()
                 .collect(Collectors.groupingBy(TeamUser::getTeam));
         Map<Team, List<TeamRegion>> visibleTeamRegionsMap = teamRegionRepository.findAllByTeamIn(visibleTeams).stream()
