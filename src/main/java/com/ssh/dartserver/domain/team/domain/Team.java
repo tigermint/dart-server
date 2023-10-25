@@ -1,5 +1,6 @@
 package com.ssh.dartserver.domain.team.domain;
 
+import com.ssh.dartserver.domain.proposal.domain.Proposal;
 import com.ssh.dartserver.domain.university.domain.University;
 import com.ssh.dartserver.global.common.BaseTimeEntity;
 import lombok.AllArgsConstructor;
@@ -47,6 +48,9 @@ public class Team extends BaseTimeEntity {
     @OneToMany(mappedBy = "team", cascade = CascadeType.ALL)
     @BatchSize(size = 500)
     private List<SingleTeamFriend> singleTeamFriends = new ArrayList<>();
+
+    @OneToMany(mappedBy = "requestedTeam", cascade = CascadeType.ALL)
+    private List<Proposal> requestedTeamProposals = new ArrayList<>();
 
     @Builder
     public Team(String name, Boolean isVisibleToSameUniversity, University university, TeamUsersCombinationHash teamUsersCombinationHash) {
