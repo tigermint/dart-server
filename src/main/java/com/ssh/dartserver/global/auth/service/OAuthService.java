@@ -111,7 +111,13 @@ public class OAuthService {
 
         //jwt 토큰 생성
         String jwtToken = jwtTokenProvider.createToken(userEntity);
-        return new TokenResponse(jwtToken, userEntity.getProviderId());
+        return TokenResponse.builder()
+                .jwtToken(jwtToken)
+                .tokenType("BEARER")
+                .expiresAt(jwtTokenProvider.getExpiresAt(jwtToken))
+                .providerId(userEntity.getProviderId())
+                .providerType(userEntity.getProvider())
+                .build();
     }
 
     private static Optional<RSAPublicKey> getPublicKey(String modulusBase64, String exponentBase64) {
