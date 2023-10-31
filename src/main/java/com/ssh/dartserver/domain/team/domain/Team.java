@@ -49,7 +49,7 @@ public class Team extends BaseTimeEntity {
     @BatchSize(size = 500)
     private List<SingleTeamFriend> singleTeamFriends = new ArrayList<>();
 
-    @OneToMany(mappedBy = "requestedTeam", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "requestedTeam")
     private List<Proposal> requestedTeamProposals = new ArrayList<>();
 
     @Builder
