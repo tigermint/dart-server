@@ -2,12 +2,15 @@ package com.ssh.dartserver.domain.survey.domain;
 
 import com.ssh.dartserver.domain.user.domain.User;
 import com.ssh.dartserver.global.common.BaseTimeEntity;
-import lombok.Getter;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Entity
 @Getter
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Comment extends BaseTimeEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "comment_id")
