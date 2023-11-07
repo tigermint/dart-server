@@ -1,6 +1,5 @@
 package com.ssh.dartserver.domain.survey.domain;
 
-import com.ssh.dartserver.global.common.BaseTimeEntity;
 import lombok.Getter;
 
 import javax.persistence.*;
@@ -9,7 +8,7 @@ import java.util.List;
 
 @Entity
 @Getter
-public class Answer extends BaseTimeEntity {
+public class Answer {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "answer_id")
