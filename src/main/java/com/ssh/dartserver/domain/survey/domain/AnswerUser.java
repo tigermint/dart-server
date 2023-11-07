@@ -1,13 +1,17 @@
 package com.ssh.dartserver.domain.survey.domain;
 
 import com.ssh.dartserver.domain.user.domain.User;
-import lombok.Getter;
+import com.ssh.dartserver.global.common.BaseTimeEntity;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Entity
 @Getter
-public class AnswerUser {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder
+public class AnswerUser extends BaseTimeEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "answer_user_id")
     private Long id;
@@ -19,4 +23,8 @@ public class AnswerUser {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private User user;
+
+    public void updateAnswer(Answer answer) {
+        this.answer = answer;
+    }
 }
