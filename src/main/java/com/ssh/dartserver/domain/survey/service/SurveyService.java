@@ -1,6 +1,8 @@
 package com.ssh.dartserver.domain.survey.service;
 
 import com.ssh.dartserver.domain.survey.domain.Comment;
+import com.ssh.dartserver.domain.survey.domain.CommentLike;
+import com.ssh.dartserver.domain.survey.domain.CommentReport;
 import com.ssh.dartserver.domain.survey.domain.Survey;
 import com.ssh.dartserver.domain.survey.dto.SurveyResponse;
 import com.ssh.dartserver.domain.survey.dto.mapper.SurveyMapper;
@@ -23,17 +25,15 @@ public class SurveyService {
     private final SurveyMapper surveyMapper;
 
     public SurveyResponse.ReadDto readSurvey(User user, Long surveyId) {
-        return surveyRepository.findSurveyById(surveyId)
-                .map(survey -> surveyMapper.toReadDto(
-                        survey,
-                        getTotalHeadCount(survey),
-                        getAnswerDtos(survey),
-                        getUserAnswerId(user, survey),
-                        getCommentDtos(survey))
-                )
+        Survey survey = surveyRepository.findById(surveyId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 설문입니다."));
+        return surveyMapper.toReadDto(
+                survey,
+                getTotalHeadCount(survey),
+                getAnswerDtos(survey),
+                getUserAnswerId(user, survey),
+                getCommentDtos(user, survey));
     }
-
 
     public Page<SurveyResponse.ListDto> listSurvey(User user, Pageable pageable) {
         Page<Survey> allVisibleSurveys = surveyRepository.findAllVisibleSurvey(pageable);
@@ -56,20 +56,42 @@ public class SurveyService {
         return new PageImpl<>(surveyResponseListDtos, pageable, allVisibleSurveys.getTotalElements());
     }
 
-    private List<SurveyResponse.ReadDto.CommentDto> getCommentDtos(Survey survey) {
+    private List<SurveyResponse.ReadDto.CommentDto> getCommentDtos(User user, Survey survey) {
         return survey.getComments().stream()
-                .map(comment -> surveyMapper.toReadCommentDto(comment, 1, getReadUserDto(comment)))
+                .map(comment -> {
+                    List<CommentLike> commentLikes = comment.getCommentLikes();
+                    List<CommentReport> commentReports = comment.getCommentReports();
+
+                    return surveyMapper.toReadCommentDto(
+                            comment,
+                            commentLikes.size(),
+                            getIsLiked(user, commentLikes),
+                            getIsReported(user, commentReports),
+                            getReadUserDto(comment)
+                    );
+                })
                 .collect(Collectors.toList());
     }
 
+    private static boolean getIsReported(User user, List<CommentReport> commentReports) {
+        return commentReports.stream()
+                .anyMatch(commentReport -> commentReport.getUser() != null && commentReport.getUser().getId().equals(user.getId()));
+    }
+
+    private static boolean getIsLiked(User user, List<CommentLike> commentLikes) {
+        return commentLikes.stream()
+                .anyMatch(commentLike -> commentLike.getUser() != null && commentLike.getUser().getId().equals(user.getId()));
+    }
+
     private SurveyResponse.ReadDto.UserDto getReadUserDto(Comment comment) {
-        return surveyMapper.toReadUserDto(comment.getUser(), surveyMapper.toReadUniversityDto(comment.getUser().getUniversity()));
+        return Optional.ofNullable(comment.getUser())
+                .map(user -> surveyMapper.toReadUserDto(user, surveyMapper.toReadUniversityDto(user.getUniversity()))).orElse(null);
     }
 
     private static Long getUserAnswerId(User user, Survey survey) {
         return survey.getAnswers().stream()
                 .flatMap(answer -> answer.getAnswerUsers().stream()
-                        .filter(answerUser -> answerUser.getUser().getId().equals(user.getId())))
+                        .filter(answerUser -> answerUser.getUser() != null && answerUser.getUser().getId().equals(user.getId())))
                 .findAny()
                 .map(answerUser -> answerUser.getAnswer().getId())
                 .orElse(null);
