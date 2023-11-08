@@ -79,4 +79,36 @@ public class SurveyController {
         commentService.deleteComment(principal.getUser(),surveyId, commentId);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/{surveyId}/comments/{commentId}/likes")
+    public ResponseEntity<Void> createCommentLike(Authentication authentication,
+                                                  @PathVariable("surveyId") Long surveyId,
+                                                  @PathVariable("commentId") Long commentId) {
+        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
+        Long commentLikeId = commentService.createCommentLike(principal.getUser(), surveyId, commentId);
+
+        URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("v1/{surveyId}/comments/{commentId}/likes/{commentLikeId}")
+                .buildAndExpand(surveyId, commentId, commentLikeId)
+                .toUri();
+
+        return ResponseEntity.created(location).build();
+    }
+
+    @PostMapping("/{surveyId}/comments/{commentId}/reports")
+    public ResponseEntity<Void> createCommentReport(Authentication authentication,
+                                                  @PathVariable("surveyId") Long surveyId,
+                                                  @PathVariable("commentId") Long commentId) {
+        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
+        Long commentReportId = commentService.createCommentReport(principal.getUser(), surveyId, commentId);
+
+        URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("v1/{surveyId}/comments/{commentId}/reports/{commentReportId}")
+                .buildAndExpand(surveyId, commentId, commentReportId)
+                .toUri();
+
+        return ResponseEntity.created(location).build();
+    }
+
+
 }

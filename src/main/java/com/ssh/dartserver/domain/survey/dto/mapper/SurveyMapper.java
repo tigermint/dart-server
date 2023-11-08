@@ -25,13 +25,15 @@ public interface SurveyMapper {
     @Mapping(target = "commentId", source = "comment.id")
     @Mapping(target = "content", source = "comment.content.value")
     @Mapping(target = "user", source = "user")
-    SurveyResponse.ReadDto.CommentDto toReadCommentDto(Comment comment, Integer like, SurveyResponse.ReadDto.UserDto user);
+    SurveyResponse.ReadDto.CommentDto toReadCommentDto(Comment comment, Integer like, Boolean isLiked, Boolean isReported ,SurveyResponse.ReadDto.UserDto user);
+
     @Mapping(target = "userId", source = "user.id")
     @Mapping(target = "name", source = "user.personalInfo.name.value")
     @Mapping(target = "nickname", source = "user.personalInfo.nickname.value")
     @Mapping(target = "gender", source = "user.personalInfo.gender")
     @Mapping(target = "admissionYear", source = "user.personalInfo.admissionYear.value")
     SurveyResponse.ReadDto.UserDto toReadUserDto(User user, SurveyResponse.ReadDto.UniversityDto university);
+
     @Mapping(target = "universityId", source = "university.id")
     SurveyResponse.ReadDto.UniversityDto toReadUniversityDto(University university);
 
