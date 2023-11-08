@@ -46,6 +46,10 @@ public class SurveyController {
         return ResponseEntity.ok(answerService.createAnswer(principal.getUser(), surveyId, request));
     }
 
+    /**
+     * @deprecated
+     */
+    @Deprecated(since = "2023-11-08", forRemoval = false)
     @PatchMapping("/{surveyId}/answers/{answerId}")
     public ResponseEntity<SurveyResponse.ReadDto> updateAnswer(Authentication authentication,
                                                                @PathVariable("surveyId") Long surveyId,
