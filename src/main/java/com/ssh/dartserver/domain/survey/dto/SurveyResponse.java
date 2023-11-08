@@ -28,6 +28,8 @@ public class SurveyResponse {
             private LocalDateTime lastModifiedTime;
             private String content;
             private Integer like;
+            private Boolean isLiked;
+            private Boolean isReported;
             private UserDto user;
         }
 
