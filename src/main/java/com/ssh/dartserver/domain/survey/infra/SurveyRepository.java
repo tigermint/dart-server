@@ -14,10 +14,12 @@ public interface SurveyRepository extends JpaRepository<Survey, Long>, SurveyRep
             "join fetch s.category ct " +
             "left join s.answers a " +
             "left join a.answerUsers au " +
-            "join au.user auu " +
+            "left join au.user auu " +
             "left join s.comments cm " +
-            "join cm.user cmu " +
+            "left join cm.user cmu " +
+            "left join cm.commentLikes cml " +
+            "left join cm.commentReports cmr " +
             "where s.id = :surveyId")
-    Optional<Survey> findSurveyById(@Param("surveyId") Long id);
+    Optional<Survey> findById(@Param("surveyId") Long surveyId);
 
 }
