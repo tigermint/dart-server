@@ -3,6 +3,7 @@ package com.ssh.dartserver.domain.user.service;
 import com.ssh.dartserver.domain.friend.infra.FriendRepository;
 import com.ssh.dartserver.domain.question.domain.Question;
 import com.ssh.dartserver.domain.question.dto.mapper.QuestionMapper;
+import com.ssh.dartserver.domain.survey.infra.*;
 import com.ssh.dartserver.domain.team.domain.TeamUser;
 import com.ssh.dartserver.domain.team.infra.TeamUserRepository;
 import com.ssh.dartserver.domain.team.service.MyTeamService;
@@ -49,6 +50,10 @@ public class UserService {
     private final ProfileQuestionRepository profileQuestionRepository;
     private final CandidateRepository candidateRepository;
     private final TeamUserRepository teamUserRepository;
+    private final AnswerUserRepository answerUserRepository;
+    private final CommentRepository commentRepository;
+    private final CommentLikeRepository commentLikeRepository;
+    private final CommentReportRepository commentReportRepository;
 
     private final MyTeamService myTeamService;
 
@@ -129,6 +134,11 @@ public class UserService {
                 .distinct()
                 .collect(Collectors.toList())
                 .forEach(team -> myTeamService.deleteTeam(user, team.getId()));
+
+        commentRepository.updateAllUserToNull(user);
+        answerUserRepository.updateAllUserToNull(user);
+        commentLikeRepository.updateAllUserToNull(user);
+        commentReportRepository.updateAllUserToNull(user);
 
         userRepository.delete(user);
     }
