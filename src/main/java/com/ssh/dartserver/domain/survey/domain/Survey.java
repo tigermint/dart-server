@@ -12,6 +12,7 @@ import java.util.List;
 public class Survey extends BaseTimeEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "survey_id")
     private Long id;
 
     @Embedded
