@@ -29,8 +29,8 @@ public class SurveyRepositoryImpl implements SurveyRepositoryCustom{
                 .from(survey)
                 .join(survey.category, category).fetchJoin()
                 .leftJoin(survey.answers, answer)
-                .leftJoin(survey.comments, comment)
                 .leftJoin(answer.answerUsers, answerUser)
+                .leftJoin(survey.comments, comment)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -38,10 +38,10 @@ public class SurveyRepositoryImpl implements SurveyRepositoryCustom{
         JPAQuery<Long> countQuery = queryFactory
                 .select(survey.countDistinct())
                 .from(survey)
-                .join(survey.category, category).fetchJoin()
+                .join(survey.category, category)
                 .leftJoin(survey.answers, answer)
-                .leftJoin(survey.comments, comment)
-                .leftJoin(answer.answerUsers, answerUser);
+                .leftJoin(answer.answerUsers, answerUser)
+                .leftJoin(survey.comments, comment);
 
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
