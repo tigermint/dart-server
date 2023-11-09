@@ -31,6 +31,7 @@ public class SurveyRepositoryImpl implements SurveyRepositoryCustom{
                 .leftJoin(survey.answers, answer)
                 .leftJoin(answer.answerUsers, answerUser)
                 .leftJoin(survey.comments, comment)
+                .orderBy(survey.id.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
