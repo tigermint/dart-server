@@ -2,7 +2,7 @@ package com.ssh.dartserver.domain.team.domain;
 
 import lombok.Getter;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @Getter

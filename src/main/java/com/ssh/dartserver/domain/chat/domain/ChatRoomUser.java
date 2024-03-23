@@ -3,7 +3,7 @@ package com.ssh.dartserver.domain.chat.domain;
 import com.ssh.dartserver.domain.user.domain.User;
 import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "chat_room_user")

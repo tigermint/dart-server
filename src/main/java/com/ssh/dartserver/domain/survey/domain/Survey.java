@@ -3,7 +3,7 @@ package com.ssh.dartserver.domain.survey.domain;
 import com.ssh.dartserver.global.common.BaseTimeEntity;
 import lombok.Getter;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 

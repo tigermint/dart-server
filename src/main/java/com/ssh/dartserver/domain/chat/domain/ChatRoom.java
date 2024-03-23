@@ -4,7 +4,7 @@ import com.ssh.dartserver.domain.proposal.domain.Proposal;
 import com.ssh.dartserver.global.common.BaseTimeEntity;
 import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 

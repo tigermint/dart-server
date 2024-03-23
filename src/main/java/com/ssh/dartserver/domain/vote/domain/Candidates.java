@@ -3,7 +3,7 @@ package com.ssh.dartserver.domain.vote.domain;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.List;
 
 @Embeddable

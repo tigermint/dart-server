@@ -6,7 +6,7 @@ import com.ssh.dartserver.domain.user.domain.personalinfo.Nickname;
 import com.ssh.dartserver.domain.user.domain.personalinfo.ProfileImageUrl;
 import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.Optional;
 
 @Entity

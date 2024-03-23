@@ -4,8 +4,8 @@ package com.ssh.dartserver.domain.user.domain.profilequestions;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Embeddable;
-import javax.persistence.OneToMany;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.OneToMany;
 import java.util.List;
 
 @Embeddable

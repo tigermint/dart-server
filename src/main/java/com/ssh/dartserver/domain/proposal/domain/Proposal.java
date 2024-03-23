@@ -4,7 +4,7 @@ import com.ssh.dartserver.domain.team.domain.Team;
 import com.ssh.dartserver.global.common.BaseTimeEntity;
 import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @Getter

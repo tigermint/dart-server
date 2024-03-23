@@ -3,7 +3,7 @@ package com.ssh.dartserver.domain.user.presentation;
 import com.ssh.dartserver.domain.user.dto.GuestInviteRequest;
 import com.ssh.dartserver.domain.user.service.GuestService;
 import java.net.URI;
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

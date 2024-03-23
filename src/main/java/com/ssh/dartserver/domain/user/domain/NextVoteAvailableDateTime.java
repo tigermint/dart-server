@@ -4,8 +4,8 @@ import com.ssh.dartserver.global.util.DateTimeUtil;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
