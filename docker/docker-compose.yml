@@ -2,15 +2,14 @@ version: '3'
 services:
   dart-db-local:
     container_name: dart-db-local
-    image: mysql:8.0
+    image: postgres:16
     restart: always
     ports:
-      - '3307:3306'
+      - '5432:5432'
     environment:
-      MYSQL_DATABASE: dartdb
-      MYSQL_USER: dart
-      MYSQL_PASSWORD: dart
-      MYSQL_ROOT_PASSWORD: dart
+      POSTGRES_DB: dart-db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
   dart-server-local:
     container_name: dart-server-local
     build:
@@ -22,4 +21,4 @@ services:
     volumes:
       - .:/dart
     ports:
-      - '8081:8080'
+      - '8081:8081'
