@@ -38,17 +38,18 @@ public class SecurityConfig {
                 .addFilter(new JwtAuthorizationFilter(authenticationConfiguration.getAuthenticationManager(), jwtTokenProvider))
                 .addFilterBefore(new ExceptionHandlerFilter(), JwtAuthenticationFilter.class);
         http
-                .authorizeRequests()
-                .antMatchers(
-                        "/v1/auth/**",
-                        "/v1/admin/**",
-                        "/v1/ws/**",
-                        "/v1/health/**",
-                        "/swagger-ui/**",
-                        "/swagger-resources/**",
-                        "/v3/api-docs/**"
-                ).permitAll()
-                .anyRequest().authenticated();
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers(
+                                "/v1/auth/**",
+                                "/v1/admin/**",
+                                "/v1/ws/**",
+                                "/v1/health/**",
+                                "/swagger-ui/**",
+                                "/swagger-resources/**",
+                                "/v3/api-docs/**"
+                        ).permitAll()
+                        .anyRequest().authenticated()
+                );
         return http.build();
     }
 }
