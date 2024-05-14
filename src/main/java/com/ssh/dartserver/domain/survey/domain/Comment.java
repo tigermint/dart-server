@@ -30,8 +30,10 @@ public class Comment extends BaseTimeEntity {
     private User user;
 
     @OneToMany(mappedBy = "comment")
+    @Builder.Default
     private List<CommentLike> commentLikes = new ArrayList<>();
 
     @OneToMany(mappedBy = "comment")
+    @Builder.Default
     private List<CommentReport> commentReports = new ArrayList<>();
 }

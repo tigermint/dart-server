@@ -27,6 +27,7 @@ public class ChatRoom extends BaseTimeEntity {
     private Proposal proposal;
 
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
+    @Builder.Default
     private List<ChatRoomUser> chatRoomUsers = new ArrayList<>();
 
     public void updateLastMessage(String latestChatMessageContent) {
