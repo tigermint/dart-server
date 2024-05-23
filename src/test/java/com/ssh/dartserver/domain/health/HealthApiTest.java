@@ -1,4 +1,4 @@
-package com.ssh.dartserver.health;
+package com.ssh.dartserver.domain.health;
 
 import com.ssh.dartserver.ApiTest;
 import io.restassured.RestAssured;
