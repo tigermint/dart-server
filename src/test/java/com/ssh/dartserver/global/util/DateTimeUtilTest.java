@@ -2,10 +2,12 @@ package com.ssh.dartserver.global.util;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.ssh.dartserver.testing.UnitTest;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import org.junit.jupiter.api.Test;
 
+@UnitTest
 class DateTimeUtilTest {
     @Test
     public void test_now_from_zone_returns_seoul_time() {

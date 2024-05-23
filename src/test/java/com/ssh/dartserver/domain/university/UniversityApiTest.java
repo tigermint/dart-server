@@ -8,6 +8,7 @@ import com.ssh.dartserver.UserManager;
 import com.ssh.dartserver.domain.university.domain.University;
 import com.ssh.dartserver.domain.university.dto.UniversityResponse;
 import com.ssh.dartserver.domain.university.infra.UniversityRepository;
+import com.ssh.dartserver.testing.IntegrationTest;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.List;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
+@IntegrationTest
 public class UniversityApiTest extends ApiTest {
     @Autowired
     private UniversityRepository universityRepository;

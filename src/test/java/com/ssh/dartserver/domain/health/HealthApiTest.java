@@ -1,6 +1,7 @@
 package com.ssh.dartserver.domain.health;
 
 import com.ssh.dartserver.ApiTest;
+import com.ssh.dartserver.testing.IntegrationTest;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
+@IntegrationTest
 public class HealthApiTest extends ApiTest {
     @Test
     void 헬스체크() {

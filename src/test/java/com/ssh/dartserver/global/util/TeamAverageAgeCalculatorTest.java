@@ -2,11 +2,13 @@ package com.ssh.dartserver.global.util;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.ssh.dartserver.testing.UnitTest;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+@UnitTest
 class TeamAverageAgeCalculatorTest {
     private TeamAverageAgeCalculator calculator;
 

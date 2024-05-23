@@ -8,6 +8,7 @@ import com.ssh.dartserver.ApiTest;
 import com.ssh.dartserver.global.auth.dto.AppleTokenRequest;
 import com.ssh.dartserver.global.auth.dto.KakaoTokenRequest;
 import com.ssh.dartserver.global.auth.dto.TokenResponse;
+import com.ssh.dartserver.testing.IntegrationTest;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.HashSet;
@@ -15,6 +16,7 @@ import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 
+@IntegrationTest
 public class AuthApiTest extends ApiTest {
     @Test
     void 카카오로그인() {
