@@ -6,26 +6,21 @@ import static org.assertj.core.api.Assertions.*;
 
 import com.ssh.dartserver.ApiTest;
 import com.ssh.dartserver.UserManager;
-import com.ssh.dartserver.domain.team.UsersTeamApiTest;
 import com.ssh.dartserver.domain.university.domain.University;
 import com.ssh.dartserver.domain.university.infra.UniversityRepository;
 import com.ssh.dartserver.domain.user.dto.UserProfileResponse;
-import com.ssh.dartserver.domain.user.dto.UserResponse;
 import com.ssh.dartserver.domain.user.dto.UserSignupRequest;
 import com.ssh.dartserver.domain.user.dto.UserUpdateRequest;
 import com.ssh.dartserver.testing.IntegrationTest;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import java.util.List;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
 @IntegrationTest
-@Nested
 public class UserApiTest extends ApiTest {
     @Autowired
     private UserManager userManager;
