@@ -152,7 +152,7 @@ public class UserController {
     @GetMapping("/me/proposals")
     public ResponseEntity<List<ProposalResponse.ListDto>> listProposal(Authentication authentication, @RequestParam(defaultValue = "sent") String type) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
-        if (type.equals("sent")) {
+        if (type.equals("sent")) {  // TODO Enum
             return ResponseEntity.ok(proposalService.listSentProposal(principal.getUser()));
         }
         if (type.equals("received")) {
