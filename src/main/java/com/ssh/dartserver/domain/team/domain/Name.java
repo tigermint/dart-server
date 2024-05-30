@@ -20,7 +20,7 @@ public class Name {
 
     private void validateLength(String value) {
         if (value.length() > 10) {
-            throw new IllegalArgumentException("팀 이름은 10글자를 넘을 수 없습니다.");
+            throw new IllegalArgumentException("팀 이름은 10글자를 넘을 수 없습니다. (value:" + value + ")");
         }
     }
 

@@ -187,7 +187,7 @@ public class ProposalService {
 
     private void validateUserInTeam(User user, List<TeamUser> requestingTeamUsers) {
         if (requestingTeamUsers.stream().noneMatch(teamUser -> teamUser.getUser().getId().equals(user.getId()))) {
-            throw new IllegalArgumentException("유저가 해당 팀에 속해있지 않습니다.");
+            throw new IllegalArgumentException("유저가 해당 팀에 속해있지 않습니다. (userId:" + user.getId() + ")");
         }
     }
 }
