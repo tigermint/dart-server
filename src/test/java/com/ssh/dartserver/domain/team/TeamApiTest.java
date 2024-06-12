@@ -58,7 +58,7 @@ class TeamApiTest extends ApiTest {
     @Test
     void test_createTeam_created() {
         //given
-        final TeamRequest request = getTeamRequest();
+        final TeamRequest request = TeamRequestTestFixture.getTeamRequest();
 
         //when
         final ExtractableResponse<Response> extractableResponse = TeamSteps.팀_생성_요청(jwtToken, request);
@@ -80,8 +80,7 @@ class TeamApiTest extends ApiTest {
 
         for (int i = 0; i < count; i++) {
             final String otherUserJwtToken = userManager.createTestUserWithInformation().getJwtToken();
-            final TeamRequest teamRequest = getTeamRequest();
-            TeamSteps.팀_생성_요청(otherUserJwtToken, teamRequest);
+            TeamSteps.팀_생성_요청(otherUserJwtToken, TeamRequestTestFixture.getTeamRequest());
         }
 
         //when & then
@@ -103,8 +102,7 @@ class TeamApiTest extends ApiTest {
     @Test
     void test_readTeam_isSuccess() {
         //given
-        final TeamRequest request = getTeamRequest();
-        final ExtractableResponse<Response> extractableResponse = TeamSteps.팀_생성_요청(jwtToken, request);
+        final ExtractableResponse<Response> extractableResponse = TeamSteps.팀_생성_요청(jwtToken, TeamRequestTestFixture.getTeamRequest());
         final String location = extractableResponse.header("Location");
         final String teamId = location.substring(location.lastIndexOf("/") + 1);
 
@@ -134,8 +132,7 @@ class TeamApiTest extends ApiTest {
 
         for (int i = 0; i < count; i++) {
             final String otherUserJwtToken = userManager.createTestUserWithInformation(Gender.FEMALE).getJwtToken();
-            final TeamRequest teamRequest = getTeamRequest();
-
+            final TeamRequest teamRequest = TeamRequestTestFixture.getTeamRequest();
             final ExtractableResponse<Response> extractableResponse = TeamSteps.팀_생성_요청(otherUserJwtToken, teamRequest);
 
             final String location = extractableResponse.header("Location");
@@ -168,25 +165,5 @@ class TeamApiTest extends ApiTest {
 
             assertThat(team).containsEntry("name", expectedTeam.getName());
         }
-    }
-
-    private static TeamRequest getTeamRequest() {
-        final TeamRequest request = new TeamRequest();
-        final int randomNum = (int) (Math.random() * 900000) + 100000;
-        request.setName("팀" + randomNum);
-        request.setIsVisibleToSameUniversity(true);
-        request.setUserIds(List.of());
-        request.setRegionIds(List.of(1L));
-        request.setSingleTeamFriends(List.of(getSingleTeamFriendDto()));
-        return request;
-    }
-
-    private static TeamRequest.SingleTeamFriendDto getSingleTeamFriendDto() {
-        final TeamRequest.SingleTeamFriendDto singleTeamFriendDto = new TeamRequest.SingleTeamFriendDto();
-        singleTeamFriendDto.setBirthYear(2005);
-        singleTeamFriendDto.setNickname("친구닉네임");
-        singleTeamFriendDto.setUniversityId(1L);
-        singleTeamFriendDto.setProfileImageUrl("DEFAULT");
-        return singleTeamFriendDto;
     }
 }
