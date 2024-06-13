@@ -85,7 +85,7 @@ public abstract class UsersTeamApiTest extends ApiTest {
     }
 
     private String getCreatedTeamId() {
-        final ExtractableResponse<Response> extractableResponse = TeamSteps.팀_생성_요청(jwtToken, TeamRequestTestFixture.getTeamRequest());
+        final ExtractableResponse<Response> extractableResponse = TeamSteps.팀_생성(jwtToken, TeamRequestTestFixture.getTeamRequest());
         final String location = extractableResponse.header("Location");
         return location.substring(location.lastIndexOf("/") + 1);
     }

@@ -6,7 +6,7 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 
 public class TeamSteps {
-    public static ExtractableResponse<Response> 팀_생성_요청(final String jwtToken, final TeamRequest request) {
+    public static ExtractableResponse<Response> 팀_생성(final String jwtToken, final TeamRequest request) {
         return RestAssured
                 .given().log().all()
                 .auth().oauth2(jwtToken)

@@ -61,7 +61,7 @@ class TeamApiTest extends ApiTest {
         final TeamRequest request = TeamRequestTestFixture.getTeamRequest();
 
         //when
-        final ExtractableResponse<Response> extractableResponse = TeamSteps.팀_생성_요청(jwtToken, request);
+        final ExtractableResponse<Response> extractableResponse = TeamSteps.팀_생성(jwtToken, request);
 
         //then
         assertThat(extractableResponse.statusCode()).isEqualTo(HttpStatus.CREATED.value());
@@ -80,7 +80,7 @@ class TeamApiTest extends ApiTest {
 
         for (int i = 0; i < count; i++) {
             final String otherUserJwtToken = userManager.createTestUserWithInformation().getJwtToken();
-            TeamSteps.팀_생성_요청(otherUserJwtToken, TeamRequestTestFixture.getTeamRequest());
+            TeamSteps.팀_생성(otherUserJwtToken, TeamRequestTestFixture.getTeamRequest());
         }
 
         //when & then
@@ -102,7 +102,7 @@ class TeamApiTest extends ApiTest {
     @Test
     void test_readTeam_isSuccess() {
         //given
-        final ExtractableResponse<Response> extractableResponse = TeamSteps.팀_생성_요청(jwtToken, TeamRequestTestFixture.getTeamRequest());
+        final ExtractableResponse<Response> extractableResponse = TeamSteps.팀_생성(jwtToken, TeamRequestTestFixture.getTeamRequest());
         final String location = extractableResponse.header("Location");
         final String teamId = location.substring(location.lastIndexOf("/") + 1);
 
@@ -133,7 +133,7 @@ class TeamApiTest extends ApiTest {
         for (int i = 0; i < count; i++) {
             final String otherUserJwtToken = userManager.createTestUserWithInformation(Gender.FEMALE).getJwtToken();
             final TeamRequest teamRequest = TeamRequestTestFixture.getTeamRequest();
-            final ExtractableResponse<Response> extractableResponse = TeamSteps.팀_생성_요청(otherUserJwtToken, teamRequest);
+            final ExtractableResponse<Response> extractableResponse = TeamSteps.팀_생성(otherUserJwtToken, teamRequest);
 
             final String location = extractableResponse.header("Location");
             final String teamId = location.substring(location.lastIndexOf("/") + 1);
