@@ -7,4 +7,8 @@ public class UniversityResponse {
     private Long id;
     private String name;
     private String department;
+
+    public UniversityResponse(final String name) {
+        this.name = name;
+    }
 }
