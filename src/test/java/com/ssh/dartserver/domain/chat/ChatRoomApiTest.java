@@ -1,4 +1,4 @@
-package com.ssh.dartserver.domain.chatRoom;
+package com.ssh.dartserver.domain.chat;
 
 import com.ssh.dartserver.ApiTest;
 import com.ssh.dartserver.UserManager;

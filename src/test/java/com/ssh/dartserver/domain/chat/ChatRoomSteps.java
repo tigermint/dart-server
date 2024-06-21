@@ -1,8 +1,7 @@
-package com.ssh.dartserver.domain.chatRoom;
+package com.ssh.dartserver.domain.chat;
 
 import com.ssh.dartserver.domain.chat.dto.ChatRoomRequest;
 import com.ssh.dartserver.domain.proposal.ProposalSteps;
-import com.ssh.dartserver.domain.proposal.dto.ProposalRequest;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
