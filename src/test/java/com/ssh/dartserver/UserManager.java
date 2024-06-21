@@ -120,4 +120,10 @@ public class UserManager {
 
         return createUserWithInformation(signupRequest);
     }
+
+    public User getUser(String jwtToken) {
+        final Authentication authentication = jwtTokenProvider.getAuthentication(jwtToken);
+        return ((PrincipalDetails) authentication.getPrincipal()).getUser();
+    }
+
 }
