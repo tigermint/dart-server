@@ -95,4 +95,11 @@ public class ProposalSteps {
 
         return request;
     }
+
+    public static String getCreatedProposalId(final long requestingTeamId, final long requestedTeamId, final String requestingTeamUserJwtToken) {
+        final ProposalRequest.Create proposalRequest = ProposalSteps.호감보내기요청_생성(requestingTeamId, requestedTeamId);
+        final ExtractableResponse<Response> extractableResponse = ProposalSteps.호감보내기요청(requestingTeamUserJwtToken, proposalRequest);
+        final String location = extractableResponse.header("Location");
+        return location.substring(location.lastIndexOf("/") + 1);
+    }
 }

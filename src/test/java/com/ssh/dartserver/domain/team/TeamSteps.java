@@ -17,4 +17,10 @@ public class TeamSteps {
                 .then().log().all()
                 .extract();
     }
+
+    public static long getCreatedTeamId(String jwtToken) {
+        final ExtractableResponse<Response> extractableResponse = TeamSteps.팀_생성(jwtToken, TeamRequestTestFixture.getTeamRequest());
+        final String location = extractableResponse.header("Location");
+        return Long.parseLong(location.substring(location.lastIndexOf("/") + 1));
+    }
 }
