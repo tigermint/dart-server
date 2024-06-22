@@ -26,7 +26,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
-import org.springframework.messaging.simp.stomp.StompFrameHandler;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
@@ -35,7 +34,6 @@ import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 
-import java.lang.reflect.Type;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -78,6 +76,7 @@ class ChatMessageApiTest extends ApiTest {
 
     /**
      * MESSAGE /app/chat/rooms/{chatRoomId}
+     *
      * @throws Exception
      */
     @DisplayName("WebSocket을 통해 채팅 메시지를 전송하고 수신한다.")
@@ -153,18 +152,6 @@ class ChatMessageApiTest extends ApiTest {
                 .containsExactlyInAnyOrder("Hello, World!", "Hi there!");
     }
 
-    private class DefaultStompFrameHandler implements StompFrameHandler {
-        @Override
-        public Type getPayloadType(final StompHeaders headers) {
-            return ChatMessageResponse.class;
-        }
-
-        @Override
-        public void handleFrame(final StompHeaders headers, final Object payload) {
-            blockingQueue.offer((ChatMessageResponse) payload);
-        }
-    }
-
     private void sendMessageToChatRoom(long chatRoomId, String jwtToken, User user, String content) throws Exception {
         final StompSession stompSession = connectWebSocket(jwtToken);
         subscribeToChatRoom(stompSession, chatRoomId);
@@ -187,10 +174,10 @@ class ChatMessageApiTest extends ApiTest {
 
 
     private void subscribeToChatRoom(final StompSession stompSession, final long chatRoomId) {
-        stompSession.subscribe("/topic/chat/rooms/" + chatRoomId, new DefaultStompFrameHandler());
+        stompSession.subscribe("/topic/chat/rooms/" + chatRoomId, new StompFrameHandlerImpl<>(new ChatMessageResponse(), blockingQueue));
     }
 
-    private void sendMessage(final StompSession stompSession, final long chatRoomId, final User user, String content) {
+    private static void sendMessage(final StompSession stompSession, final long chatRoomId, final User user, String content) {
         final ChatMessageRequest chatMessageRequest = getChatMessageRequest(chatRoomId, user, content);
         stompSession.send("/app/chat/rooms/" + chatRoomId, chatMessageRequest);
     }
@@ -204,7 +191,7 @@ class ChatMessageApiTest extends ApiTest {
         return chatMessageRequest;
     }
 
-    private String getWebSocketUri() {
+    private static String getWebSocketUri() {
         return "ws://localhost:" + RestAssured.port + "/v1/ws";
     }
 }
