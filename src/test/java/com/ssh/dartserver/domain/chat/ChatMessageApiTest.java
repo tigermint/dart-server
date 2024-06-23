@@ -36,6 +36,7 @@ import org.springframework.web.socket.messaging.WebSocketStompClient;
 
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -121,9 +122,12 @@ class ChatMessageApiTest extends ApiTest {
         final long requestedTeamId = TeamSteps.getCreatedTeamId(requestedTeamUserJwtToken);
         final long chatRoomId = ChatRoomSteps.getCreatedChatRoomId(requestingTeamId, requestedTeamId, jwtToken);
 
+
         // 채팅 메시지 전송
-        sendMessageToChatRoom(chatRoomId, jwtToken, requestingUser, "Hello, World!");
-        sendMessageToChatRoom(chatRoomId, requestedTeamUserJwtToken, requestedUser, "Hi there!");
+        final CompletableFuture<Void> future1 = sendMessageToChatRoom(chatRoomId, jwtToken, requestingUser, "Hello, World!");
+        final CompletableFuture<Void> future2 = sendMessageToChatRoom(chatRoomId, requestedTeamUserJwtToken, requestedUser, "Hi there!");
+
+        CompletableFuture.allOf(future1, future2).get(10, TimeUnit.SECONDS);
 
         // when
         final ExtractableResponse<Response> extractableResponse =
@@ -152,10 +156,12 @@ class ChatMessageApiTest extends ApiTest {
                 .containsExactlyInAnyOrder("Hello, World!", "Hi there!");
     }
 
-    private void sendMessageToChatRoom(long chatRoomId, String jwtToken, User user, String content) throws Exception {
+    private CompletableFuture<Void> sendMessageToChatRoom(long chatRoomId, String jwtToken, User user, String content) throws Exception {
         final StompSession stompSession = connectWebSocket(jwtToken);
-        subscribeToChatRoom(stompSession, chatRoomId);
+        CompletableFuture<Void> future = new CompletableFuture<>();
+        subscribeToChatRoom(stompSession, chatRoomId, future);
         sendMessage(stompSession, chatRoomId, user, content);
+        return future;
     }
 
     private StompSession connectWebSocket(final String jwtToken) throws Exception {
@@ -173,8 +179,14 @@ class ChatMessageApiTest extends ApiTest {
     }
 
 
-    private void subscribeToChatRoom(final StompSession stompSession, final long chatRoomId) {
-        stompSession.subscribe("/topic/chat/rooms/" + chatRoomId, new StompFrameHandlerImpl<>(new ChatMessageResponse(), blockingQueue));
+    private void subscribeToChatRoom(final StompSession stompSession, final long chatRoomId, CompletableFuture<Void> future) {
+        stompSession.subscribe("/topic/chat/rooms/" + chatRoomId, new StompFrameHandlerImpl<>(new ChatMessageResponse(), blockingQueue){
+            @Override
+            public void handleFrame(final StompHeaders headers, final Object payload) {
+                super.handleFrame(headers, payload);
+                future.complete(null);
+            }
+        });
     }
 
     private static void sendMessage(final StompSession stompSession, final long chatRoomId, final User user, String content) {
