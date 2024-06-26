@@ -3,6 +3,7 @@ plugins {
     id 'org.springframework.boot' version '2.7.12'
     id 'io.spring.dependency-management' version '1.1.0'
     id 'com.google.cloud.tools.jib' version '3.3.2'
+    id 'jacoco'
 }
 
 jib{
@@ -57,6 +58,7 @@ dependencies {
     annotationProcessor 'jakarta.annotation:jakarta.annotation-api'
 
     runtimeOnly 'org.postgresql:postgresql'
+    runtimeOnly 'com.h2database:h2'
 
     compileOnly 'org.projectlombok:lombok'
     compileOnly 'org.springframework:spring-context-indexer'
@@ -66,9 +68,12 @@ dependencies {
     implementation 'org.mapstruct:mapstruct:1.5.3.Final'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
 
+    // test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
     implementation 'org.springdoc:springdoc-openapi-ui:1.7.0'
+    testImplementation 'io.rest-assured:rest-assured'  // spring-boot 3는 rest-assured 5 이상을 사용해야함
+    testImplementation "com.google.guava:guava:33.0.0-jre"
 }
 
 def querydslSrcDir = 'src/main/generated'
@@ -101,5 +106,34 @@ tasks.register('copyPrivate', Copy) {
         from './dart-secret'
         include '*.yml'
         into 'src/main/resources'
+    }
+}
+
+test {
+    finalizedBy 'jacocoTestReport'
+}
+
+jacocoTestReport {
+    reports {
+        html.enabled true
+        csv.enabled true
+        xml.enabled false
+    }
+
+    finalizedBy 'jacocoTestCoverageVerification'
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            enabled = false
+            element = 'CLASS'
+
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                minimum = 0.00
+            }
+        }
     }
 }

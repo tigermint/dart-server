@@ -1,11 +1,8 @@
 package com.ssh.dartserver.global.util;
 
-import org.springframework.stereotype.Component;
-
 import java.util.List;
 import java.util.Random;
 
-@Component
 public class RandomNicknameGenerator {
 
     private static final List<String> ADJECTIVES = List.of(

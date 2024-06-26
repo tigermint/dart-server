@@ -43,8 +43,5 @@ src/main/resources/*.yml
 ### Seed ###
 src/main/resources/db/seed/
 
-### Test ###
-src/test/
-
 ### generated files ###
 src/main/generated/

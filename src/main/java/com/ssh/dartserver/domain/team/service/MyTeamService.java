@@ -71,6 +71,7 @@ public class MyTeamService {
                 .teamUsersCombinationHash(TeamUsersCombinationHash.of(userIds))
                 .build();
 
+        // TODO request의 SingleTeamFriends NPE 발생가능함
         List<SingleTeamFriend> singleTeamFriends = request.getSingleTeamFriends().stream()
                 .map(singleTeamFriendDto -> {
                     University university = universityRepository.findById(singleTeamFriendDto.getUniversityId())

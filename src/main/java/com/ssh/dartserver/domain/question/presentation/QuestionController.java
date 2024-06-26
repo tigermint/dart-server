@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+@Deprecated
 @RestController
 @RequiredArgsConstructor
 public class QuestionController {
