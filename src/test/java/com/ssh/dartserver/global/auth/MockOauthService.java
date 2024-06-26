@@ -11,12 +11,12 @@ import com.ssh.dartserver.global.auth.infra.OAuthRestTemplate;
 import com.ssh.dartserver.global.auth.service.OAuthService;
 import com.ssh.dartserver.global.auth.service.jwt.JwtTokenProvider;
 import com.ssh.dartserver.global.common.Role;
-import com.ssh.dartserver.global.config.properties.JwtProperty;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * OAuth 로그인을 외부 API에 의존하지 않도록 Mocking (통합테스트 의존)
@@ -30,12 +30,12 @@ public class MockOauthService extends OAuthService {
     public MockOauthService(final OAuthRestTemplate oauthRestTemplate,
                             final UserRepository userRepository,
                             final BCryptPasswordEncoder bCryptPasswordEncoder,
-                            final JwtTokenProvider jwtTokenProvider,
-                            final JwtProperty jwtProperty) {
-        super(oauthRestTemplate, userRepository, bCryptPasswordEncoder, jwtTokenProvider, jwtProperty);
+                            final JwtTokenProvider jwtTokenProvider) {
+        super(oauthRestTemplate, userRepository, bCryptPasswordEncoder, jwtTokenProvider);
         this.userRepository = userRepository;
         this.jwtTokenProvider = jwtTokenProvider;
     }
+
 
     public TokenResponse createTokenForKakao(KakaoTokenRequest request) {
         return createTokenForTest("kakao", generateHash(request.getAccessToken()));

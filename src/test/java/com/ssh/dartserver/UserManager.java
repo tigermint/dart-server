@@ -101,4 +101,29 @@ public class UserManager {
 
         return createUserWithInformation(signupRequest);
     }
+
+    /**
+     * (Mock) 임의정보와 입력받은 성별로 회원가입을 완료한 카카오 유저를 생성합니다.
+     * @param gender
+     * @return
+     */
+
+    public TokenResponse createTestUserWithInformation(Gender gender) {
+        final UserSignupRequest signupRequest = UserSignupRequest.builder()
+                .universityId(1L)
+                .admissionYear(2010)
+                .birthYear(2005)
+                .name("테스트")
+                .phone("01012345678")
+                .gender(gender)
+                .build();
+
+        return createUserWithInformation(signupRequest);
+    }
+
+    public User getUser(String jwtToken) {
+        final Authentication authentication = jwtTokenProvider.getAuthentication(jwtToken);
+        return ((PrincipalDetails) authentication.getPrincipal()).getUser();
+    }
+
 }

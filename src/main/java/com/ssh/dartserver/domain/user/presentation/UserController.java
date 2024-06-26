@@ -97,12 +97,15 @@ public class UserController {
         return ResponseEntity.ok(myTeamService.readTeam(principal.getUser(), teamId));
     }
 
+    @Deprecated(since="20230901")
     @GetMapping("/me/teams")
     public ResponseEntity<List<TeamResponse>> listTeam(Authentication authentication) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         return ResponseEntity.ok(myTeamService.listTeam(principal.getUser()));
     }
 
+
+    @Deprecated(since="20230901")
     @PatchMapping("/me/teams/{teamId}")
     public ResponseEntity<TeamResponse> updateTeam(Authentication authentication, @PathVariable Long teamId, @Valid @RequestBody TeamRequest request) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
