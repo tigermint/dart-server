@@ -1,5 +1,6 @@
 package com.ssh.dartserver.domain.university.domain;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,9 +11,9 @@ import javax.persistence.*;
 
 @Entity
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
+@AllArgsConstructor
 @BatchSize(size = 500)
 public class University {
     @Id
@@ -30,15 +31,4 @@ public class University {
     private String department;
 
     private String state;
-
-    private String div0;
-
-    private String div1;
-
-    private String div2;
-
-    private String div3;
-
-    private String years;
-
 }

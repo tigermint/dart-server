@@ -30,11 +30,10 @@ public class UniversityApiTest extends ApiTest {
         universityRepository.saveAll(universities);
         final String jwtToken = userManager.createTestUser().getJwtToken();
 
-        final ExtractableResponse<Response> response = 대학목록조회요청(jwtToken);
+        final ExtractableResponse<Response> response = 대학목록조회요청(jwtToken, 대학목록조회요청_생성());
         final UniversityResponse[] universityDtos = response.body().as(UniversityResponse[].class);
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(universityDtos.length).isEqualTo(생성대학수);
+        assertThat(universityDtos).hasSize(10);
     }
-
 }
