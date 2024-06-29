@@ -32,9 +32,7 @@ public class UniversitySteps {
             .id(i)
             .area("서울")
             .name(name)
-            .type("Urban")
             .department(department)
-            .state("California")
             .build();
         return university;
     }

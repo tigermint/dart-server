@@ -20,15 +20,7 @@ public class University {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "university_id")
     private Long id;
-
-    private String area;
-
     private String name;
-
-    @Column(name = "campus_type")
-    private String type;
-
     private String department;
-
-    private String state;
+    private String area;
 }
