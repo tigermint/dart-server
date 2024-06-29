@@ -36,7 +36,7 @@ public class UniversityApiTest extends ApiTest {
         final UniversityResponse[] universityDtos = response.body().as(UniversityResponse[].class);
 
         assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
-        assertThat(universityDtos).hasSize(20);
+        assertThat(universityDtos).hasSize(10);
         assertThat(universityDtos[0].getName()).startsWith("Tech University ");
     }
 

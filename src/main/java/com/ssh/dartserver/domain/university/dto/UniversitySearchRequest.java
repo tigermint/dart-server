@@ -1,6 +1,8 @@
 package com.ssh.dartserver.domain.university.dto;
 
+import javax.validation.constraints.Max;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,4 +14,6 @@ public class UniversitySearchRequest {
     private String name;
     @Size(max = 20)
     private String department;
+    @Positive @Max(30)
+    private int size = 10;
 }

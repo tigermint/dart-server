@@ -20,6 +20,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 @ExtendWith(MockitoExtension.class)
 class UniversityServiceTest {
@@ -38,10 +40,12 @@ class UniversityServiceTest {
     @MethodSource("keywordAndResultProvider")
     void searchUniversity(String keyword, List<String> result) {
         // given
+        int size = 10;
         UniversitySearchRequest request = new UniversitySearchRequest();
         request.setName(keyword);
+        request.setSize(10);
 
-        Mockito.when(universityRepository.findTop20ByNameStartsWith(request.getName())).thenReturn(result);
+        Mockito.when(universityRepository.findAllByNameStartsWith(request.getName(), 10)).thenReturn(result);
 
         // when
         final List<UniversityResponse> response = universityService.search(request);
@@ -63,11 +67,14 @@ class UniversityServiceTest {
     @DisplayName("학교 학과명으로 검색한다")
     void searchNameAndDepartment() {
         // given
+        int size = 20;
         UniversitySearchRequest request = new UniversitySearchRequest();
         request.setName("인천대학교");
         request.setDepartment("사회");
+        request.setSize(size);
 
-        Mockito.when(universityRepository.findDistinctTop20ByNameAndDepartmentStartsWith(request.getName(), request.getDepartment())).thenReturn(
+        Mockito.when(universityRepository.findDistinctByNameAndDepartmentStartsWith(request.getName(), request.getDepartment(),
+            PageRequest.of(0, size, Sort.by("id").ascending()))).thenReturn(
             List.of(
                 new University(1L, "인천대학교", "사회과", "인천"),
                 new University(2L, "인천대학교", "사회사회과", "인천"),
