@@ -42,14 +42,23 @@ repositories {
 }
 
 dependencies {
+    // web
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'com.auth0:java-jwt:4.3.0'
     implementation 'com.fasterxml.jackson.core:jackson-core'
+
+    // security
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'com.auth0:java-jwt:4.3.0'
+
+    // validation
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // database
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.flywaydb:flyway-core'
+    runtimeOnly 'org.postgresql:postgresql'
+    runtimeOnly 'com.h2database:h2'
 
     implementation 'com.querydsl:querydsl-jpa'
     implementation 'com.querydsl:querydsl-apt'
@@ -57,9 +66,7 @@ dependencies {
     annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
     annotationProcessor 'jakarta.annotation:jakarta.annotation-api'
 
-    runtimeOnly 'org.postgresql:postgresql'
-    runtimeOnly 'com.h2database:h2'
-
+    // develop
     compileOnly 'org.projectlombok:lombok'
     compileOnly 'org.springframework:spring-context-indexer'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
@@ -71,9 +78,9 @@ dependencies {
     // test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
-    implementation 'org.springdoc:springdoc-openapi-ui:1.7.0'
     testImplementation 'io.rest-assured:rest-assured'  // spring-boot 3는 rest-assured 5 이상을 사용해야함
     testImplementation "com.google.guava:guava:33.0.0-jre"
+    implementation 'org.springdoc:springdoc-openapi-ui:1.7.0'
 }
 
 def querydslSrcDir = 'src/main/generated'
