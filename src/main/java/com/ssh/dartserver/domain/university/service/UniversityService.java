@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -16,23 +17,23 @@ public class UniversityService {
     private final UniversityRepository universityRepository;
     private final UniversityMapper universityMapper;
 
+    @Transactional(readOnly = true)
     public List<UniversityResponse> search(UniversitySearchRequest request) {
         if (request.getDepartment() == null) {
-            return searchBy(request.getName(), request.getSize());
+            return searchBy(request.getName());
         } else {
-            return searchBy(request.getName(), request.getDepartment(), request.getSize());
+            return searchBy(request.getName(), request.getDepartment());
         }
     }
 
-    public List<UniversityResponse> searchBy(String name, int size) {
-        return universityRepository.findTop0ByNameStartsWith(name, size).stream()
+    public List<UniversityResponse> searchBy(String name) {
+        return universityRepository.findTop20ByNameStartsWith(name).stream()
             .map(UniversityResponse::new)
             .collect(Collectors.toList());
     }
 
-    public List<UniversityResponse> searchBy(String name, String department, int size) {
-        // TODO Size 활용하기
-        return universityRepository.findDistinctTop10ByNameAndDepartmentStartsWith(name, department).stream()
+    public List<UniversityResponse> searchBy(String name, String department) {
+        return universityRepository.findDistinctTop20ByNameAndDepartmentStartsWith(name, department).stream()
             .map(universityMapper::toUniversityResponse)
             .collect(Collectors.toList());
     }

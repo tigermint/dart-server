@@ -1,8 +1,10 @@
 package com.ssh.dartserver.domain.university.dto;
 
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 public class UniversityResponse {
     private Long id;
     private String name;
@@ -13,11 +15,5 @@ public class UniversityResponse {
 
     public UniversityResponse(final String name) {
         this.name = name;
-    }
-
-    public UniversityResponse(final Long id, final String name, final String department) {
-        this.id = id;
-        this.name = name;
-        this.department = department;
     }
 }
