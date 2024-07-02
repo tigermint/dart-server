@@ -13,6 +13,6 @@ import java.util.List;
 @Repository
 public interface UniversityRepository extends CrudRepository<University, Long> {
     @Query(value = "SELECT u.name FROM University u WHERE u.name LIKE :universityName% GROUP BY u.name ORDER BY u.name ASC LIMIT :size", nativeQuery = true)
-    List<String> findAllByNameStartsWith(@NonNull @Param("universityName") String universityName, @Param("size") int size);
+    List<String> findNamesStartWith(@NonNull @Param("universityName") String universityName, @Param("size") int size);
     List<University> findDistinctByNameAndDepartmentStartsWith(@NonNull String name, @NonNull String department, Pageable pageable);
 }

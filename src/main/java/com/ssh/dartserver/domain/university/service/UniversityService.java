@@ -29,7 +29,7 @@ public class UniversityService {
     }
 
     private List<UniversityResponse> searchBy(String name, int size) {
-        return universityRepository.findAllByNameStartsWith(name, size)
+        return universityRepository.findNamesStartWith(name, size)
             .stream()
             .map(universityMapper::toUniversityResponse)
             .collect(Collectors.toList());

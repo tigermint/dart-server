@@ -43,9 +43,9 @@ class UniversityServiceTest {
         int size = 10;
         UniversitySearchRequest request = new UniversitySearchRequest();
         request.setName(keyword);
-        request.setSize(10);
+        request.setSize(size);
 
-        Mockito.when(universityRepository.findAllByNameStartsWith(request.getName(), 10)).thenReturn(result);
+        Mockito.when(universityRepository.findNamesStartWith(request.getName(), size)).thenReturn(result);
 
         // when
         final List<UniversityResponse> response = universityService.search(request);
