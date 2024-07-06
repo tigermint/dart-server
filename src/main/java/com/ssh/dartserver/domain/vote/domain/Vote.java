@@ -2,9 +2,9 @@ package com.ssh.dartserver.domain.vote.domain;
 
 import com.ssh.dartserver.domain.question.domain.Question;
 import com.ssh.dartserver.domain.user.domain.User;
+import jakarta.persistence.*;
 import lombok.*;
 
-import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;

@@ -97,12 +97,15 @@ public class UserController {
         return ResponseEntity.ok(myTeamService.readTeam(principal.getUser(), teamId));
     }
 
+    @Deprecated(since="20230901")
     @GetMapping("/me/teams")
     public ResponseEntity<List<TeamResponse>> listTeam(Authentication authentication) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         return ResponseEntity.ok(myTeamService.listTeam(principal.getUser()));
     }
 
+
+    @Deprecated(since="20230901")
     @PatchMapping("/me/teams/{teamId}")
     public ResponseEntity<TeamResponse> updateTeam(Authentication authentication, @PathVariable Long teamId, @Valid @RequestBody TeamRequest request) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
@@ -152,7 +155,7 @@ public class UserController {
     @GetMapping("/me/proposals")
     public ResponseEntity<List<ProposalResponse.ListDto>> listProposal(Authentication authentication, @RequestParam(defaultValue = "sent") String type) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
-        if (type.equals("sent")) {
+        if (type.equals("sent")) {  // TODO Enum
             return ResponseEntity.ok(proposalService.listSentProposal(principal.getUser()));
         }
         if (type.equals("received")) {

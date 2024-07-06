@@ -15,6 +15,7 @@ import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.RestController;
 import java.net.URI;
 
+@Deprecated
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1/votes")

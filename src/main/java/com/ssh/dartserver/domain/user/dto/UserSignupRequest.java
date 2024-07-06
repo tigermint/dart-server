@@ -1,13 +1,19 @@
 package com.ssh.dartserver.domain.user.dto;
 
 import com.ssh.dartserver.domain.user.domain.personalinfo.Gender;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import lombok.NoArgsConstructor;
 
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserSignupRequest {
     @NotNull(message = "학교 Id는 null 일 수 없습니다.")
     private Long universityId;

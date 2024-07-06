@@ -73,9 +73,9 @@ public class TeamRepositoryImpl implements TeamRepositoryCustom {
     private static OrderSpecifier<?>[] createOrderSpecifier(OrderMethod order) {
         List<OrderSpecifier<?>> orderSpecifiers = new ArrayList<>();
 
-        if (order == null || order.equals(OrderMethod.LATEST))
+        if (order == null || order.equals(OrderMethod.LATEST)) {
             orderSpecifiers.add(new OrderSpecifier<>(Order.DESC, team.createdTime));
-        else if (order.equals(OrderMethod.LIKE)) {
+        } else if (order.equals(OrderMethod.LIKE)) {
             orderSpecifiers.add(new OrderSpecifier<>(Order.DESC, team.requestedTeamProposals.size()));
             orderSpecifiers.add(new OrderSpecifier<>(Order.DESC, team.createdTime));
         } else if (order.equals(OrderMethod.VIEW)) {

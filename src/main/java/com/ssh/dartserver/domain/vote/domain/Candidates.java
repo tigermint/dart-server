@@ -1,9 +1,9 @@
 package com.ssh.dartserver.domain.vote.domain;
 
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import jakarta.persistence.*;
 import java.util.List;
 
 @Embeddable

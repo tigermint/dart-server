@@ -1,5 +1,6 @@
 package com.ssh.dartserver.domain.university.domain;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,35 +11,16 @@ import jakarta.persistence.*;
 
 @Entity
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
+@AllArgsConstructor
 @BatchSize(size = 500)
 public class University {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "university_id")
     private Long id;
-
-    private String area;
-
     private String name;
-
-    @Column(name = "campus_type")
-    private String type;
-
     private String department;
-
-    private String state;
-
-    private String div0;
-
-    private String div1;
-
-    private String div2;
-
-    private String div3;
-
-    private String years;
-
+    private String area;
 }

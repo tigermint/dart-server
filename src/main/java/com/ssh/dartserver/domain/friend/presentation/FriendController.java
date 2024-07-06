@@ -16,6 +16,7 @@ import jakarta.validation.constraints.NotNull;
 import java.net.URI;
 import java.util.List;
 
+@Deprecated
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1/friends")
