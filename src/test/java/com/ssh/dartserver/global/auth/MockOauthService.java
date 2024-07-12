@@ -9,8 +9,7 @@ import com.ssh.dartserver.global.auth.dto.KakaoTokenRequest;
 import com.ssh.dartserver.global.auth.dto.TokenResponse;
 import com.ssh.dartserver.global.auth.infra.OAuthRestTemplate;
 import com.ssh.dartserver.global.auth.service.OAuthService;
-import com.ssh.dartserver.global.auth.service.jwt.JwtTokenProvider;
-import com.ssh.dartserver.global.auth.service.jwt.JwtTokenUtil;
+import com.ssh.dartserver.global.auth.service.jwt.JwtToken;
 import com.ssh.dartserver.global.common.Role;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -26,20 +25,13 @@ import java.security.NoSuchAlgorithmException;
 @Primary
 public class MockOauthService extends OAuthService {
     private final UserRepository userRepository;
-    private final JwtTokenProvider jwtTokenProvider;
-    private final JwtTokenUtil jwtTokenUtil;
 
     public MockOauthService(final OAuthRestTemplate oauthRestTemplate,
                             final UserRepository userRepository,
-                            final BCryptPasswordEncoder bCryptPasswordEncoder,
-                            final JwtTokenProvider jwtTokenProvider,
-                            final JwtTokenUtil jwtTokenUtil) {
-        super(oauthRestTemplate, userRepository, bCryptPasswordEncoder, jwtTokenProvider, jwtTokenUtil);
+                            final BCryptPasswordEncoder bCryptPasswordEncoder) {
+        super(oauthRestTemplate, userRepository, bCryptPasswordEncoder);
         this.userRepository = userRepository;
-        this.jwtTokenProvider = jwtTokenProvider;
-        this.jwtTokenUtil = jwtTokenUtil;
     }
-
 
     public TokenResponse createTokenForKakao(KakaoTokenRequest request) {
         return createTokenForTest("kakao", generateHash(request.getAccessToken()));
@@ -71,11 +63,11 @@ public class MockOauthService extends OAuthService {
         }
 
         //jwt 토큰 생성
-        String jwtToken = jwtTokenUtil.createToken(userEntity);
+        final JwtToken jwtToken = JwtToken.create(userEntity);
         return TokenResponse.builder()
-            .jwtToken(jwtToken)
+            .jwtToken(jwtToken.getToken())
             .tokenType("BEARER")
-            .expiresAt(jwtTokenUtil.getExpiresAt(jwtToken))
+            .expiresAt(jwtToken.getExpiresAt())
             .providerId(userEntity.getProviderId())
             .providerType(userEntity.getProvider())
             .build();

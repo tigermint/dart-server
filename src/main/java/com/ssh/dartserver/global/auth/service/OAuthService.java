@@ -14,8 +14,7 @@ import com.ssh.dartserver.global.auth.domain.OAuthUserInfo;
 import com.ssh.dartserver.global.auth.dto.*;
 import com.ssh.dartserver.global.auth.infra.OAuthRestTemplate;
 import com.ssh.dartserver.global.auth.service.jwt.JwtProperties;
-import com.ssh.dartserver.global.auth.service.jwt.JwtTokenProvider;
-import com.ssh.dartserver.global.auth.service.jwt.JwtTokenUtil;
+import com.ssh.dartserver.global.auth.service.jwt.JwtToken;
 import com.ssh.dartserver.global.common.Role;
 import com.ssh.dartserver.global.error.AppleLoginFailedException;
 import com.ssh.dartserver.global.error.ApplePublicKeyNotFoundException;
@@ -41,8 +40,6 @@ public class OAuthService {
     private final OAuthRestTemplate oauthRestTemplate;
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
-    private final JwtTokenProvider jwtTokenProvider;
-    private final JwtTokenUtil jwtTokenUtil;
 
     public TokenResponse createTokenForKakao(KakaoTokenRequest request) {
         return oauthRestTemplate.getKakaoUserInfo(request.getAccessToken()).map(userInfo -> {
@@ -112,11 +109,11 @@ public class OAuthService {
         }
 
         //jwt 토큰 생성
-        String jwtToken = jwtTokenUtil.createToken(userEntity);
+        final JwtToken jwtToken = JwtToken.create(userEntity);
         return TokenResponse.builder()
-                .jwtToken(jwtToken)
+                .jwtToken(jwtToken.getToken())
                 .tokenType("BEARER")
-                .expiresAt(jwtTokenUtil.getExpiresAt(jwtToken))
+                .expiresAt(jwtToken.getExpiresAt())
                 .providerId(userEntity.getProviderId())
                 .providerType(userEntity.getProvider())
                 .build();
@@ -135,8 +132,4 @@ public class OAuthService {
             return Optional.empty();
         }
     }
-
 }
-
-
-

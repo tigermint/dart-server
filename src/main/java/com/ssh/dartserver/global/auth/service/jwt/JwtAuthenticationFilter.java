@@ -14,7 +14,6 @@ import java.io.IOException;
 
 public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
     private final JwtTokenProvider jwtTokenProvider;
-    private final JwtTokenUtil jwtTokenUtil = new JwtTokenUtil();  // TODO JwtTokenProvider에서 인증처리를 하는 경우 여기에서 해당 코드를 제거
 
     public JwtAuthenticationFilter(AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider) {
         super(authenticationManager);
@@ -30,13 +29,15 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
             return;
         }
 
+        final JwtToken jwtToken = new JwtToken(token);
+
         // validateToken - 토큰 유효성 검사
-        if (jwtTokenUtil.validateToken(token)) {
+        if (jwtToken.validateToken()) {
             throw new CertificationException("유효하지 않은 토큰입니다.");
         }
 
         // getAuthentication - 인증 정보 조회
-        Authentication authentication = jwtTokenProvider.getAuthentication(token);
+        Authentication authentication = jwtTokenProvider.getAuthentication(jwtToken);
 
         // SecurityContext에 Authentication 객체 저장
         SecurityContextHolder.getContext().setAuthentication(authentication);

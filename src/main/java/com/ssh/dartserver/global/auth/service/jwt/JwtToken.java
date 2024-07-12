@@ -18,26 +18,23 @@ public class JwtToken {
         decodedJwt = getDecodedJwt(token);
     }
 
-    //토큰에서 회원 정보 추출
+    public boolean validateToken() {
+        return validateTokenExpired(decodedJwt);
+    }
+
+    public String getToken() {
+        return decodedJwt.getToken();
+    }
+
     public String getUsername() {
         return decodedJwt.getClaim(USERNAME_CLAIM)
             .asString();
     }
 
-    //토큰에서 만료 시간 추출
     public LocalDateTime getExpiresAt() {
         return DateTypeConverter.toLocalDateTime(
             decodedJwt.getExpiresAt()
         );
-    }
-
-    //토큰 유효성 검사 + 만료일자 확인
-    public boolean validateToken() {
-        try {
-            return validateTokenExpired(decodedJwt);
-        } catch (Exception e) {
-            return true;
-        }
     }
 
     private DecodedJWT getDecodedJwt(String token) {
@@ -51,7 +48,6 @@ public class JwtToken {
         return expiresAt.before(new Date());
     }
 
-    //JWT 토큰 생성
     public static JwtToken create(User user) {
         final String token = JWT.create()
             .withSubject(user.getUsername())
@@ -73,7 +69,7 @@ public class JwtToken {
             return false;
         }
         final JwtToken jwtToken = (JwtToken) o;
-        return Objects.equals(decodedJwt, jwtToken.decodedJwt);
+        return Objects.equals(decodedJwt.getToken(), jwtToken.decodedJwt.getToken());
     }
 
     @Override

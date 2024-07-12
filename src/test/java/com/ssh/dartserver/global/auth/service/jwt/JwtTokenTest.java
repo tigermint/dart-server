@@ -31,4 +31,16 @@ class JwtTokenTest {
             new JwtToken(malformedToken).getUsername();
         });
     }
+
+    @Test
+    @DisplayName("토큰값이 동일한 두 객체를 비교할 경우 동일하다고 판단합니다.")
+    public void test_equals_identical_decodedJwt() {
+        String tokenString = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJrYWthb18yODE3MDU0MDM1IiwiaWQiOjEsImV4cCI6MTcyMTY2NTE3MywidXNlcm5hbWUiOiJrYWthb18yODE3MDU0MDM1In0.eg_yD-BvpMV1w7t89SpVjO6InjprmRROP07FAvdDoXvWnra1L8m61aJK44LAHlG819kP1XcK6aaqbq0gqX9RHA";
+        JwtToken token1 = new JwtToken(tokenString);
+        JwtToken token2 = new JwtToken(tokenString);
+
+        boolean result = token1.equals(token2);
+
+        assertTrue(result);
+    }
 }

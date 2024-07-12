@@ -8,6 +8,7 @@ import com.ssh.dartserver.global.auth.dto.AppleTokenRequest;
 import com.ssh.dartserver.global.auth.dto.KakaoTokenRequest;
 import com.ssh.dartserver.global.auth.dto.TokenResponse;
 import com.ssh.dartserver.global.auth.service.OAuthService;
+import com.ssh.dartserver.global.auth.service.jwt.JwtToken;
 import com.ssh.dartserver.global.auth.service.jwt.JwtTokenProvider;
 import com.ssh.dartserver.global.auth.service.oauth.PrincipalDetails;
 import java.util.UUID;
@@ -76,7 +77,7 @@ public class UserManager {
      */
     public TokenResponse createUserWithInformation(UserSignupRequest request) {
         final TokenResponse tokenResponse = kakaoLogin("abcdefghijklmnop" + UUID.randomUUID());
-        final String jwtToken = tokenResponse.getJwtToken();
+        final JwtToken jwtToken = new JwtToken(tokenResponse.getJwtToken());
 
         final Authentication authentication = jwtTokenProvider.getAuthentication(jwtToken);
         final User user = ((PrincipalDetails) authentication.getPrincipal()).getUser();
@@ -122,8 +123,7 @@ public class UserManager {
     }
 
     public User getUser(String jwtToken) {
-        final Authentication authentication = jwtTokenProvider.getAuthentication(jwtToken);
+        final Authentication authentication = jwtTokenProvider.getAuthentication(new JwtToken(jwtToken));
         return ((PrincipalDetails) authentication.getPrincipal()).getUser();
     }
-
 }
