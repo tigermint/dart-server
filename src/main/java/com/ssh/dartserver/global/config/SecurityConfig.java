@@ -1,9 +1,7 @@
 package com.ssh.dartserver.global.config;
 
 import com.ssh.dartserver.global.auth.service.jwt.JwtAuthenticationFilter;
-import com.ssh.dartserver.global.auth.service.jwt.JwtAuthorizationFilter;
 import com.ssh.dartserver.global.auth.service.jwt.JwtTokenProvider;
-import com.ssh.dartserver.global.error.ExceptionHandlerFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,9 +32,7 @@ public class SecurityConfig {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http
                 .addFilter(corsConfig.corsFilter())
-                .addFilter(new JwtAuthenticationFilter(authenticationConfiguration.getAuthenticationManager()))
-                .addFilter(new JwtAuthorizationFilter(authenticationConfiguration.getAuthenticationManager(), jwtTokenProvider))
-                .addFilterBefore(new ExceptionHandlerFilter(), JwtAuthenticationFilter.class);
+                .addFilter(new JwtAuthenticationFilter(authenticationConfiguration.getAuthenticationManager(), jwtTokenProvider));
         http
                 .authorizeRequests()
                 .antMatchers(
