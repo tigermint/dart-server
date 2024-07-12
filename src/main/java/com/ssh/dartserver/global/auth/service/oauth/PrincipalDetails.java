@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 @Getter
 public class PrincipalDetails implements UserDetails {
-
     private final User user;
 
     public PrincipalDetails(User user) {
@@ -25,7 +24,7 @@ public class PrincipalDetails implements UserDetails {
 
     @Override
     public String getPassword() {
-        return user.getPassword();
+        throw new UnsupportedOperationException("password not supported (user have not password)");
     }
 
     @Override

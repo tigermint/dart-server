@@ -10,6 +10,7 @@ import com.ssh.dartserver.global.auth.dto.TokenResponse;
 import com.ssh.dartserver.global.auth.infra.OAuthRestTemplate;
 import com.ssh.dartserver.global.auth.service.OAuthService;
 import com.ssh.dartserver.global.auth.service.jwt.JwtTokenProvider;
+import com.ssh.dartserver.global.auth.service.jwt.JwtTokenUtil;
 import com.ssh.dartserver.global.common.Role;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -26,14 +27,17 @@ import java.security.NoSuchAlgorithmException;
 public class MockOauthService extends OAuthService {
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final JwtTokenUtil jwtTokenUtil;
 
     public MockOauthService(final OAuthRestTemplate oauthRestTemplate,
                             final UserRepository userRepository,
                             final BCryptPasswordEncoder bCryptPasswordEncoder,
-                            final JwtTokenProvider jwtTokenProvider) {
-        super(oauthRestTemplate, userRepository, bCryptPasswordEncoder, jwtTokenProvider);
+                            final JwtTokenProvider jwtTokenProvider,
+                            final JwtTokenUtil jwtTokenUtil) {
+        super(oauthRestTemplate, userRepository, bCryptPasswordEncoder, jwtTokenProvider, jwtTokenUtil);
         this.userRepository = userRepository;
         this.jwtTokenProvider = jwtTokenProvider;
+        this.jwtTokenUtil = jwtTokenUtil;
     }
 
 
@@ -67,11 +71,11 @@ public class MockOauthService extends OAuthService {
         }
 
         //jwt 토큰 생성
-        String jwtToken = jwtTokenProvider.createToken(userEntity);
+        String jwtToken = jwtTokenUtil.createToken(userEntity);
         return TokenResponse.builder()
             .jwtToken(jwtToken)
             .tokenType("BEARER")
-            .expiresAt(jwtTokenProvider.getExpiresAt(jwtToken))
+            .expiresAt(jwtTokenUtil.getExpiresAt(jwtToken))
             .providerId(userEntity.getProviderId())
             .providerType(userEntity.getProvider())
             .build();
