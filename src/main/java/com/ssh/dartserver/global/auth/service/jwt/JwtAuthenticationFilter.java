@@ -1,6 +1,5 @@
 package com.ssh.dartserver.global.auth.service.jwt;
 
-import com.ssh.dartserver.global.error.CertificationException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,12 +28,10 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
             return;
         }
 
-        final JwtToken jwtToken = new JwtToken(token);
+        final JwtToken jwtToken = jwtTokenProvider.decode(token);
 
         // validateToken - 토큰 유효성 검사
-        if (jwtToken.validateToken()) {
-            throw new CertificationException("유효하지 않은 토큰입니다.");
-        }
+        jwtToken.validateToken();
 
         // getAuthentication - 인증 정보 조회
         Authentication authentication = jwtTokenProvider.getAuthentication(jwtToken);

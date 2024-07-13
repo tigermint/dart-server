@@ -77,7 +77,7 @@ public class UserManager {
      */
     public TokenResponse createUserWithInformation(UserSignupRequest request) {
         final TokenResponse tokenResponse = kakaoLogin("abcdefghijklmnop" + UUID.randomUUID());
-        final JwtToken jwtToken = new JwtToken(tokenResponse.getJwtToken());
+        final JwtToken jwtToken = jwtTokenProvider.decode(tokenResponse.getJwtToken());
 
         final Authentication authentication = jwtTokenProvider.getAuthentication(jwtToken);
         final User user = ((PrincipalDetails) authentication.getPrincipal()).getUser();
@@ -123,7 +123,7 @@ public class UserManager {
     }
 
     public User getUser(String jwtToken) {
-        final Authentication authentication = jwtTokenProvider.getAuthentication(new JwtToken(jwtToken));
+        final Authentication authentication = jwtTokenProvider.getAuthentication(jwtToken);
         return ((PrincipalDetails) authentication.getPrincipal()).getUser();
     }
 }

@@ -1,25 +1,27 @@
 package com.ssh.dartserver.global.auth.service.jwt;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.ssh.dartserver.domain.user.domain.User;
+import com.ssh.dartserver.global.error.CertificationException;
 import com.ssh.dartserver.global.util.DateTypeConverter;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Objects;
 
 public class JwtToken {
-    private static final String USERNAME_CLAIM = "username";
-    private static final String ID_CLAIM = "id";
+    public static final String USERNAME_CLAIM = "username";
+    public static final String ID_CLAIM = "id";
     private final DecodedJWT decodedJwt;
 
-    public JwtToken(final String token) {
-        decodedJwt = getDecodedJwt(token);
+    public JwtToken(final DecodedJWT decodedJwt) {
+        this.decodedJwt = decodedJwt;
     }
 
-    public boolean validateToken() {
-        return validateTokenExpired(decodedJwt);
+    public void validateToken() {
+        Date now = new Date();
+        if (now.before(decodedJwt.getExpiresAt())) {
+            return;
+        }
+        throw new CertificationException("유효하지 않은 토큰입니다.");
     }
 
     public String getToken() {
@@ -35,29 +37,6 @@ public class JwtToken {
         return DateTypeConverter.toLocalDateTime(
             decodedJwt.getExpiresAt()
         );
-    }
-
-    private DecodedJWT getDecodedJwt(String token) {
-        return JWT.require(Algorithm.HMAC512(JwtProperties.SECRET.getValue()))
-            .build()
-            .verify(token);
-    }
-
-    private boolean validateTokenExpired(DecodedJWT jwt) {
-        Date expiresAt = jwt.getExpiresAt();
-        return expiresAt.before(new Date());
-    }
-
-    public static JwtToken create(User user) {
-        final String token = JWT.create()
-            .withSubject(user.getUsername())
-            .withExpiresAt(
-                new Date(System.currentTimeMillis() + Integer.parseInt(JwtProperties.EXPIRATION_TIME.getValue())))
-            .withClaim(ID_CLAIM, user.getId())
-            .withClaim(USERNAME_CLAIM, user.getUsername())
-            .sign(Algorithm.HMAC512(JwtProperties.SECRET.getValue()));
-
-        return new JwtToken(token);
     }
 
     @Override

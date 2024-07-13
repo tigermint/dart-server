@@ -10,6 +10,7 @@ import com.ssh.dartserver.global.auth.dto.TokenResponse;
 import com.ssh.dartserver.global.auth.infra.OAuthRestTemplate;
 import com.ssh.dartserver.global.auth.service.OAuthService;
 import com.ssh.dartserver.global.auth.service.jwt.JwtToken;
+import com.ssh.dartserver.global.auth.service.jwt.JwtTokenProvider;
 import com.ssh.dartserver.global.common.Role;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -24,13 +25,16 @@ import java.security.NoSuchAlgorithmException;
 @Component
 @Primary
 public class MockOauthService extends OAuthService {
+    private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
 
     public MockOauthService(final OAuthRestTemplate oauthRestTemplate,
                             final UserRepository userRepository,
-                            final BCryptPasswordEncoder bCryptPasswordEncoder) {
-        super(oauthRestTemplate, userRepository, bCryptPasswordEncoder);
+                            final BCryptPasswordEncoder bCryptPasswordEncoder,
+                            final JwtTokenProvider jwtTokenProvider) {
+        super(oauthRestTemplate, userRepository, bCryptPasswordEncoder, jwtTokenProvider);
         this.userRepository = userRepository;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 
     public TokenResponse createTokenForKakao(KakaoTokenRequest request) {
@@ -63,7 +67,7 @@ public class MockOauthService extends OAuthService {
         }
 
         //jwt 토큰 생성
-        final JwtToken jwtToken = JwtToken.create(userEntity);
+        final JwtToken jwtToken = jwtTokenProvider.create(userEntity);
         return TokenResponse.builder()
             .jwtToken(jwtToken.getToken())
             .tokenType("BEARER")
