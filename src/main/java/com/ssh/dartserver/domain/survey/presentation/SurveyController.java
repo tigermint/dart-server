@@ -18,6 +18,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.validation.Valid;
 import java.net.URI;
 
+@Deprecated
 @RestController
 @RequestMapping("/v1/surveys")
 @RequiredArgsConstructor

@@ -22,7 +22,7 @@ public class ChatRoomController {
     @PostMapping
     public ResponseEntity<ChatRoomResponse> createRoom(@RequestBody ChatRoomRequest.Create request) {
         Long chatRoomId = chatRoomService.createChatRoom(request);
-        URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(chatRoomId)
                 .toUri();

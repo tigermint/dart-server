@@ -15,7 +15,7 @@ public class ProposalRequest {
 
     @Data
     public static class Update{
-        private String proposalStatus;
+        private String proposalStatus;  // TODO Enum?
     }
 
 }
