@@ -10,6 +10,8 @@ import javax.persistence.Embeddable;
 @Embeddable
 @NoArgsConstructor
 public class BirthYear {
+    private static final int BIRTH_YEAR_MIN = 1995;
+    private static final int BIRTH_YEAR_MAX = 2005;
 
     @Column(name = "birth_year")
     private int value;
@@ -20,9 +22,12 @@ public class BirthYear {
     }
 
     private void validateBirthYear(int value) {
-        if (value < 1995 || value > 2004) {
-            throw new IllegalArgumentException("생년은 1995 ~ 2004 사이의 값이어야 합니다.");
+        if (BIRTH_YEAR_MIN <= value && value <= BIRTH_YEAR_MAX) {
+            return;
         }
+        throw new IllegalArgumentException(
+            String.format("생년은 %d ~ %d 사이의 값이어야 합니다. 현재값: %d", BIRTH_YEAR_MIN, BIRTH_YEAR_MAX, value)
+        );
     }
 
 

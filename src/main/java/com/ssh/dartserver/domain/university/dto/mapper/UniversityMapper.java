@@ -7,4 +7,5 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface UniversityMapper {
     UniversityResponse toUniversityResponse(University university);
+    UniversityResponse toUniversityResponse(String name);
 }

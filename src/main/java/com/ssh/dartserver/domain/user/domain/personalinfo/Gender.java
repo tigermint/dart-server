@@ -26,7 +26,6 @@ public enum Gender {
         return value;
     }
 
-    @JsonValue
     public String getKorValue() {
         return korValue;
     }
