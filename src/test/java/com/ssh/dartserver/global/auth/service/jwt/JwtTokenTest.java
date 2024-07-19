@@ -52,13 +52,14 @@ class JwtTokenTest {
     @Test
     @DisplayName("토큰값이 동일한 두 객체를 비교할 경우 동일하다.")
     public void test_equals_identical_decodedJwt() {
-        String tokenString = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ0ZXN0dXNlciIsImlkIjoxLCJleHAiOjE3MjA5NzAyMDIsInVzZXJuYW1lIjoidGVzdHVzZXIifQ.jz3fcW5PRWOVhnS_nLUB39wpKELVN-Lj2Md7JINbMQ2hO8qkI2vBTzp8X32Zt2YcXsl51p9rbZmas_ZRXkMuEw";
+        User user = createTestUser();
+        final JwtToken jwtToken = jwtTokenProvider.create(user);
+        final String tokenString = jwtToken.getToken();
+
         final JwtToken token1 = jwtTokenProvider.decode(tokenString);
         final JwtToken token2 = jwtTokenProvider.decode(tokenString);
 
-        boolean result = token1.equals(token2);
-
-        assertTrue(result);
+        assertEquals(token1, token2);
     }
 
     @Test
