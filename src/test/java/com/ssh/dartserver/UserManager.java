@@ -4,10 +4,10 @@ import com.ssh.dartserver.domain.user.domain.User;
 import com.ssh.dartserver.domain.user.domain.personalinfo.Gender;
 import com.ssh.dartserver.domain.user.dto.UserSignupRequest;
 import com.ssh.dartserver.domain.user.service.UserService;
+import com.ssh.dartserver.global.auth.MockOauthService;
 import com.ssh.dartserver.global.auth.dto.AppleTokenRequest;
 import com.ssh.dartserver.global.auth.dto.KakaoTokenRequest;
 import com.ssh.dartserver.global.auth.dto.TokenResponse;
-import com.ssh.dartserver.global.auth.service.OAuthService;
 import com.ssh.dartserver.global.auth.service.jwt.JwtToken;
 import com.ssh.dartserver.global.auth.service.jwt.JwtTokenProvider;
 import com.ssh.dartserver.global.auth.service.oauth.PrincipalDetails;
@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserManager {
     @Autowired
-    private OAuthService mockOauthService;  // 통합테스트 환경에서 MockOAuthService가 대입됨
+    private MockOauthService mockOauthService;
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
     @Autowired

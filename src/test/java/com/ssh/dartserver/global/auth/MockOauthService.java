@@ -7,13 +7,11 @@ import com.ssh.dartserver.domain.user.infra.UserRepository;
 import com.ssh.dartserver.global.auth.dto.AppleTokenRequest;
 import com.ssh.dartserver.global.auth.dto.KakaoTokenRequest;
 import com.ssh.dartserver.global.auth.dto.TokenResponse;
-import com.ssh.dartserver.global.auth.infra.OAuthRestTemplate;
-import com.ssh.dartserver.global.auth.service.OAuthService;
+import com.ssh.dartserver.global.auth.service.OauthService;
 import com.ssh.dartserver.global.auth.service.jwt.JwtToken;
 import com.ssh.dartserver.global.auth.service.jwt.JwtTokenProvider;
 import com.ssh.dartserver.global.common.Role;
 import org.springframework.context.annotation.Primary;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.security.MessageDigest;
@@ -24,17 +22,18 @@ import java.security.NoSuchAlgorithmException;
  */
 @Component
 @Primary
-public class MockOauthService extends OAuthService {
+public class MockOauthService implements OauthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
 
-    public MockOauthService(final OAuthRestTemplate oauthRestTemplate,
-                            final UserRepository userRepository,
-                            final BCryptPasswordEncoder bCryptPasswordEncoder,
-                            final JwtTokenProvider jwtTokenProvider) {
-        super(oauthRestTemplate, userRepository, bCryptPasswordEncoder, jwtTokenProvider);
+    public MockOauthService(final UserRepository userRepository, final JwtTokenProvider jwtTokenProvider) {
         this.userRepository = userRepository;
         this.jwtTokenProvider = jwtTokenProvider;
+    }
+
+    @Override
+    public TokenResponse createToken(final String providerToken) {
+        return createTokenForTest("dart", generateHash(providerToken));
     }
 
     public TokenResponse createTokenForKakao(KakaoTokenRequest request) {
@@ -77,7 +76,7 @@ public class MockOauthService extends OAuthService {
             .build();
     }
 
-    public static String generateHash(String inputString) {
+    private static String generateHash(String inputString) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             byte[] hashBytes = md.digest(inputString.getBytes());
