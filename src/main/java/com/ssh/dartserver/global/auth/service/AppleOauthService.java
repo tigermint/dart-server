@@ -13,7 +13,7 @@ import com.ssh.dartserver.global.auth.domain.OAuthUserInfo;
 import com.ssh.dartserver.global.auth.dto.ApplePublicKey;
 import com.ssh.dartserver.global.auth.dto.GetApplePublicKeyResponse;
 import com.ssh.dartserver.global.auth.dto.TokenResponse;
-import com.ssh.dartserver.global.auth.infra.OAuthRestTemplate;
+import com.ssh.dartserver.global.auth.infra.AppleOauthApi;
 import com.ssh.dartserver.global.auth.service.jwt.JwtProperties;
 import com.ssh.dartserver.global.auth.service.jwt.JwtToken;
 import com.ssh.dartserver.global.auth.service.jwt.JwtTokenProvider;
@@ -38,7 +38,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @OauthProviderType(OauthProvider.APPLE)
 public class AppleOauthService implements OauthService {
-    private final OAuthRestTemplate oauthRestTemplate;
+    private final AppleOauthApi appleOauthApi;
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
@@ -51,7 +51,7 @@ public class AppleOauthService implements OauthService {
         ObjectMapper objectMapper = new ObjectMapper();
 
         try {
-            GetApplePublicKeyResponse applePublicKeys = oauthRestTemplate.getApplePublicKey();
+            GetApplePublicKeyResponse applePublicKeys = appleOauthApi.getApplePublicKey();
 
             String headerString = new String(decoder.decode(jwt.getHeader()), StandardCharsets.UTF_8);
             String payloadString = new String(decoder.decode(jwt.getPayload()), StandardCharsets.UTF_8);
