@@ -9,6 +9,6 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class GetApplePublicKeyResponse {
+public class ApplePublicKeyResponse {
     private List<ApplePublicKey> keys;
 }

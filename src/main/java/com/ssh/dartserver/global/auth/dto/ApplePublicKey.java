@@ -36,6 +36,7 @@ import lombok.NoArgsConstructor;
  * Apple Auth Keys Example</a>.
  *
  * @author  최현식
+ * @see ApplePublicKeyResponse
  * @see AppleTokenRequest
  */
 @Getter
