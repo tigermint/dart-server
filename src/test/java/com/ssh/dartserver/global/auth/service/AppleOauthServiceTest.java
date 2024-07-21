@@ -6,7 +6,7 @@ import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.ssh.dartserver.domain.user.domain.User;
 import com.ssh.dartserver.domain.user.infra.UserRepository;
 import com.ssh.dartserver.global.auth.dto.ApplePublicKey;
-import com.ssh.dartserver.global.auth.dto.GetApplePublicKeyResponse;
+import com.ssh.dartserver.global.auth.dto.ApplePublicKeyResponse;
 import com.ssh.dartserver.global.auth.dto.TokenResponse;
 import com.ssh.dartserver.global.auth.infra.AppleOauthApi;
 import com.ssh.dartserver.global.auth.service.jwt.JwtToken;
@@ -58,7 +58,7 @@ class AppleOauthServiceTest {
 
         String appleIdToken = createAppleIdToken(kid, providerId, publicKey, privateKey);
 
-        GetApplePublicKeyResponse applePublicKeyResponse = createApplePublicKeyResponse(kid, publicKey);
+        ApplePublicKeyResponse applePublicKeyResponse = createApplePublicKeyResponse(kid, publicKey);
 
         when(appleOauthApi.getApplePublicKey()).thenReturn(applePublicKeyResponse);
         when(userRepository.findByUsername("apple_" + providerId)).thenReturn(Optional.empty());
@@ -89,7 +89,7 @@ class AppleOauthServiceTest {
         // Given
         KeyPair keyPair = generateKeyPair();
         String appleIdToken = createAppleIdToken("unknownKid", "apple_1234", (RSAPublicKey) keyPair.getPublic(), (RSAPrivateKey) keyPair.getPrivate());
-        when(appleOauthApi.getApplePublicKey()).thenReturn(new GetApplePublicKeyResponse(Collections.emptyList()));
+        when(appleOauthApi.getApplePublicKey()).thenReturn(new ApplePublicKeyResponse(Collections.emptyList()));
 
         // When & Then
         assertThrows(ApplePublicKeyNotFoundException.class, () -> appleOauthService.createToken(appleIdToken));
@@ -127,7 +127,7 @@ class AppleOauthServiceTest {
             .sign(algorithm);
     }
 
-    private GetApplePublicKeyResponse createApplePublicKeyResponse(String kid, RSAPublicKey publicKey) {
+    private ApplePublicKeyResponse createApplePublicKeyResponse(String kid, RSAPublicKey publicKey) {
         ApplePublicKey applePublicKey = new ApplePublicKey(
             "RSA",
             kid,
@@ -136,7 +136,7 @@ class AppleOauthServiceTest {
             Base64.getUrlEncoder().encodeToString(publicKey.getModulus().toByteArray()),
             Base64.getUrlEncoder().encodeToString(publicKey.getPublicExponent().toByteArray())
         );
-        return new GetApplePublicKeyResponse(Collections.singletonList(applePublicKey));
+        return new ApplePublicKeyResponse(Collections.singletonList(applePublicKey));
     }
 
     private static String createJwtToken(final String tokenValue, Date expiresAt) {

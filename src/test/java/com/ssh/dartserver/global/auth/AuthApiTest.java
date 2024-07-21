@@ -20,8 +20,7 @@ import org.springframework.http.HttpStatus;
 public class AuthApiTest extends ApiTest {
     @Test
     void 카카오로그인() {
-        final KakaoTokenRequest request = new KakaoTokenRequest();
-        request.setAccessToken("defaultTestUser");
+        final KakaoTokenRequest request = new KakaoTokenRequest("defaultTestUser");
 
         final ExtractableResponse<Response> response = 카카오로그인요청(request);
 
@@ -30,8 +29,7 @@ public class AuthApiTest extends ApiTest {
 
     @Test
     void 카카오로그인_여러번해도_동일한사용자여야함() {
-        final KakaoTokenRequest request = new KakaoTokenRequest();
-        request.setAccessToken("defaultTestUser");
+        final KakaoTokenRequest request = new KakaoTokenRequest("defaultTestUser");
 
         Set<String> userIds = new HashSet<>();
         for (int i=0; i<3; i++) {
@@ -46,8 +44,7 @@ public class AuthApiTest extends ApiTest {
 
     @Test
     void 애플로그인() {
-        final AppleTokenRequest request = new AppleTokenRequest();
-        request.setIdToken("defaultTestUser");
+        final AppleTokenRequest request = new AppleTokenRequest("defaultTestUser");
 
         final ExtractableResponse<Response> response = 애플로그인요청(request);
 

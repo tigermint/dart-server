@@ -10,7 +10,7 @@ import com.ssh.dartserver.domain.user.infra.UserRepository;
 import com.ssh.dartserver.global.auth.domain.AppleUser;
 import com.ssh.dartserver.global.auth.domain.OAuthUserInfo;
 import com.ssh.dartserver.global.auth.dto.ApplePublicKey;
-import com.ssh.dartserver.global.auth.dto.GetApplePublicKeyResponse;
+import com.ssh.dartserver.global.auth.dto.ApplePublicKeyResponse;
 import com.ssh.dartserver.global.auth.dto.TokenResponse;
 import com.ssh.dartserver.global.auth.infra.AppleOauthApi;
 import com.ssh.dartserver.global.auth.service.jwt.JwtTokenProvider;
@@ -45,7 +45,7 @@ public class AppleOauthService extends OauthServiceAbstract {
 
         try {
             AppleJwtToken appleJwtToken = new AppleJwtToken(jwt);
-            GetApplePublicKeyResponse applePublicKeys = appleOauthApi.getApplePublicKey();
+            ApplePublicKeyResponse applePublicKeys = appleOauthApi.getApplePublicKey();
             final Map<String, Object> possiblePayloadMap = appleJwtToken.getPossiblePayloadMap(applePublicKeys);
             OAuthUserInfo appleUser = new AppleUser(possiblePayloadMap);
 
@@ -78,7 +78,7 @@ public class AppleOauthService extends OauthServiceAbstract {
             payload = objectMapper.readValue(payloadString, Map.class);
         }
 
-        public Map<String, Object> getPossiblePayloadMap(GetApplePublicKeyResponse applePublicKeys)
+        public Map<String, Object> getPossiblePayloadMap(ApplePublicKeyResponse applePublicKeys)
             throws JsonProcessingException {
             ApplePublicKey possibleApplePublicKey = applePublicKeys.getKeys().stream()
                 .filter(key -> key.getKid().equals(getKid()))

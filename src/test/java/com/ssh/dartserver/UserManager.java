@@ -31,8 +31,7 @@ public class UserManager {
      * @return TokenResponse 현재 서버에서 사용되는 JWT 포함
      */
     public TokenResponse kakaoLogin(String accessToken) {
-        KakaoTokenRequest request = new KakaoTokenRequest();
-        request.setAccessToken(accessToken);
+        KakaoTokenRequest request = new KakaoTokenRequest(accessToken);
 
         return mockOauthService.createTokenForKakao(request);
     }
@@ -43,8 +42,7 @@ public class UserManager {
      * @return TokenResponse 현재 서버에서 사용되는 JWT 포함
      */
     public TokenResponse appleLogin(String id) {
-        AppleTokenRequest request = new AppleTokenRequest();
-        request.setIdToken(id);
+        AppleTokenRequest request = new AppleTokenRequest(id);
 
         return mockOauthService.createTokenForApple(request);
     }
@@ -54,8 +52,7 @@ public class UserManager {
      * @return TokenResponse 현재 서버에서 사용되는 JWT 포함
      */
     public TokenResponse createTestUser() {
-        KakaoTokenRequest request = new KakaoTokenRequest();
-        request.setAccessToken("DEFAULT_TEST_TOKEN");
+        KakaoTokenRequest request = new KakaoTokenRequest("DEFAULT_TEST_TOKEN");
 
         return mockOauthService.createTokenForKakao(request);
     }

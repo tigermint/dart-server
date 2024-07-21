@@ -1,6 +1,6 @@
 package com.ssh.dartserver.global.auth.infra;
 
-import com.ssh.dartserver.global.auth.dto.GetApplePublicKeyResponse;
+import com.ssh.dartserver.global.auth.dto.ApplePublicKeyResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -12,12 +12,13 @@ public class AppleOauthApi {
 
     /**
      * id token 검증을 위한 apple 공개키 가져오기
-     * @return
+     * @return Apple에게 받은 ApplePublicKey들
+     * @see ApplePublicKeyResponse
      */
-    public GetApplePublicKeyResponse getApplePublicKey() {
+    public ApplePublicKeyResponse getApplePublicKey() {
         return restTemplate.getForObject(
             "https://appleid.apple.com/auth/keys",
-            GetApplePublicKeyResponse.class
+            ApplePublicKeyResponse.class
         );
     }
 }
