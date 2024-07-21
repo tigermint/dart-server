@@ -53,6 +53,6 @@ public class JwtToken {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(decodedJwt);
+        return Objects.hashCode(decodedJwt.getToken());
     }
 }
