@@ -3,6 +3,7 @@ package com.ssh.dartserver.global.auth.service;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssh.dartserver.domain.user.domain.User;
 import com.ssh.dartserver.domain.user.infra.UserRepository;
@@ -40,38 +41,16 @@ public class AppleOauthService extends OauthServiceAbstract {
 
     @Override
     public TokenResponse createToken(final String providerToken) {
-        String idToken = providerToken;
-        Base64.Decoder decoder = Base64.getDecoder();
-        DecodedJWT jwt = JWT.decode(idToken);
-        ObjectMapper objectMapper = new ObjectMapper();
+        DecodedJWT jwt = JWT.decode(providerToken);
 
         try {
+            AppleJwtToken appleJwtToken = new AppleJwtToken(jwt);
             GetApplePublicKeyResponse applePublicKeys = appleOauthApi.getApplePublicKey();
-
-            String headerString = new String(decoder.decode(jwt.getHeader()), StandardCharsets.UTF_8);
-            String payloadString = new String(decoder.decode(jwt.getPayload()), StandardCharsets.UTF_8);
-
-            Map<String, Object> header = objectMapper.readValue(headerString, Map.class);
-            Map<String, Object> payload = objectMapper.readValue(payloadString, Map.class);
-
-            //apple 공개키 가져오기
-            ApplePublicKey possibleApplePublicKey = applePublicKeys.getKeys().stream()
-                .filter(key -> key.getKid().equals(header.get("kid")))
-                .findFirst()
-                .orElseThrow(() -> new ApplePublicKeyNotFoundException("일치하는 Apple Public Key가 없습니다."));
-
-            RSAPublicKey publicKey = getPublicKey(possibleApplePublicKey.getN(), possibleApplePublicKey.getE())
-                .orElseThrow(() -> new ApplePublicKeyNotFoundException("일치하는 Apple Public Key가 없습니다."));
-
-            //apple id token 검증
-            Algorithm algorithm = Algorithm.RSA256(publicKey, null);
-            String possiblePayload = new String(decoder.decode(JWT.require(algorithm).build().verify(idToken).getPayload()), StandardCharsets.UTF_8);
-            Map<String, Object> possiblePayloadMap = objectMapper.readValue(possiblePayload, Map.class);
-
+            final Map<String, Object> possiblePayloadMap = appleJwtToken.getPossiblePayloadMap(applePublicKeys);
             OAuthUserInfo appleUser = new AppleUser(possiblePayloadMap);
 
             //apple username 검색을 통한 기존 유저 확인
-            User userEntity = userRepository.findByUsername("apple_" + payload.get("sub"))
+            User userEntity = userRepository.findByUsername("apple_" + appleJwtToken.getSub())
                 .orElse(null);
 
             return getTokenResponseDto(appleUser, userEntity);
@@ -82,17 +61,61 @@ public class AppleOauthService extends OauthServiceAbstract {
         }
     }
 
-    private Optional<RSAPublicKey> getPublicKey(String modulusBase64, String exponentBase64) {
-        try {
-            BigInteger modulus = new BigInteger(1, Base64.getUrlDecoder().decode(modulusBase64));
-            BigInteger exponent = new BigInteger(1, Base64.getUrlDecoder().decode(exponentBase64));
+    public static class AppleJwtToken {
+        private final ObjectMapper objectMapper = new ObjectMapper();
+        private final Base64.Decoder decoder = Base64.getDecoder();
 
-            RSAPublicKeySpec spec = new RSAPublicKeySpec(modulus, exponent);
-            KeyFactory factory = KeyFactory.getInstance("RSA");
+        private final DecodedJWT decodedJWT;
+        private final Map<String, Object> header;
+        private final Map<String, Object> payload;
 
-            return Optional.of((RSAPublicKey) factory.generatePublic(spec));
-        } catch (IllegalArgumentException | NoSuchAlgorithmException | InvalidKeySpecException e) {
-            return Optional.empty();
+        public AppleJwtToken(DecodedJWT jwt) throws JsonProcessingException {
+            decodedJWT = jwt;
+            String headerString = new String(decoder.decode(jwt.getHeader()), StandardCharsets.UTF_8);
+            String payloadString = new String(decoder.decode(jwt.getPayload()), StandardCharsets.UTF_8);
+
+            header = objectMapper.readValue(headerString, Map.class);
+            payload = objectMapper.readValue(payloadString, Map.class);
+        }
+
+        public Map<String, Object> getPossiblePayloadMap(GetApplePublicKeyResponse applePublicKeys)
+            throws JsonProcessingException {
+            ApplePublicKey possibleApplePublicKey = applePublicKeys.getKeys().stream()
+                .filter(key -> key.getKid().equals(getKid()))
+                .findFirst()
+                .orElseThrow(() -> new ApplePublicKeyNotFoundException("일치하는 Apple Public Key가 없습니다."));
+
+            RSAPublicKey publicKey = getPublicKey(possibleApplePublicKey.getN(), possibleApplePublicKey.getE())
+                .orElseThrow(() -> new ApplePublicKeyNotFoundException("일치하는 Apple Public Key가 없습니다."));
+
+            Algorithm algorithm = Algorithm.RSA256(publicKey, null);
+            String possiblePayload = new String(decoder.decode(JWT.require(algorithm)
+                .build()
+                .verify(decodedJWT)
+                .getPayload()), StandardCharsets.UTF_8);
+            return objectMapper.readValue(possiblePayload, Map.class);
+        }
+
+        private Optional<RSAPublicKey> getPublicKey(String modulusBase64, String exponentBase64) {
+            try {
+                BigInteger modulus = new BigInteger(1, Base64.getUrlDecoder().decode(modulusBase64));
+                BigInteger exponent = new BigInteger(1, Base64.getUrlDecoder().decode(exponentBase64));
+
+                RSAPublicKeySpec spec = new RSAPublicKeySpec(modulus, exponent);
+                KeyFactory factory = KeyFactory.getInstance("RSA");
+
+                return Optional.of((RSAPublicKey) factory.generatePublic(spec));
+            } catch (IllegalArgumentException | NoSuchAlgorithmException | InvalidKeySpecException e) {
+                return Optional.empty();
+            }
+        }
+
+        public String getKid() {
+            return String.valueOf(header.get("kid"));
+        }
+
+        public String getSub() {
+            return String.valueOf(payload.get("sub"));
         }
     }
 }
