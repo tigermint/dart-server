@@ -6,7 +6,6 @@ import com.ssh.dartserver.domain.user.domain.personalinfo.PersonalInfo;
 import com.ssh.dartserver.domain.user.infra.UserRepository;
 import com.ssh.dartserver.global.auth.domain.OAuthUserInfo;
 import com.ssh.dartserver.global.auth.dto.TokenResponse;
-import com.ssh.dartserver.global.auth.service.jwt.JwtProperties;
 import com.ssh.dartserver.global.auth.service.jwt.JwtToken;
 import com.ssh.dartserver.global.auth.service.jwt.JwtTokenProvider;
 import com.ssh.dartserver.global.common.Role;
@@ -30,7 +29,7 @@ public abstract class OauthServiceAbstract implements OauthService {
         if (userEntity == null) {
             User userRequest = User.builder()
                 .username(oauthUser.getProvider() + "_" + oauthUser.getProviderId())
-                .password(bCryptPasswordEncoder.encode(JwtProperties.SECRET.getValue()))
+                .password(bCryptPasswordEncoder.encode(jwtTokenProvider.getSecret()))
                 .provider(oauthUser.getProvider())
                 .providerId(oauthUser.getProviderId())
                 .role(Role.USER)

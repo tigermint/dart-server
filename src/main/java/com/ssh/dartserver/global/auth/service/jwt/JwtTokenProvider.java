@@ -71,6 +71,10 @@ public class JwtTokenProvider {
         return new JwtToken(JWT.decode(token));
     }
 
+    public String getSecret() {
+        return jwtProperty.getSecret();
+    }
+
     private Algorithm getAlgorithm() {
         return Algorithm.HMAC512(jwtProperty.getSecret());
     }

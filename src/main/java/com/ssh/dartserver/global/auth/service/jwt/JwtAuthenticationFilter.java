@@ -1,5 +1,6 @@
 package com.ssh.dartserver.global.auth.service.jwt;
 
+import com.ssh.dartserver.global.config.properties.JwtProperty;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -43,9 +44,9 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
 
     //request header 에서 token 값을 가져옴 "Authorization: "TOKEN"
      String resolveToken(HttpServletRequest request) {
-        String header = request.getHeader(JwtProperties.HEADER_STRING.getValue());
-        if (header != null && header.startsWith(JwtProperties.TOKEN_PREFIX.getValue())) {
-            return header.replace(JwtProperties.TOKEN_PREFIX.getValue(), "");
+        String header = request.getHeader(JwtProperty.HEADER_STRING);
+        if (header != null && header.startsWith(JwtProperty.TOKEN_PREFIX)) {
+            return header.replace(JwtProperty.TOKEN_PREFIX, "");
         }
         return null;
     }

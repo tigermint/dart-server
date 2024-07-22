@@ -1,9 +1,9 @@
 package com.ssh.dartserver.domain.chat.presentation;
 
 import com.ssh.dartserver.domain.chat.service.ActiveUserStore;
-import com.ssh.dartserver.global.auth.service.jwt.JwtProperties;
 import com.ssh.dartserver.global.auth.service.jwt.JwtToken;
 import com.ssh.dartserver.global.auth.service.jwt.JwtTokenProvider;
+import com.ssh.dartserver.global.config.properties.JwtProperty;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
@@ -22,7 +22,7 @@ public class ChatPreHandler implements ChannelInterceptor {
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(message);
-        String authorizationHeader = String.valueOf(headerAccessor.getNativeHeader(JwtProperties.HEADER_STRING.getValue()));
+        String authorizationHeader = String.valueOf(headerAccessor.getNativeHeader(JwtProperty.HEADER_STRING));
 
         if (StompCommand.CONNECT.equals(headerAccessor.getCommand())) {
             if (authorizationHeader == null || authorizationHeader.equals("null")) {
@@ -41,7 +41,7 @@ public class ChatPreHandler implements ChannelInterceptor {
     }
 
     private JwtToken getJwtToken(final String authorizationHeader) {
-        return jwtTokenProvider.decode(authorizationHeader.replaceFirst(JwtProperties.TOKEN_PREFIX.getValue(), "")
+        return jwtTokenProvider.decode(authorizationHeader.replaceFirst(JwtProperty.TOKEN_PREFIX, "")
                 .replaceAll("[\\[\\]]", ""));
     }
 }
