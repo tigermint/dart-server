@@ -1,9 +1,7 @@
-package com.ssh.dartserver.domain.user.presentation;
+package com.ssh.dartserver.domain.user.presentation.v1;
 
-import com.ssh.dartserver.domain.user.dto.GuestInviteRequest;
-import com.ssh.dartserver.domain.user.service.GuestService;
-import java.net.URI;
-import javax.validation.Valid;
+import com.ssh.dartserver.domain.user.application.GuestService;
+import com.ssh.dartserver.domain.user.presentation.v1.request.GuestInviteRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,7 +9,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Deprecated
+import javax.validation.Valid;
+import java.net.URI;
+
+@Deprecated(since="20240724", forRemoval = true)
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1/guests")

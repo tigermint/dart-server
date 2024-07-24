@@ -1,35 +1,41 @@
-package com.ssh.dartserver.domain.user.presentation;
+package com.ssh.dartserver.domain.user.presentation.v1;
 
-import com.ssh.dartserver.domain.chat.dto.ChatRoomResponse;
-import com.ssh.dartserver.domain.chat.service.ChatRoomService;
-import com.ssh.dartserver.domain.proposal.dto.ProposalRequest;
-import com.ssh.dartserver.domain.proposal.dto.ProposalResponse;
-import com.ssh.dartserver.domain.proposal.service.ProposalService;
-import com.ssh.dartserver.domain.question.dto.ReceivedQuestionResponse;
-import com.ssh.dartserver.domain.question.service.QuestionService;
-import com.ssh.dartserver.domain.team.dto.TeamRequest;
-import com.ssh.dartserver.domain.team.dto.TeamResponse;
-import com.ssh.dartserver.domain.team.service.MyTeamService;
-import com.ssh.dartserver.domain.user.dto.*;
-import com.ssh.dartserver.domain.user.service.NextVoteService;
-import com.ssh.dartserver.domain.user.service.StudentIdCardVerificationService;
-import com.ssh.dartserver.domain.user.service.UserService;
-import com.ssh.dartserver.domain.vote.dto.ReceivedVoteDetailResponse;
-import com.ssh.dartserver.domain.vote.dto.ReceivedVoteResponse;
-import com.ssh.dartserver.domain.vote.service.VoteService;
+import com.ssh.dartserver.domain.chat.presentation.response.ChatRoomResponse;
+import com.ssh.dartserver.domain.chat.application.ChatRoomService;
+import com.ssh.dartserver.domain.proposal.presentation.request.ProposalRequest;
+import com.ssh.dartserver.domain.proposal.presentation.response.ProposalResponse;
+import com.ssh.dartserver.domain.proposal.application.ProposalService;
+import com.ssh.dartserver.domain.question.presentation.response.ReceivedQuestionResponse;
+import com.ssh.dartserver.domain.question.application.QuestionService;
+import com.ssh.dartserver.domain.team.presentation.request.TeamRequest;
+import com.ssh.dartserver.domain.team.presentation.response.TeamResponse;
+import com.ssh.dartserver.domain.team.application.MyTeamService;
+import com.ssh.dartserver.domain.user.domain.User;
+import com.ssh.dartserver.domain.user.presentation.v1.request.UserSignUpRequest;
+import com.ssh.dartserver.domain.user.presentation.v1.request.UserStudentIdCardVerificationRequest;
+import com.ssh.dartserver.domain.user.presentation.v1.request.UserUpdateRequest;
+import com.ssh.dartserver.domain.user.presentation.v1.response.UserNextVoteResponse;
+import com.ssh.dartserver.domain.user.presentation.v1.response.UserProfileResponse;
+import com.ssh.dartserver.domain.user.presentation.v1.response.UserWithUniversityResponse;
+import com.ssh.dartserver.domain.user.application.NextVoteService;
+import com.ssh.dartserver.domain.user.application.StudentIdCardVerificationService;
+import com.ssh.dartserver.domain.user.application.UserService;
+import com.ssh.dartserver.domain.vote.presentation.response.ReceivedVoteDetailResponse;
+import com.ssh.dartserver.domain.vote.presentation.response.ReceivedVoteResponse;
+import com.ssh.dartserver.domain.vote.application.VoteService;
 import com.ssh.dartserver.global.auth.service.oauth.PrincipalDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
 
-@RestController
+@RestController("userControllerV1")
 @RequiredArgsConstructor
 @RequestMapping("/v1/users")
 public class UserController {
@@ -43,41 +49,48 @@ public class UserController {
     private final ProposalService proposalService;
 
     @PostMapping("/signup")
-    public ResponseEntity<UserProfileResponse> signup(Authentication authentication, @Valid @RequestBody UserSignupRequest request) {
-        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
-        Long userId = userService.signup(principal.getUser(), request);
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(userId)
-                .toUri();
-        return ResponseEntity.created(location).build();
+    public ResponseEntity<UserProfileResponse> signUp(
+            @AuthenticationPrincipal PrincipalDetails principalDetails,
+            @Valid @RequestBody UserSignUpRequest request
+    ) {
+        final User user = userService.signUp(principalDetails.getUser(), request.toPersonalInfo(), request.getUniversityId());
+        return ResponseEntity.created(URI.create("/v1/users/signup/" + user.getId())).build();
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UserProfileResponse> read(Authentication authentication) {
-        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
-        return ResponseEntity.ok(userService.read(principal.getUser().getId()));
+    public ResponseEntity<UserProfileResponse> read(
+            @AuthenticationPrincipal PrincipalDetails principalDetails
+    ) {
+        final User user = userService.read(principalDetails.getUser().getId());
+        return ResponseEntity.ok(UserProfileResponse.of(user));
     }
 
     @PatchMapping("/me")
-    public ResponseEntity<UserProfileResponse> update(Authentication authentication, @Valid @RequestBody UserUpdateRequest request) {
-        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
-        return ResponseEntity.ok(userService.update(principal.getUser(), request));
+    public ResponseEntity<UserProfileResponse> update(
+            @AuthenticationPrincipal PrincipalDetails principalDetails,
+            @Valid @RequestBody UserUpdateRequest request
+    ) {
+        final User user = userService.update(principalDetails.getUser(), request.getNickname(), request.getProfileImageUrl());
+        return ResponseEntity.ok(UserProfileResponse.of(user));
     }
 
     @DeleteMapping("/me")
-    public ResponseEntity<String> delete(Authentication authentication) {
-        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
-        userService.delete(principal.getUser());
+    public ResponseEntity<String> delete(
+            @AuthenticationPrincipal PrincipalDetails principalDetails
+    ) {
+        userService.delete(principalDetails.getUser());
         return ResponseEntity.noContent().build();
     }
 
+    @Deprecated(since="20240724", forRemoval = true)
     @GetMapping("/me/next-voting-time")
     public ResponseEntity<UserNextVoteResponse> readNextVoteAvailableDateTime(Authentication authentication) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         return ResponseEntity.ok(nextVoteService.readNextVoteAvailableDateTime(principal.getUser()));
     }
 
+
+    @Deprecated(since="20240724", forRemoval = true)
     @PostMapping("/me/next-voting-time")
     public ResponseEntity<UserNextVoteResponse> updateNextVoteAvailableDateTime(Authentication authentication) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
@@ -97,7 +110,7 @@ public class UserController {
         return ResponseEntity.ok(myTeamService.readTeam(principal.getUser(), teamId));
     }
 
-    @Deprecated(since="20230901")
+    @Deprecated(since = "20230901")
     @GetMapping("/me/teams")
     public ResponseEntity<List<TeamResponse>> listTeam(Authentication authentication) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
@@ -105,7 +118,7 @@ public class UserController {
     }
 
 
-    @Deprecated(since="20230901")
+    @Deprecated(since = "20230901")
     @PatchMapping("/me/teams/{teamId}")
     public ResponseEntity<TeamResponse> updateTeam(Authentication authentication, @PathVariable Long teamId, @Valid @RequestBody TeamRequest request) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
@@ -119,12 +132,14 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
+    @Deprecated(since="20240724", forRemoval = true)
     @GetMapping("/me/votes/{voteId}")
     public ResponseEntity<ReceivedVoteDetailResponse> readReceivedVote(Authentication authentication, @PathVariable Long voteId) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         return ResponseEntity.ok(voteService.readReceivedVote(principal.getUser(), voteId));
     }
 
+    @Deprecated(since="20240724", forRemoval = true)
     @GetMapping("/me/votes")
     public ResponseEntity<Page<ReceivedVoteResponse>> listReceivedVote(
             Authentication authentication,
@@ -134,6 +149,7 @@ public class UserController {
         return ResponseEntity.ok(voteService.listReceivedVote(principal.getUser(), page, criteria));
     }
 
+    @Deprecated(since="20240724", forRemoval = true)
     @GetMapping("/me/questions")
     public ResponseEntity<List<ReceivedQuestionResponse>> listReceivedQuestion(Authentication authentication) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
@@ -169,6 +185,4 @@ public class UserController {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         return ResponseEntity.ok(proposalService.updateProposal(principal.getUser(), proposalId, request));
     }
-
-
 }
