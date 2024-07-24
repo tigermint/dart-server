@@ -17,10 +17,10 @@ import com.ssh.dartserver.domain.university.dto.mapper.UniversityMapper;
 import com.ssh.dartserver.domain.university.infra.UniversityRepository;
 import com.ssh.dartserver.domain.user.domain.User;
 import com.ssh.dartserver.domain.user.domain.profilequestions.ProfileQuestions;
-import com.ssh.dartserver.domain.user.dto.UserProfileResponse;
-import com.ssh.dartserver.domain.user.dto.mapper.ProfileQuestionMapper;
-import com.ssh.dartserver.domain.user.dto.mapper.UserMapper;
 import com.ssh.dartserver.domain.user.infra.UserRepository;
+import com.ssh.dartserver.domain.user.presentation.v1.response.UserProfileResponse;
+import com.ssh.dartserver.domain.user.service.ProfileQuestionMapper;
+import com.ssh.dartserver.domain.user.service.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -70,6 +70,7 @@ public class MyTeamService {
                 .university(user.getUniversity())
                 .teamUsersCombinationHash(TeamUsersCombinationHash.of(userIds))
                 .build();
+
 
         // TODO request의 SingleTeamFriends NPE 발생가능함
         List<SingleTeamFriend> singleTeamFriends = request.getSingleTeamFriends().stream()
@@ -205,24 +206,31 @@ public class MyTeamService {
 
     @Transactional
     public void deleteTeam(User user, Long teamId) {
+        //teamId로 해당 팀의 TeamUser를 모두 찾는다
         List<TeamUser> teamUsers = teamUserRepository.findAllByTeamId(teamId);
 
+
+        //User가 해당 팀의 멤버인지 확인
         validateTeamUserIsPartOfTeam(user, teamUsers);
 
+        //TeamUser들의 실제 UserID를 모두 찾는다
         List<Long> teamUserIds = teamUsers.stream()
                 .map(TeamUser::getUser)
                 .map(User::getId)
                 .collect(Collectors.toList());
 
+        //삭제된 팀에 속한 채팅방 유저들을 모두 찾아 삭제
         List<ChatRoomUser> chatRoomUsersInTeamUsers = chatRoomUserRepository.findAllByTeamId(teamId).stream()
                 .filter(chatRoomUser -> teamUserIds.contains(chatRoomUser.getUser().getId()))
                 .collect(Collectors.toList());
         chatRoomUserRepository.deleteAll(chatRoomUsersInTeamUsers);
 
+        //팀이 보낸 호감을 찾아 null 처리
         List<Proposal> proposalsOfTeam = proposalRepository.findAllByRequestingTeamIdOrRequestedTeamId(teamId, teamId);
         proposalsOfTeam.forEach(proposal -> proposal.updateProposalOnTeamDeletion(teamId));
-        singleTeamFriendRepository.deleteAllByTeamId(teamId);
 
+        //팀과 관련된 정보 제거 -> 왜 이거 다해놨지? Cascade 되는거 아닌가?
+        singleTeamFriendRepository.deleteAllByTeamId(teamId);
         teamUserRepository.deleteAllByTeamId(teamId);
         teamRegionRepository.deleteAllByTeamId(teamId);
         teamRepository.deleteById(teamId);

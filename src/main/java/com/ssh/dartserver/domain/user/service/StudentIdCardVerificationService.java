@@ -5,11 +5,10 @@ import com.ssh.dartserver.domain.university.dto.mapper.UniversityMapper;
 import com.ssh.dartserver.domain.university.infra.UniversityRepository;
 import com.ssh.dartserver.domain.user.domain.User;
 import com.ssh.dartserver.domain.user.domain.studentverificationinfo.StudentIdCardVerificationStatus;
-import com.ssh.dartserver.domain.user.dto.UserStudentIdCardVerificationRequest;
-import com.ssh.dartserver.domain.user.dto.UserWithUniversityResponse;
-import com.ssh.dartserver.domain.user.dto.mapper.UserMapper;
 import com.ssh.dartserver.domain.user.infra.UserRepository;
 import com.ssh.dartserver.domain.user.infra.VerifyMessageSender;
+import com.ssh.dartserver.domain.user.presentation.v1.request.UserStudentIdCardVerificationRequest;
+import com.ssh.dartserver.domain.user.presentation.v1.response.UserWithUniversityResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 @RequiredArgsConstructor

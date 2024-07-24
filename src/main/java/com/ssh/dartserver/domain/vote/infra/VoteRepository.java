@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -40,10 +41,12 @@ public interface VoteRepository extends JpaRepository<Vote, Long> {
     Page<Vote> findAllByPickedUser(@Param("pickedUser") User pickedUser, Pageable pageable);
 
     @Modifying
+    @Transactional
     @Query("update Vote v set v.pickingUser = null where v.pickingUser = :user")
     void updateAllPickingUserToNull(@Param("user") User user);
 
     @Modifying
+    @Transactional
     @Query("delete from Vote v where v in :pickedUserVotes")
     void deleteAllByVoteIn(@Param("pickedUserVotes") List<Vote> pickedUserVotes);
 }

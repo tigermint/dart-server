@@ -5,7 +5,7 @@ import com.ssh.dartserver.domain.question.dto.mapper.QuestionMapper;
 import com.ssh.dartserver.domain.question.infra.QuestionRepository;
 import com.ssh.dartserver.domain.university.dto.mapper.UniversityMapper;
 import com.ssh.dartserver.domain.user.domain.User;
-import com.ssh.dartserver.domain.user.dto.mapper.UserMapper;
+import com.ssh.dartserver.domain.user.service.UserMapper;
 import com.ssh.dartserver.domain.user.infra.UserRepository;
 import com.ssh.dartserver.domain.vote.domain.Candidate;
 import com.ssh.dartserver.domain.vote.domain.Vote;

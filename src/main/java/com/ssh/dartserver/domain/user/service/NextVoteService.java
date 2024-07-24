@@ -1,9 +1,8 @@
 package com.ssh.dartserver.domain.user.service;
 
 import com.ssh.dartserver.domain.user.domain.User;
-import com.ssh.dartserver.domain.user.dto.UserNextVoteResponse;
-import com.ssh.dartserver.domain.user.dto.mapper.UserMapper;
 import com.ssh.dartserver.domain.user.infra.UserRepository;
+import com.ssh.dartserver.domain.user.presentation.v1.response.UserNextVoteResponse;
 import com.ssh.dartserver.global.infra.notification.PlatformNotification;
 import com.ssh.dartserver.global.util.DateTimeUtil;
 import lombok.RequiredArgsConstructor;
