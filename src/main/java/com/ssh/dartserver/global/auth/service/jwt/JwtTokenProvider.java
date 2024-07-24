@@ -24,10 +24,10 @@ public class JwtTokenProvider {
     //JWT 토큰 생성
     public String createToken(User user) {
         return JWT.create()
-                .withSubject(user.getUsername())
+                .withSubject(user.getAuthInfo().getUsername())
                 .withExpiresAt(new Date(System.currentTimeMillis() + Integer.parseInt(JwtProperties.EXPIRATION_TIME.getValue())))
                 .withClaim("id", user.getId())
-                .withClaim("username", user.getUsername())
+                .withClaim("username", user.getAuthInfo().getUsername())
                 .sign(Algorithm.HMAC512(JwtProperties.SECRET.getValue()));
     }
 

@@ -38,7 +38,7 @@ public class RandomNicknameGenerator {
         throw new IllegalStateException("Utility class");
     }
 
-    public static String create() {
+    public static String generate() {
         String adjective = ADJECTIVES.get(random.nextInt(ADJECTIVES.size()));
         String noun = NOUNS.get(random.nextInt(NOUNS.size()));
         return adjective + " " + noun;

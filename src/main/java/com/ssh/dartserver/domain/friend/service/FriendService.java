@@ -8,8 +8,8 @@ import com.ssh.dartserver.domain.friend.dto.mapper.FriendMapper;
 import com.ssh.dartserver.domain.friend.infra.FriendRepository;
 import com.ssh.dartserver.domain.university.dto.mapper.UniversityMapper;
 import com.ssh.dartserver.domain.user.domain.User;
-import com.ssh.dartserver.domain.user.domain.recommendcode.RecommendationCode;
-import com.ssh.dartserver.domain.user.dto.mapper.UserMapper;
+import com.ssh.dartserver.domain.user.domain.RecommendationCode;
+import com.ssh.dartserver.domain.user.service.UserMapper;
 import com.ssh.dartserver.domain.user.infra.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -44,7 +44,7 @@ public class FriendService {
 
     @Transactional
     public Long createFriendByRecommendationCode(User user, FriendRecommendationCodeRequest request) {
-        User friendUser = userRepository.findByRecommendationCode(new RecommendationCode(request.getRecommendationCode()))
+        User friendUser = userRepository.findByRecommendationCode(RecommendationCode.from(request.getRecommendationCode()))
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 추천인 코드입니다."));
 
         validateIsAlreadyFriend(user, friendUser);

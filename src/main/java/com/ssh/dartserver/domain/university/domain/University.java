@@ -1,18 +1,13 @@
 package com.ssh.dartserver.domain.university.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.*;
 
 @Entity
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @BatchSize(size = 500)
 public class University {
     @Id
@@ -41,4 +36,30 @@ public class University {
 
     private String years;
 
+    @Builder
+    private University(
+            final Long id,
+            final String area,
+            final String name,
+            final String type,
+            final String department,
+            final String state,
+            final String div0,
+            final String div1,
+            final String div2,
+            final String div3,
+            final String years
+    ) {
+        this.id = id;
+        this.area = area;
+        this.name = name;
+        this.type = type;
+        this.department = department;
+        this.state = state;
+        this.div0 = div0;
+        this.div1 = div1;
+        this.div2 = div2;
+        this.div3 = div3;
+        this.years = years;
+    }
 }

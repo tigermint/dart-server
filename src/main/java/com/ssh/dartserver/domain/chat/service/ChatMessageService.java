@@ -83,7 +83,7 @@ public class ChatMessageService {
 
         List<Long> userIds = chatRoomUsers.stream()
                 .map(ChatRoomUser::getUser)
-                .filter(userInChatRoom -> !activeUserStore.isUserActive(userInChatRoom.getUsername()))
+                .filter(userInChatRoom -> !activeUserStore.isUserActive(userInChatRoom.getAuthInfo().getUsername()))
                 .map(User::getId)
                 .collect(Collectors.toList());
 
