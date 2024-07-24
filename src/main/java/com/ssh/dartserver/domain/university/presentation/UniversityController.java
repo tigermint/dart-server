@@ -1,7 +1,7 @@
 package com.ssh.dartserver.domain.university.presentation;
 
-import com.ssh.dartserver.domain.university.dto.UniversityResponse;
-import com.ssh.dartserver.domain.university.service.UniversityService;
+import com.ssh.dartserver.domain.university.presentation.response.UniversityResponse;
+import com.ssh.dartserver.domain.university.application.UniversityService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@Deprecated
+@Deprecated(since="20240724")
 @RequiredArgsConstructor
 @RestController
 public class UniversityController {

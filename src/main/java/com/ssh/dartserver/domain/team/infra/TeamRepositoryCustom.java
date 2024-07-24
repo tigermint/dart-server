@@ -1,7 +1,7 @@
 package com.ssh.dartserver.domain.team.infra;
 
 import com.ssh.dartserver.domain.team.domain.Team;
-import com.ssh.dartserver.domain.team.dto.TeamSearchCondition;
+import com.ssh.dartserver.domain.team.domain.TeamSearchCondition;
 import com.ssh.dartserver.domain.user.domain.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

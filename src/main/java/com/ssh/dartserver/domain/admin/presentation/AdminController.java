@@ -1,6 +1,6 @@
 package com.ssh.dartserver.domain.admin.presentation;
 
-import com.ssh.dartserver.domain.admin.service.AdminIdCardService;
+import com.ssh.dartserver.domain.admin.application.AdminIdCardService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+@Deprecated(since="20240724")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1/admin")

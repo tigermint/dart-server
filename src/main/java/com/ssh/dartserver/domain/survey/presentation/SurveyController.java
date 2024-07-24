@@ -1,11 +1,11 @@
 package com.ssh.dartserver.domain.survey.presentation;
 
-import com.ssh.dartserver.domain.survey.dto.AnswerRequest;
-import com.ssh.dartserver.domain.survey.dto.CommentRequest;
-import com.ssh.dartserver.domain.survey.dto.SurveyResponse;
-import com.ssh.dartserver.domain.survey.service.AnswerService;
-import com.ssh.dartserver.domain.survey.service.CommentService;
-import com.ssh.dartserver.domain.survey.service.SurveyService;
+import com.ssh.dartserver.domain.survey.presentation.request.AnswerRequest;
+import com.ssh.dartserver.domain.survey.presentation.request.CommentRequest;
+import com.ssh.dartserver.domain.survey.presentation.response.SurveyResponse;
+import com.ssh.dartserver.domain.survey.application.AnswerService;
+import com.ssh.dartserver.domain.survey.application.CommentService;
+import com.ssh.dartserver.domain.survey.application.SurveyService;
 import com.ssh.dartserver.global.auth.service.oauth.PrincipalDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -18,7 +18,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.validation.Valid;
 import java.net.URI;
 
-@Deprecated
+@Deprecated(since="20240724", forRemoval = true)
 @RestController
 @RequestMapping("/v1/surveys")
 @RequiredArgsConstructor
@@ -47,10 +47,7 @@ public class SurveyController {
         return ResponseEntity.ok(answerService.createAnswer(principal.getUser(), surveyId, request));
     }
 
-    /**
-     * @deprecated
-     */
-    @Deprecated(since = "2023-11-08", forRemoval = false)
+    @Deprecated(since = "20231108", forRemoval = true)
     @PatchMapping("/{surveyId}/answers/{answerId}")
     public ResponseEntity<SurveyResponse.ReadDto> updateAnswer(Authentication authentication,
                                                                @PathVariable("surveyId") Long surveyId,
