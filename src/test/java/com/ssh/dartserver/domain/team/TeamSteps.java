@@ -1,6 +1,6 @@
 package com.ssh.dartserver.domain.team;
 
-import com.ssh.dartserver.domain.team.dto.TeamRequest;
+import com.ssh.dartserver.domain.team.presentation.request.TeamRequest;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
