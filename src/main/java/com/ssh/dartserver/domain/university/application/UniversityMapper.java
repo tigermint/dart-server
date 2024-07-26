@@ -10,4 +10,5 @@ public interface UniversityMapper {
     UniversityMapper INSTANCE = Mappers.getMapper(UniversityMapper.class);
 
     UniversityResponse toUniversityResponse(University university);
+    UniversityResponse toUniversityResponse(String name);
 }
