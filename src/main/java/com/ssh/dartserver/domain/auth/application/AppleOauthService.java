@@ -6,7 +6,6 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssh.dartserver.domain.auth.domain.OauthProvider;
-import com.ssh.dartserver.domain.user.domain.User;
 import com.ssh.dartserver.domain.user.infra.UserRepository;
 import com.ssh.dartserver.domain.auth.domain.AppleUser;
 import com.ssh.dartserver.domain.auth.domain.OAuthUserInfo;
@@ -27,7 +26,6 @@ import java.security.spec.RSAPublicKeySpec;
 import java.util.Base64;
 import java.util.Map;
 import java.util.Optional;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -35,8 +33,8 @@ import org.springframework.stereotype.Service;
 public class AppleOauthService extends OauthServiceAbstract {
     private final AppleOauthApi appleOauthApi;
 
-    public AppleOauthService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder, JwtTokenProvider jwtTokenProvider, AppleOauthApi appleOauthApi) {
-        super(userRepository, bCryptPasswordEncoder, jwtTokenProvider);
+    public AppleOauthService(UserRepository userRepository, JwtTokenProvider jwtTokenProvider, AppleOauthApi appleOauthApi) {
+        super(userRepository, jwtTokenProvider);
         this.appleOauthApi = appleOauthApi;
     }
 
@@ -50,11 +48,7 @@ public class AppleOauthService extends OauthServiceAbstract {
             final Map<String, Object> possiblePayloadMap = appleJwtToken.getPossiblePayloadMap(applePublicKeys);
             OAuthUserInfo appleUser = new AppleUser(possiblePayloadMap);
 
-            //apple username 검색을 통한 기존 유저 확인
-            User userEntity = userRepository.findByAuthInfo_Username("apple_" + appleJwtToken.getSub())
-                .orElse(null);
-
-            return getTokenResponseDto(appleUser, userEntity);
+            return getTokenResponseDto(appleUser);
         } catch (ApplePublicKeyNotFoundException | AppleLoginFailedException e) {
             throw e;
         } catch (Exception e) {
