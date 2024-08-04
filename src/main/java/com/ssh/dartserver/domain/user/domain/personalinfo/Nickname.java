@@ -1,6 +1,5 @@
 package com.ssh.dartserver.domain.user.domain.personalinfo;
 
-import com.ssh.dartserver.global.util.RandomNicknameGenerator;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,6 +11,9 @@ import javax.persistence.Embeddable;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Nickname {
+
+    private static final int MAX_LENGTH = 10;
+
     @Column(name = "nickname")
     private String value;
 
@@ -20,8 +22,8 @@ public class Nickname {
         this.value = value;
     }
 
-    public static Nickname newInstance() {
-        return new Nickname(RandomNicknameGenerator.generate());
+    public static Nickname createRandomNickname() {
+        return new Nickname(RandomNicknameGenerator.generate(MAX_LENGTH));
     }
 
     public static Nickname from(String value) {
@@ -29,9 +31,8 @@ public class Nickname {
     }
 
     private void validateLength(String value) {
-        if (value.length() > 10) {
-            throw new IllegalArgumentException("닉네임은 10글자 이하만 가능합니다.");
+        if (value.length() > MAX_LENGTH) {
+            throw new IllegalArgumentException(String.format("닉네임은 %d글자 이하만 가능합니다.", MAX_LENGTH));
         }
     }
-
 }

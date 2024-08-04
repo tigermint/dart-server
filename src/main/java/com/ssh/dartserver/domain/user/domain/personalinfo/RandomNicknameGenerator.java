@@ -1,4 +1,4 @@
-package com.ssh.dartserver.global.util;
+package com.ssh.dartserver.domain.user.domain.personalinfo;
 
 import java.util.List;
 import java.util.Random;
@@ -38,9 +38,13 @@ public class RandomNicknameGenerator {
         throw new IllegalStateException("Utility class");
     }
 
-    public static String generate() {
-        String adjective = ADJECTIVES.get(random.nextInt(ADJECTIVES.size()));
-        String noun = NOUNS.get(random.nextInt(NOUNS.size()));
-        return adjective + " " + noun;
+    public static String generate(final int length) {
+        String nickname;
+        do {
+            String adjective = ADJECTIVES.get(random.nextInt(ADJECTIVES.size()));
+            String noun = NOUNS.get(random.nextInt(NOUNS.size()));
+            nickname = adjective + " " + noun;
+        } while (nickname.length() > length);
+        return nickname;
     }
 }
