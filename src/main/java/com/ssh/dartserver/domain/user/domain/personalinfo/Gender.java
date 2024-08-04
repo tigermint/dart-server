@@ -5,8 +5,13 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 
 public enum Gender {
-    MALE("MALE","남"), FEMALE("FEMALE", "여"), UNKNOWN("UNKNOWN", "알수없음");
+    MALE("MALE","남"),
+    FEMALE("FEMALE", "여"),
+    UNKNOWN("UNKNOWN", "알수없음");
+
     private final String value;
+
+    @Deprecated(since = "20240804", forRemoval = true)
     @Getter
     private final String korValue;
 
@@ -29,5 +34,4 @@ public enum Gender {
     public String getValue() {
         return value;
     }
-
 }
