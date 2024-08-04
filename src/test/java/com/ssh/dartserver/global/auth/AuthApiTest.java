@@ -5,9 +5,9 @@ import static com.ssh.dartserver.global.auth.AuthSteps.카카오로그인요청;
 import static org.assertj.core.api.Assertions.*;
 
 import com.ssh.dartserver.ApiTest;
-import com.ssh.dartserver.global.auth.dto.AppleTokenRequest;
-import com.ssh.dartserver.global.auth.dto.KakaoTokenRequest;
-import com.ssh.dartserver.global.auth.dto.TokenResponse;
+import com.ssh.dartserver.domain.auth.presentation.request.AppleTokenRequest;
+import com.ssh.dartserver.domain.auth.presentation.request.KakaoTokenRequest;
+import com.ssh.dartserver.domain.auth.presentation.response.TokenResponse;
 import com.ssh.dartserver.testing.IntegrationTest;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;

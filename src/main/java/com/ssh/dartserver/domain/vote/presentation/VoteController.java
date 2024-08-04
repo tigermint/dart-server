@@ -2,7 +2,7 @@ package com.ssh.dartserver.domain.vote.presentation;
 
 import com.ssh.dartserver.domain.vote.application.VoteService;
 import com.ssh.dartserver.domain.vote.presentation.request.VoteResultRequest;
-import com.ssh.dartserver.global.auth.service.oauth.PrincipalDetails;
+import com.ssh.dartserver.global.security.PrincipalDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;

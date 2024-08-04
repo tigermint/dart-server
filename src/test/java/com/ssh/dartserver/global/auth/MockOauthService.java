@@ -1,16 +1,13 @@
 package com.ssh.dartserver.global.auth;
 
 import com.ssh.dartserver.domain.user.domain.User;
-import com.ssh.dartserver.domain.user.domain.personalinfo.Gender;
-import com.ssh.dartserver.domain.user.domain.personalinfo.PersonalInfo;
 import com.ssh.dartserver.domain.user.infra.UserRepository;
-import com.ssh.dartserver.global.auth.dto.AppleTokenRequest;
-import com.ssh.dartserver.global.auth.dto.KakaoTokenRequest;
-import com.ssh.dartserver.global.auth.dto.TokenResponse;
-import com.ssh.dartserver.global.auth.service.OauthService;
-import com.ssh.dartserver.global.auth.service.jwt.JwtToken;
-import com.ssh.dartserver.global.auth.service.jwt.JwtTokenProvider;
-import com.ssh.dartserver.global.common.Role;
+import com.ssh.dartserver.domain.auth.presentation.request.AppleTokenRequest;
+import com.ssh.dartserver.domain.auth.presentation.request.KakaoTokenRequest;
+import com.ssh.dartserver.domain.auth.presentation.response.TokenResponse;
+import com.ssh.dartserver.domain.auth.application.OauthService;
+import com.ssh.dartserver.global.security.jwt.JwtToken;
+import com.ssh.dartserver.global.security.jwt.JwtTokenProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 

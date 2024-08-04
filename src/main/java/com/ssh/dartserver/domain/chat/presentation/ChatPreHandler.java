@@ -1,8 +1,8 @@
 package com.ssh.dartserver.domain.chat.presentation;
 
 import com.ssh.dartserver.domain.chat.application.ActiveUserStore;
-import com.ssh.dartserver.global.auth.service.jwt.JwtToken;
-import com.ssh.dartserver.global.auth.service.jwt.JwtTokenProvider;
+import com.ssh.dartserver.global.security.jwt.JwtToken;
+import com.ssh.dartserver.global.security.jwt.JwtTokenProvider;
 import com.ssh.dartserver.global.config.properties.JwtProperty;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.Message;

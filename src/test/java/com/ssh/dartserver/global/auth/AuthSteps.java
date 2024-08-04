@@ -1,7 +1,7 @@
 package com.ssh.dartserver.global.auth;
 
-import com.ssh.dartserver.global.auth.dto.AppleTokenRequest;
-import com.ssh.dartserver.global.auth.dto.KakaoTokenRequest;
+import com.ssh.dartserver.domain.auth.presentation.request.AppleTokenRequest;
+import com.ssh.dartserver.domain.auth.presentation.request.KakaoTokenRequest;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;

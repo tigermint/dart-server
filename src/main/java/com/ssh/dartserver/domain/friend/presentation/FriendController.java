@@ -4,7 +4,7 @@ import com.ssh.dartserver.domain.friend.application.FriendService;
 import com.ssh.dartserver.domain.friend.presentation.request.FriendRecommendationCodeRequest;
 import com.ssh.dartserver.domain.friend.presentation.request.FriendRequest;
 import com.ssh.dartserver.domain.friend.presentation.response.FriendResponse;
-import com.ssh.dartserver.global.auth.service.oauth.PrincipalDetails;
+import com.ssh.dartserver.global.security.PrincipalDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
