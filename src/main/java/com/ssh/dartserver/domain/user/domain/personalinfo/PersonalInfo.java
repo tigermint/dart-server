@@ -64,7 +64,7 @@ public class PersonalInfo {
     ) {
         return PersonalInfo.builder()
                 .name(Name.from(name))
-                .nickname(Nickname.newInstance())
+                .nickname(Nickname.createRandomNickname())
                 .phone(Phone.from(phone))
                 .profileImageUrl(ProfileImageUrl.newInstance())
                 .gender(gender)

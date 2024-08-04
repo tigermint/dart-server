@@ -97,7 +97,7 @@ public class User extends BaseTimeEntity {
     ) {
         this.personalInfo = personalInfo;
         this.studentVerificationInfo = StudentVerificationInfo.newInstance();
-        this.recommendationCode = RecommendationCode.newInstance();
+        this.recommendationCode = RecommendationCode.createRandomRecommendationCode();
         this.point = Point.newInstance();
         this.role = Role.USER;
         this.university = university;
