@@ -1,7 +1,7 @@
 package com.ssh.dartserver.domain.vote.presentation;
 
-import com.ssh.dartserver.domain.vote.dto.VoteResultRequest;
-import com.ssh.dartserver.domain.vote.service.VoteService;
+import com.ssh.dartserver.domain.vote.application.VoteService;
+import com.ssh.dartserver.domain.vote.presentation.request.VoteResultRequest;
 import com.ssh.dartserver.global.auth.service.oauth.PrincipalDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -9,13 +9,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
-import org.springframework.web.bind.annotation.RestController;
 import java.net.URI;
 
-@Deprecated
+@Deprecated(since="20240724", forRemoval = true)
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/v1/votes")

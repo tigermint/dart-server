@@ -1,6 +1,6 @@
 package com.ssh.dartserver.domain.chat.presentation;
 
-import com.ssh.dartserver.domain.chat.service.ActiveUserStore;
+import com.ssh.dartserver.domain.chat.application.ActiveUserStore;
 import com.ssh.dartserver.global.auth.service.jwt.JwtProperties;
 import com.ssh.dartserver.global.auth.service.jwt.JwtTokenProvider;
 import com.ssh.dartserver.global.error.CertificationException;

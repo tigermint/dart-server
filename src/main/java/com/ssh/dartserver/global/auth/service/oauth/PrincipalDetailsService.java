@@ -15,7 +15,7 @@ public class PrincipalDetailsService implements UserDetailsService {
 
     @Override
     public PrincipalDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username)
+        User user = userRepository.findByAuthInfo_Username(username)
                 .orElseThrow(() -> new CertificationException("존재하지 않는 유저입니다."));
         return new PrincipalDetails(user);
     }

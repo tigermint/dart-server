@@ -1,6 +1,6 @@
 package com.ssh.dartserver.domain.user.domain.personalinfo;
 
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,11 +10,9 @@ import javax.persistence.Embedded;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 
-@Getter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 @Embeddable
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PersonalInfo {
     @Embedded
     private Name name;
@@ -38,6 +36,43 @@ public class PersonalInfo {
     private ProfileImageUrl profileImageUrl;
 
 
+    @Builder
+    private PersonalInfo(
+            final Name name,
+            final Nickname nickname,
+            final Phone phone,
+            final Gender gender,
+            final AdmissionYear admissionYear,
+            final BirthYear birthYear,
+            final ProfileImageUrl profileImageUrl
+    ) {
+        this.name = name;
+        this.nickname = nickname;
+        this.phone = phone;
+        this.gender = gender;
+        this.admissionYear = admissionYear;
+        this.birthYear = birthYear;
+        this.profileImageUrl = profileImageUrl;
+    }
+
+    public static PersonalInfo of(
+            final String name,
+            final String phone,
+            final Gender gender,
+            final int admissionYear,
+            final int birthYear
+    ) {
+        return PersonalInfo.builder()
+                .name(Name.from(name))
+                .nickname(Nickname.createRandomNickname())
+                .phone(Phone.from(phone))
+                .profileImageUrl(ProfileImageUrl.newInstance())
+                .gender(gender)
+                .admissionYear(AdmissionYear.from(admissionYear))
+                .birthYear(BirthYear.from(birthYear))
+                .build();
+    }
+
     public void updateNickname(String value) {
         this.nickname = Nickname.from(value);
     }
@@ -46,3 +81,4 @@ public class PersonalInfo {
         this.profileImageUrl = ProfileImageUrl.from(value);
     }
 }
+

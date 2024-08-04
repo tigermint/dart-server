@@ -1,14 +1,11 @@
 package com.ssh.dartserver.domain.university.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
+import com.ssh.dartserver.domain.university.application.UniversityMapperImpl;
+import com.ssh.dartserver.domain.university.application.UniversityService;
 import com.ssh.dartserver.domain.university.domain.University;
-import com.ssh.dartserver.domain.university.dto.UniversityResponse;
-import com.ssh.dartserver.domain.university.dto.UniversitySearchRequest;
-import com.ssh.dartserver.domain.university.dto.mapper.UniversityMapperImpl;
 import com.ssh.dartserver.domain.university.infra.UniversityRepository;
-import java.util.List;
-import java.util.stream.Stream;
+import com.ssh.dartserver.domain.university.presentation.response.UniversityResponse;
+import com.ssh.dartserver.domain.university.presentation.response.UniversitySearchRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,6 +19,11 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+
+import java.util.List;
+import java.util.stream.Stream;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @ExtendWith(MockitoExtension.class)
 class UniversityServiceTest {
@@ -56,10 +58,10 @@ class UniversityServiceTest {
 
     private static Stream<Arguments> keywordAndResultProvider() {
         return Stream.of(
-            // 검색 키워드, 검색 반환 리스트
-            Arguments.arguments("인천", List.of("인천대학교", "인천국제대학교")),
-            Arguments.arguments("서울", List.of("서울대학교")),
-            Arguments.arguments("검색결과없음", List.of())
+                // 검색 키워드, 검색 반환 리스트
+                Arguments.arguments("인천", List.of("인천대학교", "인천국제대학교")),
+                Arguments.arguments("서울", List.of("서울대학교")),
+                Arguments.arguments("검색결과없음", List.of())
         );
     }
 
@@ -74,13 +76,13 @@ class UniversityServiceTest {
         request.setSize(size);
 
         Mockito.when(universityRepository.findDistinctByNameAndDepartmentStartsWith(request.getName(), request.getDepartment(),
-            PageRequest.of(0, size, Sort.by("id").ascending()))).thenReturn(
-            List.of(
-                new University(1L, "인천대학교", "사회과", "인천"),
-                new University(2L, "인천대학교", "사회사회과", "인천"),
-                new University(3L, "인천대학교", "사회과학과", "인천"),
-                new University(4L, "인천대학교", "사회환원과", "인천")
-            )
+                PageRequest.of(0, size, Sort.by("id").ascending()))).thenReturn(
+                List.of(
+                        University.builder().id(1L).name("인천대학교").department("사회과").area("인천").build(),
+                        University.builder().id(2L).name("인천대학교").department("사회사회과").area("인천").build(),
+                        University.builder().id(3L).name("인천대학교").department("사회과학과").area("인천").build(),
+                        University.builder().id(4L).name("인천대학교").department("사회환원과").area("인천").build()
+                )
         );
 
         // when

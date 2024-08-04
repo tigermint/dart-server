@@ -5,22 +5,17 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssh.dartserver.domain.user.domain.User;
-import com.ssh.dartserver.domain.user.domain.personalinfo.Gender;
-import com.ssh.dartserver.domain.user.domain.personalinfo.PersonalInfo;
 import com.ssh.dartserver.domain.user.infra.UserRepository;
 import com.ssh.dartserver.global.auth.domain.AppleUser;
 import com.ssh.dartserver.global.auth.domain.KakaoUser;
 import com.ssh.dartserver.global.auth.domain.OAuthUserInfo;
 import com.ssh.dartserver.global.auth.dto.*;
 import com.ssh.dartserver.global.auth.infra.OAuthRestTemplate;
-import com.ssh.dartserver.global.auth.service.jwt.JwtProperties;
 import com.ssh.dartserver.global.auth.service.jwt.JwtTokenProvider;
-import com.ssh.dartserver.global.common.Role;
 import com.ssh.dartserver.global.error.AppleLoginFailedException;
 import com.ssh.dartserver.global.error.ApplePublicKeyNotFoundException;
 import com.ssh.dartserver.global.error.KakaoLoginFailedException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
@@ -39,15 +34,12 @@ import java.util.Optional;
 public class OAuthService {
     private final OAuthRestTemplate oauthRestTemplate;
     private final UserRepository userRepository;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
 
     public TokenResponse createTokenForKakao(KakaoTokenRequest request) {
         return oauthRestTemplate.getKakaoUserInfo(request.getAccessToken()).map(userInfo -> {
             OAuthUserInfo kakaoUser = new KakaoUser(userInfo);
-            User userEntity = userRepository.findByUsername(kakaoUser.getProvider() + "_" + kakaoUser.getProviderId())
-                    .orElse(null);
-            return getTokenResponseDto(kakaoUser, userEntity);
+            return getTokenResponse(kakaoUser);
         }).orElseThrow(() -> new KakaoLoginFailedException("카카오 로그인에 실패하였습니다."));
     }
 
@@ -82,42 +74,13 @@ public class OAuthService {
 
             OAuthUserInfo appleUser = new AppleUser(possiblePayloadMap);
 
-            //apple username 검색을 통한 기존 유저 확인
-            User userEntity = userRepository.findByUsername("apple_" + payload.get("sub"))
-                    .orElse(null);
+            return getTokenResponse(appleUser);
 
-            return getTokenResponseDto(appleUser, userEntity);
         } catch (ApplePublicKeyNotFoundException | AppleLoginFailedException e) {
             throw e;
         } catch (Exception e) {
             throw new AppleLoginFailedException("유효하지 않은 Apple 토큰입니다", e);
         }
-    }
-
-    private TokenResponse getTokenResponseDto(OAuthUserInfo oauthUser, User userEntity) {
-        if (userEntity == null) {
-            User userRequest = User.builder()
-                    .username(oauthUser.getProvider() + "_" + oauthUser.getProviderId())
-                    .password(bCryptPasswordEncoder.encode(JwtProperties.SECRET.getValue()))
-                    .provider(oauthUser.getProvider())
-                    .providerId(oauthUser.getProviderId())
-                    .role(Role.USER)
-                    .personalInfo(PersonalInfo.builder()
-                            .gender(Gender.UNKNOWN)
-                            .build())
-                    .build();
-            userEntity = userRepository.save(userRequest);
-        }
-
-        //jwt 토큰 생성
-        String jwtToken = jwtTokenProvider.createToken(userEntity);
-        return TokenResponse.builder()
-                .jwtToken(jwtToken)
-                .tokenType("BEARER")
-                .expiresAt(jwtTokenProvider.getExpiresAt(jwtToken))
-                .providerId(userEntity.getProviderId())
-                .providerType(userEntity.getProvider())
-                .build();
     }
 
     private static Optional<RSAPublicKey> getPublicKey(String modulusBase64, String exponentBase64) {
@@ -134,6 +97,35 @@ public class OAuthService {
         }
     }
 
+    private TokenResponse getTokenResponse(final OAuthUserInfo oauthUser) {
+        final User user = readOrCreateUser(oauthUser);
+
+        //jwt 토큰 생성
+        String jwtToken = jwtTokenProvider.createToken(user);
+        return TokenResponse.builder()
+                .jwtToken(jwtToken)
+                .tokenType("BEARER")
+                .expiresAt(jwtTokenProvider.getExpiresAt(jwtToken))
+                .providerId(user.getAuthInfo().getProviderId())
+                .providerType(user.getAuthInfo().getProvider())
+                .build();
+    }
+
+    private User readOrCreateUser(final OAuthUserInfo oauthUser) {
+        String username = oauthUser.getProvider() + "_" + oauthUser.getProviderId();
+
+        return userRepository.findByAuthInfo_Username(username)
+                .orElseGet(() -> createUser(oauthUser));
+    }
+
+    private User createUser(final OAuthUserInfo oauthUser) {
+        User user = User.of(
+                oauthUser.getProvider() + "_" + oauthUser.getProviderId(),
+                oauthUser.getProviderId(),
+                oauthUser.getProvider()
+        );
+        return userRepository.save(user);
+    }
 }
 
 

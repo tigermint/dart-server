@@ -2,8 +2,8 @@ package com.ssh.dartserver;
 
 import com.ssh.dartserver.domain.user.domain.User;
 import com.ssh.dartserver.domain.user.domain.personalinfo.Gender;
-import com.ssh.dartserver.domain.user.dto.UserSignupRequest;
-import com.ssh.dartserver.domain.user.service.UserService;
+import com.ssh.dartserver.domain.user.presentation.v1.request.UserSignUpRequest;
+import com.ssh.dartserver.domain.user.application.UserService;
 import com.ssh.dartserver.global.auth.dto.AppleTokenRequest;
 import com.ssh.dartserver.global.auth.dto.KakaoTokenRequest;
 import com.ssh.dartserver.global.auth.dto.TokenResponse;
@@ -74,14 +74,14 @@ public class UserManager {
      * @param request 회원가입시 입력하는 정보 DTO
      * @return
      */
-    public TokenResponse createUserWithInformation(UserSignupRequest request) {
+    public TokenResponse createUserWithInformation(UserSignUpRequest request) {
         final TokenResponse tokenResponse = kakaoLogin("abcdefghijklmnop" + UUID.randomUUID());
         final String jwtToken = tokenResponse.getJwtToken();
 
         final Authentication authentication = jwtTokenProvider.getAuthentication(jwtToken);
         final User user = ((PrincipalDetails) authentication.getPrincipal()).getUser();
 
-        userService.signup(user, request);
+        userService.signUp(user, request.toPersonalInfo(), request.getUniversityId());
         return tokenResponse;
     }
 
@@ -90,7 +90,7 @@ public class UserManager {
      * @return
      */
     public TokenResponse createTestUserWithInformation() {
-        final UserSignupRequest signupRequest = UserSignupRequest.builder()
+        final UserSignUpRequest signupRequest = UserSignUpRequest.builder()
             .universityId(1L)
             .admissionYear(2010)
             .birthYear(2005)
@@ -109,7 +109,7 @@ public class UserManager {
      */
 
     public TokenResponse createTestUserWithInformation(Gender gender) {
-        final UserSignupRequest signupRequest = UserSignupRequest.builder()
+        final UserSignUpRequest signupRequest = UserSignUpRequest.builder()
                 .universityId(1L)
                 .admissionYear(2010)
                 .birthYear(2005)

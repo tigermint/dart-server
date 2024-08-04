@@ -1,27 +1,28 @@
 package com.ssh.dartserver.domain.user;
 
-import static com.ssh.dartserver.domain.university.UniversitySteps.*;
-import static com.ssh.dartserver.domain.user.UserSteps.*;
-import static org.assertj.core.api.Assertions.*;
-
 import com.ssh.dartserver.ApiTest;
 import com.ssh.dartserver.UserManager;
 import com.ssh.dartserver.domain.university.domain.University;
 import com.ssh.dartserver.domain.university.infra.UniversityRepository;
-import com.ssh.dartserver.domain.user.dto.UserProfileResponse;
-import com.ssh.dartserver.domain.user.dto.UserSignupRequest;
-import com.ssh.dartserver.domain.user.dto.UserUpdateRequest;
+import com.ssh.dartserver.domain.user.presentation.v1.request.UserSignUpRequest;
+import com.ssh.dartserver.domain.user.presentation.v1.request.UserUpdateRequest;
+import com.ssh.dartserver.domain.user.presentation.v1.response.UserProfileResponse;
 import com.ssh.dartserver.testing.IntegrationTest;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
+import java.util.List;
+
+import static com.ssh.dartserver.domain.university.UniversitySteps.대학생성요청_생성;
+import static com.ssh.dartserver.domain.user.UserSteps.*;
+import static org.assertj.core.api.Assertions.assertThat;
+
 @IntegrationTest
-public class UserApiTest extends ApiTest {
+class UserApiTest extends ApiTest {
     @Autowired
     private UserManager userManager;
     @Autowired
@@ -35,7 +36,7 @@ public class UserApiTest extends ApiTest {
     void 회원가입_정보입력() {
         final String jwtToken = userManager.createTestUser().getJwtToken();
         대학생성(10);
-        final UserSignupRequest request = 회원가입요청_생성();
+        final UserSignUpRequest request = 회원가입요청_생성();
 
         final ExtractableResponse<Response> response = 회원가입요청(jwtToken, request);
 

@@ -1,8 +1,6 @@
 package com.ssh.dartserver.global.auth;
 
 import com.ssh.dartserver.domain.user.domain.User;
-import com.ssh.dartserver.domain.user.domain.personalinfo.Gender;
-import com.ssh.dartserver.domain.user.domain.personalinfo.PersonalInfo;
 import com.ssh.dartserver.domain.user.infra.UserRepository;
 import com.ssh.dartserver.global.auth.dto.AppleTokenRequest;
 import com.ssh.dartserver.global.auth.dto.KakaoTokenRequest;
@@ -10,9 +8,7 @@ import com.ssh.dartserver.global.auth.dto.TokenResponse;
 import com.ssh.dartserver.global.auth.infra.OAuthRestTemplate;
 import com.ssh.dartserver.global.auth.service.OAuthService;
 import com.ssh.dartserver.global.auth.service.jwt.JwtTokenProvider;
-import com.ssh.dartserver.global.common.Role;
 import org.springframework.context.annotation.Primary;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.security.MessageDigest;
@@ -29,9 +25,8 @@ public class MockOauthService extends OAuthService {
 
     public MockOauthService(final OAuthRestTemplate oauthRestTemplate,
                             final UserRepository userRepository,
-                            final BCryptPasswordEncoder bCryptPasswordEncoder,
                             final JwtTokenProvider jwtTokenProvider) {
-        super(oauthRestTemplate, userRepository, bCryptPasswordEncoder, jwtTokenProvider);
+        super(oauthRestTemplate, userRepository, jwtTokenProvider);
         this.userRepository = userRepository;
         this.jwtTokenProvider = jwtTokenProvider;
     }
@@ -46,23 +41,14 @@ public class MockOauthService extends OAuthService {
     }
 
     private TokenResponse createTokenForTest(String provider, String id) {
-        User userEntity = userRepository.findByUsername(provider + "_" + id)
+        User userEntity = userRepository.findByAuthInfo_Username(provider + "_" + id)
             .orElse(null);
         return getTokenResponseDto(provider, id, userEntity);
     }
 
     private TokenResponse getTokenResponseDto(String provider, String id, User userEntity) {
         if (userEntity == null) {
-            User userRequest = User.builder()
-                .username(provider + "_" + id)
-                .password("1234567890")
-                .provider(provider)
-                .providerId(id)
-                .role(Role.USER)
-                .personalInfo(PersonalInfo.builder()
-                    .gender(Gender.UNKNOWN)
-                    .build())
-                .build();
+            final User userRequest = User.of(provider + "_" + id, id, provider);
             userEntity = userRepository.save(userRequest);
         }
 
@@ -72,8 +58,8 @@ public class MockOauthService extends OAuthService {
             .jwtToken(jwtToken)
             .tokenType("BEARER")
             .expiresAt(jwtTokenProvider.getExpiresAt(jwtToken))
-            .providerId(userEntity.getProviderId())
-            .providerType(userEntity.getProvider())
+            .providerId(userEntity.getAuthInfo().getProviderId())
+            .providerType(userEntity.getAuthInfo().getProvider())
             .build();
     }
 

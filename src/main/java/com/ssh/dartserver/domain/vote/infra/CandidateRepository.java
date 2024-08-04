@@ -7,14 +7,18 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 public interface CandidateRepository extends JpaRepository<Candidate, Long> {
     @Modifying
+    @Transactional
     @Query("update Candidate c set c.user = null where c.user = :user")
     void updateAllUserToNull(@Param("user") User user);
+
     @Modifying
+    @Transactional
     @Query("delete from Candidate c where c.vote in :pickedUserVotes")
     void deleteAllByVoteIn(@Param("pickedUserVotes") List<Vote> pickedUserVotes);
 }

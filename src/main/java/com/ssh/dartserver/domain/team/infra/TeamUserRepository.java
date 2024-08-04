@@ -4,8 +4,10 @@ import com.ssh.dartserver.domain.team.domain.Team;
 import com.ssh.dartserver.domain.team.domain.TeamUser;
 import com.ssh.dartserver.domain.user.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -19,8 +21,6 @@ public interface TeamUserRepository extends JpaRepository<TeamUser, Long> {
             "where t.id = :teamId")
     List<TeamUser> findAllByTeamId(@Param("teamId") Long teamId);
 
-    List<TeamUser> findAllByTeam(Team team);
-
     @Query("select distinct tu from TeamUser tu " +
             "join fetch tu.team t " +
             "join fetch tu.user u " +
@@ -29,4 +29,9 @@ public interface TeamUserRepository extends JpaRepository<TeamUser, Long> {
     List<TeamUser> findAllByTeamIn(@Param("teams") List<Team> teams);
 
     void deleteAllByTeamId(Long teamId);
+
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM TeamUser tu WHERE tu.team IN :teams")
+    void deleteAllByTeamsInBatch(List<Team> teams);
 }
