@@ -21,5 +21,5 @@ public interface SingleTeamFriendRepository extends JpaRepository<SingleTeamFrie
     @Modifying
     @Transactional
     @Query("DELETE FROM SingleTeamFriend stf WHERE stf.team IN :teams")
-    void deleteAllByTeamsInBatch(List<Team> teams);
+    void deleteAllByTeamsInBatch(@Param("teams") List<Team> teams);
 }

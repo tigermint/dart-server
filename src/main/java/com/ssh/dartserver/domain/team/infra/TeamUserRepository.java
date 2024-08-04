@@ -33,5 +33,5 @@ public interface TeamUserRepository extends JpaRepository<TeamUser, Long> {
     @Modifying
     @Transactional
     @Query("DELETE FROM TeamUser tu WHERE tu.team IN :teams")
-    void deleteAllByTeamsInBatch(List<Team> teams);
+    void deleteAllByTeamsInBatch(@Param("teams") List<Team> teams);
 }
