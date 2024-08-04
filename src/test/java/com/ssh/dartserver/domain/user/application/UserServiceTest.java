@@ -24,7 +24,7 @@ import com.ssh.dartserver.domain.user.UserTestFixture;
 import com.ssh.dartserver.domain.user.domain.User;
 import com.ssh.dartserver.domain.user.domain.personalinfo.PersonalInfo;
 import com.ssh.dartserver.domain.user.infra.UserRepository;
-import com.ssh.dartserver.testing.UnitTest;
+import com.ssh.dartserver.testing.IntegrationTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +34,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@UnitTest
+@IntegrationTest
 class UserServiceTest extends ApiTest {
 
     @Autowired
