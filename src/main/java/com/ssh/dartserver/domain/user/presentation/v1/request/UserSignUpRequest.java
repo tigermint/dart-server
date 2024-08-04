@@ -1,20 +1,18 @@
-package com.ssh.dartserver.domain.user.dto;
+package com.ssh.dartserver.domain.user.presentation.v1.request;
 
 import com.ssh.dartserver.domain.user.domain.personalinfo.Gender;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
+import com.ssh.dartserver.domain.user.domain.personalinfo.PersonalInfo;
+import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
-import lombok.NoArgsConstructor;
 
-@Data
+@Getter
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
-public class UserSignupRequest {
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public class UserSignUpRequest {
     @NotNull(message = "학교 Id는 null 일 수 없습니다.")
     private Long universityId;
 
@@ -33,4 +31,14 @@ public class UserSignupRequest {
 
     @NotNull(message = "성별은 null 일 수 없습니다.")
     private Gender gender;
+
+    public PersonalInfo toPersonalInfo() {
+        return PersonalInfo.of(
+                this.name,
+                this.phone,
+                this.gender,
+                this.admissionYear,
+                this.birthYear
+        );
+    }
 }
