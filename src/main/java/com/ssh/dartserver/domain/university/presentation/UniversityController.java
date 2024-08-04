@@ -1,15 +1,15 @@
 package com.ssh.dartserver.domain.university.presentation;
 
-import com.ssh.dartserver.domain.university.dto.UniversityResponse;
-import com.ssh.dartserver.domain.university.dto.UniversitySearchRequest;
-import com.ssh.dartserver.domain.university.service.UniversityService;
-import javax.validation.Valid;
+import com.ssh.dartserver.domain.university.application.UniversityService;
+import com.ssh.dartserver.domain.university.presentation.response.UniversityResponse;
+import com.ssh.dartserver.domain.university.presentation.response.UniversitySearchRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RequiredArgsConstructor

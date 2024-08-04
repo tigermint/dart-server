@@ -1,6 +1,6 @@
 package com.ssh.dartserver.domain.user;
 
-import com.ssh.dartserver.domain.user.dto.UserStudentIdCardVerificationRequest;
+import com.ssh.dartserver.domain.user.presentation.v1.request.UserStudentIdCardVerificationRequest;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;

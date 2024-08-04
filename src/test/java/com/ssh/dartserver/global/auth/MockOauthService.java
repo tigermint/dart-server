@@ -45,23 +45,14 @@ public class MockOauthService implements OauthService {
     }
 
     private TokenResponse createTokenForTest(String provider, String id) {
-        User userEntity = userRepository.findByUsername(provider + "_" + id)
+        User userEntity = userRepository.findByAuthInfo_Username(provider + "_" + id)
             .orElse(null);
         return getTokenResponseDto(provider, id, userEntity);
     }
 
     private TokenResponse getTokenResponseDto(String provider, String id, User userEntity) {
         if (userEntity == null) {
-            User userRequest = User.builder()
-                .username(provider + "_" + id)
-                .password("1234567890")
-                .provider(provider)
-                .providerId(id)
-                .role(Role.USER)
-                .personalInfo(PersonalInfo.builder()
-                    .gender(Gender.UNKNOWN)
-                    .build())
-                .build();
+            final User userRequest = User.of(provider + "_" + id, id, provider);
             userEntity = userRepository.save(userRequest);
         }
 
@@ -71,8 +62,8 @@ public class MockOauthService implements OauthService {
             .jwtToken(jwtToken.getToken())
             .tokenType("BEARER")
             .expiresAt(jwtToken.getExpiresAt())
-            .providerId(userEntity.getProviderId())
-            .providerType(userEntity.getProvider())
+            .providerId(userEntity.getAuthInfo().getProviderId())
+            .providerType(userEntity.getAuthInfo().getProvider())
             .build();
     }
 

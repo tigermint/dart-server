@@ -5,10 +5,10 @@ import static com.ssh.dartserver.domain.proposal.ProposalSteps.팀생성요청_�
 import static com.ssh.dartserver.domain.region.RegionSteps.지역생성요청_생성;
 import static com.ssh.dartserver.domain.university.UniversitySteps.대학생성요청_생성;
 
-import com.ssh.dartserver.domain.team.dto.TeamRequest;
-import com.ssh.dartserver.domain.team.dto.TeamRequest.SingleTeamFriendDto;
+import com.ssh.dartserver.domain.team.presentation.request.TeamRequest;
+import com.ssh.dartserver.domain.team.presentation.request.TeamRequest.SingleTeamFriendDto;
 import com.ssh.dartserver.domain.team.infra.RegionRepository;
-import com.ssh.dartserver.domain.team.service.MyTeamService;
+import com.ssh.dartserver.domain.team.application.MyTeamService;
 import com.ssh.dartserver.domain.university.domain.University;
 import com.ssh.dartserver.domain.university.infra.UniversityRepository;
 import com.ssh.dartserver.domain.user.domain.User;

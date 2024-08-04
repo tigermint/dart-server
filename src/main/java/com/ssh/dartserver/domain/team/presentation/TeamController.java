@@ -1,8 +1,12 @@
 package com.ssh.dartserver.domain.team.presentation;
 
-import com.ssh.dartserver.domain.team.dto.*;
-import com.ssh.dartserver.domain.team.service.MyTeamService;
-import com.ssh.dartserver.domain.team.service.TeamService;
+import com.ssh.dartserver.domain.team.application.MyTeamService;
+import com.ssh.dartserver.domain.team.application.TeamService;
+import com.ssh.dartserver.domain.team.domain.TeamSearchCondition;
+import com.ssh.dartserver.domain.team.presentation.request.TeamRequest;
+import com.ssh.dartserver.domain.team.presentation.response.BlindDateTeamDetailResponse;
+import com.ssh.dartserver.domain.team.presentation.response.BlindDateTeamResponse;
+import com.ssh.dartserver.domain.team.presentation.response.TeamResponse;
 import com.ssh.dartserver.global.auth.service.oauth.PrincipalDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

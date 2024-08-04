@@ -61,11 +61,10 @@ public class JwtTokenProvider {
      */
     public JwtToken create(User user) {
         final String token = JWT.create()
-            .withSubject(user.getUsername())
-            .withExpiresAt(
-                new Date(System.currentTimeMillis() + jwtProperty.getExpirationTime()))
+            .withSubject(user.getAuthInfo().getUsername())
+            .withExpiresAt(new Date(System.currentTimeMillis() + jwtProperty.getExpirationTime()))
             .withClaim(ID_CLAIM, user.getId())
-            .withClaim(USERNAME_CLAIM, user.getUsername())
+            .withClaim(USERNAME_CLAIM, user.getAuthInfo().getUsername())
             .sign(getAlgorithm());
 
         return new JwtToken(JWT.decode(token));

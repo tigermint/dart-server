@@ -50,4 +50,5 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
         }
         return null;
     }
+
 }

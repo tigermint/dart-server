@@ -26,28 +26,46 @@ public abstract class OauthServiceAbstract implements OauthService {
      */
     // FIXME 두가지 책임을 동시에 지고 있습니다. + Save에는 트랜잭셔널 어노테이션이 필요할까요?
     protected TokenResponse getTokenResponseDto(OAuthUserInfo oauthUser, User userEntity) {
-        if (userEntity == null) {
-            User userRequest = User.builder()
-                .username(oauthUser.getProvider() + "_" + oauthUser.getProviderId())
-                .password(bCryptPasswordEncoder.encode(jwtTokenProvider.getSecret()))
-                .provider(oauthUser.getProvider())
-                .providerId(oauthUser.getProviderId())
-                .role(Role.USER)
-                .personalInfo(PersonalInfo.builder()
-                    .gender(Gender.UNKNOWN)
-                    .build())
-                .build();
-            userEntity = userRepository.save(userRequest);
-        }
+        final User user = readOrCreateUser(oauthUser);
+
+//        if (userEntity == null) {
+//            User userRequest = User.builder()
+//                .username(oauthUser.getProvider() + "_" + oauthUser.getProviderId())
+//                .password(bCryptPasswordEncoder.encode(jwtTokenProvider.getSecret()))
+//                .provider(oauthUser.getProvider())
+//                .providerId(oauthUser.getProviderId())
+//                .role(Role.USER)
+//                .personalInfo(PersonalInfo.builder()
+//                    .gender(Gender.UNKNOWN)
+//                    .build())
+//                .build();
+//            userEntity = userRepository.save(userRequest);
+//        }
 
         // jwt 토큰 생성
-        final JwtToken jwtToken = jwtTokenProvider.create(userEntity);
+        final JwtToken jwtToken = jwtTokenProvider.create(user);
         return TokenResponse.builder()
             .jwtToken(jwtToken.getToken())
             .tokenType("BEARER")
             .expiresAt(jwtToken.getExpiresAt())
-            .providerId(userEntity.getProviderId())
-            .providerType(userEntity.getProvider())
+            .providerId(user.getAuthInfo().getProviderId())
+            .providerType(user.getAuthInfo().getProvider())
             .build();
+    }
+
+    private User readOrCreateUser(final OAuthUserInfo oauthUser) {
+        String username = oauthUser.getProvider() + "_" + oauthUser.getProviderId();
+
+        return userRepository.findByAuthInfo_Username(username)
+            .orElseGet(() -> createUser(oauthUser));
+    }
+
+    private User createUser(final OAuthUserInfo oauthUser) {
+        User user = User.of(
+            oauthUser.getProvider() + "_" + oauthUser.getProviderId(),
+            oauthUser.getProviderId(),
+            oauthUser.getProvider()
+        );
+        return userRepository.save(user);
     }
 }

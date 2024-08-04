@@ -47,9 +47,8 @@ class KakaoOauthServiceTest {
         JwtToken jwtToken1 = new JwtToken(JWT.decode(jwtToken));
 
         when(kakaoOauthApi.getKakaoUserInfo(providerToken)).thenReturn(Optional.of(Map.of("id", "kakao_1234")));
-        when(userRepository.findByUsername("kakao_" + providerId)).thenReturn(Optional.empty());
+        when(userRepository.findByAuthInfo_Username("kakao_" + providerId)).thenReturn(Optional.empty());
         when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
-        when(bCryptPasswordEncoder.encode(any())).thenReturn("encodedPassword");
         when(jwtTokenProvider.create(any(User.class))).thenReturn(jwtToken1);
 
         TokenResponse tokenResponse = kakaoOauthService.createToken(providerToken);

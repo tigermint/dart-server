@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTDecodeException;
+import com.ssh.dartserver.domain.user.domain.AuthInfo;
 import com.ssh.dartserver.domain.user.domain.User;
 import com.ssh.dartserver.global.config.properties.JwtProperty;
 import com.ssh.dartserver.global.error.CertificationException;
@@ -153,7 +154,7 @@ class JwtTokenTest {
 
     private static User createTestUser() {
         User user = User.builder()
-            .username("testuser")
+            .authInfo(AuthInfo.of("testuser", "", ""))
             .id(1L)
             .build();
         return user;

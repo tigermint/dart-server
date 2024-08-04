@@ -1,7 +1,7 @@
 package com.ssh.dartserver.domain.proposal.presentation;
 
-import com.ssh.dartserver.domain.proposal.dto.ProposalRequest;
-import com.ssh.dartserver.domain.proposal.service.ProposalService;
+import com.ssh.dartserver.domain.proposal.presentation.request.ProposalRequest;
+import com.ssh.dartserver.domain.proposal.application.ProposalService;
 import com.ssh.dartserver.global.auth.service.oauth.PrincipalDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

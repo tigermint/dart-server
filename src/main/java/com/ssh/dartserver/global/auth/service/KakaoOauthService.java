@@ -26,7 +26,7 @@ public class KakaoOauthService extends OauthServiceAbstract {
         return kakaoOauthApi.getKakaoUserInfo(providerToken)
             .map(userInfo -> {
                 OAuthUserInfo kakaoUser = new KakaoUser(userInfo);
-                User userEntity = userRepository.findByUsername(
+                User userEntity = userRepository.findByAuthInfo_Username(
                         kakaoUser.getProvider() + "_" + kakaoUser.getProviderId())
                     .orElse(null);
                 return getTokenResponseDto(kakaoUser, userEntity);

@@ -50,7 +50,7 @@ public class AppleOauthService extends OauthServiceAbstract {
             OAuthUserInfo appleUser = new AppleUser(possiblePayloadMap);
 
             //apple username 검색을 통한 기존 유저 확인
-            User userEntity = userRepository.findByUsername("apple_" + appleJwtToken.getSub())
+            User userEntity = userRepository.findByAuthInfo_Username("apple_" + appleJwtToken.getSub())
                 .orElse(null);
 
             return getTokenResponseDto(appleUser, userEntity);

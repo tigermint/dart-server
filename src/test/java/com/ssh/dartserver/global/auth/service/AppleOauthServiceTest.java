@@ -61,9 +61,8 @@ class AppleOauthServiceTest {
         ApplePublicKeyResponse applePublicKeyResponse = createApplePublicKeyResponse(kid, publicKey);
 
         when(appleOauthApi.getApplePublicKey()).thenReturn(applePublicKeyResponse);
-        when(userRepository.findByUsername("apple_" + providerId)).thenReturn(Optional.empty());
+        when(userRepository.findByAuthInfo_Username("apple_" + providerId)).thenReturn(Optional.empty());
         when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
-        when(bCryptPasswordEncoder.encode(any())).thenReturn("encodedPassword");
 
         Date expiresAt = new Date(System.currentTimeMillis() + 1000 * 60 * 10);
         String jwtToken = createJwtToken("user", expiresAt);
