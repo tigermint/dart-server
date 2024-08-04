@@ -29,5 +29,5 @@ public interface TeamRegionRepository extends JpaRepository<TeamRegion, Long> {
     @Modifying
     @Transactional
     @Query("DELETE FROM TeamRegion tr WHERE tr.team IN :teams")
-    void deleteAllByTeamsInBatch(List<Team> teams);
+    void deleteAllByTeamsInBatch(@Param("teams") List<Team> teams);
 }
