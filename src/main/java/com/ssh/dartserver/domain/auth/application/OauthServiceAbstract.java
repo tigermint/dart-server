@@ -27,8 +27,6 @@ public abstract class OauthServiceAbstract implements OauthService {
             .jwtToken(jwtToken.getToken())
             .tokenType("BEARER")
             .expiresAt(jwtToken.getExpiresAt())
-            .providerId(user.getAuthInfo().getProviderId())
-            .providerType(user.getAuthInfo().getProvider())
             .build();
     }
 

@@ -56,9 +56,7 @@ class KakaoOauthServiceTest {
 
         assertNotNull(tokenResponse);
         assertEquals(jwtToken, tokenResponse.getJwtToken());
-        assertEquals(providerId, tokenResponse.getProviderId());
         assertEquals("BEARER", tokenResponse.getTokenType().toUpperCase());
-        assertEquals("kakao", tokenResponse.getProviderType().toLowerCase());
     }
 
     @Test

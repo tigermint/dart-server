@@ -76,9 +76,7 @@ class AppleOauthServiceTest {
         // Then
         assertNotNull(tokenResponse);
         assertEquals(jwtToken, tokenResponse.getJwtToken());
-        assertEquals(providerId, tokenResponse.getProviderId());
         assertEquals("BEARER", tokenResponse.getTokenType().toUpperCase());
-        assertEquals("apple", tokenResponse.getProviderType().toLowerCase());
 
         verify(userRepository).save(any(User.class));
     }

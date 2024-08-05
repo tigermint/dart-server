@@ -16,8 +16,6 @@ public class FakeKakaoOauthService implements OauthService {
             .jwtToken("123456789")
             .tokenType("JWT")
             .expiresAt(LocalDateTime.MAX)
-            .providerType("KAKAO")
-            .providerId("987654321")
             .build();
     }
 }

@@ -59,8 +59,6 @@ public class MockOauthService implements OauthService {
             .jwtToken(jwtToken.getToken())
             .tokenType("BEARER")
             .expiresAt(jwtToken.getExpiresAt())
-            .providerId(userEntity.getAuthInfo().getProviderId())
-            .providerType(userEntity.getAuthInfo().getProvider())
             .build();
     }
 

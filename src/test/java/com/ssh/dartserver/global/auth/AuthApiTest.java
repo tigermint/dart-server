@@ -36,7 +36,8 @@ public class AuthApiTest extends ApiTest {
             final ExtractableResponse<Response> response = 카카오로그인요청(request);
 
             final TokenResponse tokenResponse = response.body().as(TokenResponse.class);
-            userIds.add(tokenResponse.getProviderId());
+            userIds.add(tokenResponse.getJwtToken());
+            // FIXME
         }
 
         assertThat(userIds.size()).isEqualTo(1);
