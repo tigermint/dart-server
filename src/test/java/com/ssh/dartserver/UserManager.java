@@ -4,12 +4,13 @@ import com.ssh.dartserver.domain.user.domain.User;
 import com.ssh.dartserver.domain.user.domain.personalinfo.Gender;
 import com.ssh.dartserver.domain.user.presentation.v1.request.UserSignUpRequest;
 import com.ssh.dartserver.domain.user.application.UserService;
-import com.ssh.dartserver.global.auth.dto.AppleTokenRequest;
-import com.ssh.dartserver.global.auth.dto.KakaoTokenRequest;
-import com.ssh.dartserver.global.auth.dto.TokenResponse;
-import com.ssh.dartserver.global.auth.service.OAuthService;
-import com.ssh.dartserver.global.auth.service.jwt.JwtTokenProvider;
-import com.ssh.dartserver.global.auth.service.oauth.PrincipalDetails;
+import com.ssh.dartserver.global.auth.MockOauthService;
+import com.ssh.dartserver.domain.auth.presentation.request.AppleTokenRequest;
+import com.ssh.dartserver.domain.auth.presentation.request.KakaoTokenRequest;
+import com.ssh.dartserver.domain.auth.presentation.response.TokenResponse;
+import com.ssh.dartserver.global.security.jwt.JwtToken;
+import com.ssh.dartserver.global.security.jwt.JwtTokenProvider;
+import com.ssh.dartserver.global.security.PrincipalDetails;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -18,7 +19,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserManager {
     @Autowired
-    private OAuthService mockOauthService;  // 통합테스트 환경에서 MockOAuthService가 대입됨
+    private MockOauthService mockOauthService;
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
     @Autowired
@@ -30,8 +31,7 @@ public class UserManager {
      * @return TokenResponse 현재 서버에서 사용되는 JWT 포함
      */
     public TokenResponse kakaoLogin(String accessToken) {
-        KakaoTokenRequest request = new KakaoTokenRequest();
-        request.setAccessToken(accessToken);
+        KakaoTokenRequest request = new KakaoTokenRequest(accessToken);
 
         return mockOauthService.createTokenForKakao(request);
     }
@@ -42,8 +42,7 @@ public class UserManager {
      * @return TokenResponse 현재 서버에서 사용되는 JWT 포함
      */
     public TokenResponse appleLogin(String id) {
-        AppleTokenRequest request = new AppleTokenRequest();
-        request.setIdToken(id);
+        AppleTokenRequest request = new AppleTokenRequest(id);
 
         return mockOauthService.createTokenForApple(request);
     }
@@ -53,8 +52,7 @@ public class UserManager {
      * @return TokenResponse 현재 서버에서 사용되는 JWT 포함
      */
     public TokenResponse createTestUser() {
-        KakaoTokenRequest request = new KakaoTokenRequest();
-        request.setAccessToken("DEFAULT_TEST_TOKEN");
+        KakaoTokenRequest request = new KakaoTokenRequest("DEFAULT_TEST_TOKEN");
 
         return mockOauthService.createTokenForKakao(request);
     }
@@ -76,7 +74,7 @@ public class UserManager {
      */
     public TokenResponse createUserWithInformation(UserSignUpRequest request) {
         final TokenResponse tokenResponse = kakaoLogin("abcdefghijklmnop" + UUID.randomUUID());
-        final String jwtToken = tokenResponse.getJwtToken();
+        final JwtToken jwtToken = jwtTokenProvider.decode(tokenResponse.getJwtToken());
 
         final Authentication authentication = jwtTokenProvider.getAuthentication(jwtToken);
         final User user = ((PrincipalDetails) authentication.getPrincipal()).getUser();
@@ -125,5 +123,4 @@ public class UserManager {
         final Authentication authentication = jwtTokenProvider.getAuthentication(jwtToken);
         return ((PrincipalDetails) authentication.getPrincipal()).getUser();
     }
-
 }

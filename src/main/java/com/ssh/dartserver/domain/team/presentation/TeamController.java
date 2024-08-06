@@ -7,7 +7,7 @@ import com.ssh.dartserver.domain.team.presentation.request.TeamRequest;
 import com.ssh.dartserver.domain.team.presentation.response.BlindDateTeamDetailResponse;
 import com.ssh.dartserver.domain.team.presentation.response.BlindDateTeamResponse;
 import com.ssh.dartserver.domain.team.presentation.response.TeamResponse;
-import com.ssh.dartserver.global.auth.service.oauth.PrincipalDetails;
+import com.ssh.dartserver.global.security.PrincipalDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

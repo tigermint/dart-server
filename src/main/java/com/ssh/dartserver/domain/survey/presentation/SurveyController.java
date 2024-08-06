@@ -6,7 +6,7 @@ import com.ssh.dartserver.domain.survey.presentation.response.SurveyResponse;
 import com.ssh.dartserver.domain.survey.application.AnswerService;
 import com.ssh.dartserver.domain.survey.application.CommentService;
 import com.ssh.dartserver.domain.survey.application.SurveyService;
-import com.ssh.dartserver.global.auth.service.oauth.PrincipalDetails;
+import com.ssh.dartserver.global.security.PrincipalDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

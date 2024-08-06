@@ -4,6 +4,7 @@ import com.ssh.dartserver.ApiTest;
 import com.ssh.dartserver.UserManager;
 import com.ssh.dartserver.domain.university.domain.University;
 import com.ssh.dartserver.domain.university.infra.UniversityRepository;
+import com.ssh.dartserver.domain.university.presentation.response.UniversityResponse;
 import com.ssh.dartserver.domain.user.presentation.v1.request.UserSignUpRequest;
 import com.ssh.dartserver.domain.user.presentation.v1.request.UserUpdateRequest;
 import com.ssh.dartserver.domain.user.presentation.v1.response.UserProfileResponse;

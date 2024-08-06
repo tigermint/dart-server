@@ -23,7 +23,7 @@ import com.ssh.dartserver.domain.user.application.UserService;
 import com.ssh.dartserver.domain.vote.presentation.response.ReceivedVoteDetailResponse;
 import com.ssh.dartserver.domain.vote.presentation.response.ReceivedVoteResponse;
 import com.ssh.dartserver.domain.vote.application.VoteService;
-import com.ssh.dartserver.global.auth.service.oauth.PrincipalDetails;
+import com.ssh.dartserver.global.security.PrincipalDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;

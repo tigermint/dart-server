@@ -2,12 +2,12 @@ package com.ssh.dartserver.global.auth;
 
 import com.ssh.dartserver.domain.user.domain.User;
 import com.ssh.dartserver.domain.user.infra.UserRepository;
-import com.ssh.dartserver.global.auth.dto.AppleTokenRequest;
-import com.ssh.dartserver.global.auth.dto.KakaoTokenRequest;
-import com.ssh.dartserver.global.auth.dto.TokenResponse;
-import com.ssh.dartserver.global.auth.infra.OAuthRestTemplate;
-import com.ssh.dartserver.global.auth.service.OAuthService;
-import com.ssh.dartserver.global.auth.service.jwt.JwtTokenProvider;
+import com.ssh.dartserver.domain.auth.presentation.request.AppleTokenRequest;
+import com.ssh.dartserver.domain.auth.presentation.request.KakaoTokenRequest;
+import com.ssh.dartserver.domain.auth.presentation.response.TokenResponse;
+import com.ssh.dartserver.domain.auth.application.OauthService;
+import com.ssh.dartserver.global.security.jwt.JwtToken;
+import com.ssh.dartserver.global.security.jwt.JwtTokenProvider;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
@@ -19,18 +19,19 @@ import java.security.NoSuchAlgorithmException;
  */
 @Component
 @Primary
-public class MockOauthService extends OAuthService {
-    private final UserRepository userRepository;
+public class MockOauthService implements OauthService {
     private final JwtTokenProvider jwtTokenProvider;
+    private final UserRepository userRepository;
 
-    public MockOauthService(final OAuthRestTemplate oauthRestTemplate,
-                            final UserRepository userRepository,
-                            final JwtTokenProvider jwtTokenProvider) {
-        super(oauthRestTemplate, userRepository, jwtTokenProvider);
+    public MockOauthService(final UserRepository userRepository, final JwtTokenProvider jwtTokenProvider) {
         this.userRepository = userRepository;
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
+    @Override
+    public JwtToken createToken(final String providerToken) {
+        return jwtTokenProvider.decode(createTokenForTest("dart", generateHash(providerToken)).getJwtToken());
+    }
 
     public TokenResponse createTokenForKakao(KakaoTokenRequest request) {
         return createTokenForTest("kakao", generateHash(request.getAccessToken()));
@@ -53,17 +54,15 @@ public class MockOauthService extends OAuthService {
         }
 
         //jwt 토큰 생성
-        String jwtToken = jwtTokenProvider.createToken(userEntity);
+        final JwtToken jwtToken = jwtTokenProvider.create(userEntity);
         return TokenResponse.builder()
-            .jwtToken(jwtToken)
+            .jwtToken(jwtToken.getToken())
             .tokenType("BEARER")
-            .expiresAt(jwtTokenProvider.getExpiresAt(jwtToken))
-            .providerId(userEntity.getAuthInfo().getProviderId())
-            .providerType(userEntity.getAuthInfo().getProvider())
+            .expiresAt(jwtToken.getExpiresAt())
             .build();
     }
 
-    public static String generateHash(String inputString) {
+    private static String generateHash(String inputString) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
             byte[] hashBytes = md.digest(inputString.getBytes());

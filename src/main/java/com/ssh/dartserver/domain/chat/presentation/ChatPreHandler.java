@@ -1,9 +1,9 @@
 package com.ssh.dartserver.domain.chat.presentation;
 
 import com.ssh.dartserver.domain.chat.application.ActiveUserStore;
-import com.ssh.dartserver.global.auth.service.jwt.JwtProperties;
-import com.ssh.dartserver.global.auth.service.jwt.JwtTokenProvider;
-import com.ssh.dartserver.global.error.CertificationException;
+import com.ssh.dartserver.global.security.jwt.JwtToken;
+import com.ssh.dartserver.global.security.jwt.JwtTokenProvider;
+import com.ssh.dartserver.global.config.properties.JwtProperty;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
@@ -22,24 +22,26 @@ public class ChatPreHandler implements ChannelInterceptor {
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(message);
-        String authorizationHeader = String.valueOf(headerAccessor.getNativeHeader(JwtProperties.HEADER_STRING.getValue()));
+        String authorizationHeader = String.valueOf(headerAccessor.getNativeHeader(JwtProperty.HEADER_STRING));
 
         if (StompCommand.CONNECT.equals(headerAccessor.getCommand())) {
             if (authorizationHeader == null || authorizationHeader.equals("null")) {
                 throw new MessageDeliveryException("인증 토큰이 없습니다.");
             }
-            String token = authorizationHeader.replaceFirst(JwtProperties.TOKEN_PREFIX.getValue(), "")
-                    .replaceAll("[\\[\\]]", "");
+            JwtToken token = getJwtToken(authorizationHeader);
 
-            if (jwtTokenProvider.validateToken(token)) {
-                throw new CertificationException("유효하지 않은 토큰입니다.");
-            }
-            String username = jwtTokenProvider.getUsername(token);
+            token.validateToken();
+            String username = token.getUsername();
             activeUserStore.storeSession(headerAccessor.getSessionId(), username);
         }
         if (StompCommand.DISCONNECT.equals(headerAccessor.getCommand())) {
             activeUserStore.removeSession(headerAccessor.getSessionId());
         }
         return message;
+    }
+
+    private JwtToken getJwtToken(final String authorizationHeader) {
+        return jwtTokenProvider.decode(authorizationHeader.replaceFirst(JwtProperty.TOKEN_PREFIX, "")
+                .replaceAll("[\\[\\]]", ""));
     }
 }
