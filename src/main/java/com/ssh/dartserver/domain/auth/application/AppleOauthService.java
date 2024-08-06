@@ -13,6 +13,7 @@ import com.ssh.dartserver.domain.auth.presentation.request.ApplePublicKey;
 import com.ssh.dartserver.domain.auth.presentation.request.ApplePublicKeyResponse;
 import com.ssh.dartserver.domain.auth.presentation.response.TokenResponse;
 import com.ssh.dartserver.domain.auth.infra.AppleOauthApi;
+import com.ssh.dartserver.global.security.jwt.JwtToken;
 import com.ssh.dartserver.global.security.jwt.JwtTokenProvider;
 import com.ssh.dartserver.global.error.AppleLoginFailedException;
 import com.ssh.dartserver.global.error.ApplePublicKeyNotFoundException;
@@ -39,7 +40,7 @@ public class AppleOauthService extends OauthServiceAbstract {
     }
 
     @Override
-    public TokenResponse createToken(final String providerToken) {
+    public JwtToken createToken(final String providerToken) {
         DecodedJWT jwt = JWT.decode(providerToken);
 
         try {

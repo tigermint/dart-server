@@ -1,7 +1,8 @@
 package com.ssh.dartserver.domain.auth.application;
 
 import com.ssh.dartserver.domain.auth.presentation.response.TokenResponse;
+import com.ssh.dartserver.global.security.jwt.JwtToken;
 
 public interface OauthService {
-    TokenResponse createToken(String providerToken);
+    JwtToken createToken(String providerToken);
 }

@@ -29,8 +29,8 @@ public class MockOauthService implements OauthService {
     }
 
     @Override
-    public TokenResponse createToken(final String providerToken) {
-        return createTokenForTest("dart", generateHash(providerToken));
+    public JwtToken createToken(final String providerToken) {
+        return jwtTokenProvider.decode(createTokenForTest("dart", generateHash(providerToken)).getJwtToken());
     }
 
     public TokenResponse createTokenForKakao(KakaoTokenRequest request) {

@@ -18,16 +18,9 @@ public abstract class OauthServiceAbstract implements OauthService {
      * @param oauthUser OAuth 유저 정보
      * @return
      */
-    protected TokenResponse getTokenResponseDto(OAuthUserInfo oauthUser) {
+    protected JwtToken getTokenResponseDto(OAuthUserInfo oauthUser) {
         final User user = readOrCreateUser(oauthUser);
-
-        // jwt 토큰 생성
-        final JwtToken jwtToken = jwtTokenProvider.create(user);
-        return TokenResponse.builder()
-            .jwtToken(jwtToken.getToken())
-            .tokenType("BEARER")
-            .expiresAt(jwtToken.getExpiresAt())
-            .build();
+        return jwtTokenProvider.create(user);
     }
 
     /**

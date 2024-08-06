@@ -5,6 +5,7 @@ import com.ssh.dartserver.domain.auth.presentation.request.AppleTokenRequest;
 import com.ssh.dartserver.domain.auth.presentation.request.KakaoTokenRequest;
 import com.ssh.dartserver.domain.auth.application.OauthServiceFactory;
 import com.ssh.dartserver.domain.auth.domain.OauthProvider;
+import com.ssh.dartserver.global.security.jwt.JwtToken;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,13 +21,13 @@ public class OAuthController {
 
     @PostMapping("/v1/auth/kakao")
     public ResponseEntity<TokenResponse> jwtCreateForKakao(@Valid @RequestBody KakaoTokenRequest request) {
-        final TokenResponse token = oAuthServiceFactory.getTokenResponse(OauthProvider.KAKAO, request.getAccessToken());
-        return ResponseEntity.ok(token);
+        final JwtToken token = oAuthServiceFactory.getJwtToken(OauthProvider.KAKAO, request.getAccessToken());
+        return ResponseEntity.ok(TokenResponse.from(token));
     }
 
     @PostMapping("/v1/auth/apple")
     public ResponseEntity<TokenResponse> jwtCreateForApple(@Valid @RequestBody AppleTokenRequest request) {
-        final TokenResponse token = oAuthServiceFactory.getTokenResponse(OauthProvider.APPLE, request.getIdToken());
-        return ResponseEntity.ok(token);
+        final JwtToken token = oAuthServiceFactory.getJwtToken(OauthProvider.APPLE, request.getIdToken());
+        return ResponseEntity.ok(TokenResponse.from(token));
     }
 }

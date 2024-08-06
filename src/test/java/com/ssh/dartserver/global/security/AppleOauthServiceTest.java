@@ -71,7 +71,7 @@ class AppleOauthServiceTest {
         when(jwtTokenProvider.create(any(User.class))).thenReturn(jwtToken1);
 
         // When
-        TokenResponse tokenResponse = appleOauthService.createToken(appleIdToken);
+        TokenResponse tokenResponse = TokenResponse.from(appleOauthService.createToken(appleIdToken));
 
         // Then
         assertNotNull(tokenResponse);

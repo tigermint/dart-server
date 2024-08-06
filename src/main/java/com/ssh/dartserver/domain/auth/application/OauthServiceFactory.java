@@ -1,7 +1,7 @@
 package com.ssh.dartserver.domain.auth.application;
 
 import com.ssh.dartserver.domain.auth.domain.OauthProvider;
-import com.ssh.dartserver.domain.auth.presentation.response.TokenResponse;
+import com.ssh.dartserver.global.security.jwt.JwtToken;
 import java.util.List;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +30,7 @@ public class OauthServiceFactory {
      * @return Dart 서버에서 사용할 JWT 토큰 정보
      * @throws IllegalArgumentException 지원하지 않는 Provider인 경우
      */
-    public TokenResponse getTokenResponse(OauthProvider provider, String providerToken) {
+    public JwtToken getJwtToken(OauthProvider provider, String providerToken) {
         final OauthService oauthService = oauthServices.get(provider);
         if (oauthService == null) {
             throw new IllegalArgumentException("지원하지 않는 Provider입니다. Provider: " + provider);

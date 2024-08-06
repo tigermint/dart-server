@@ -4,6 +4,7 @@ import com.ssh.dartserver.domain.auth.presentation.response.TokenResponse;
 import com.ssh.dartserver.domain.auth.domain.OauthProvider;
 import com.ssh.dartserver.domain.auth.application.OauthService;
 import com.ssh.dartserver.domain.auth.application.OauthServiceFactory;
+import com.ssh.dartserver.global.security.jwt.JwtToken;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
@@ -21,7 +22,7 @@ public class MockOauthserviceFactory extends OauthServiceFactory {
     }
 
     @Override
-    public TokenResponse getTokenResponse(OauthProvider provider, String providerToken) {
+    public JwtToken getJwtToken(OauthProvider provider, String providerToken) {
         return mockOauthService.createToken(providerToken);
     }
 }

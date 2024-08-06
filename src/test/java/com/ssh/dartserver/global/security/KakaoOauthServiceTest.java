@@ -52,7 +52,7 @@ class KakaoOauthServiceTest {
         when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(jwtTokenProvider.create(any(User.class))).thenReturn(jwtToken1);
 
-        TokenResponse tokenResponse = kakaoOauthService.createToken(providerToken);
+        TokenResponse tokenResponse = TokenResponse.from(kakaoOauthService.createToken(providerToken));
 
         assertNotNull(tokenResponse);
         assertEquals(jwtToken, tokenResponse.getJwtToken());
