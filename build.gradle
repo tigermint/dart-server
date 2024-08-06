@@ -16,7 +16,7 @@ jib{
         auth {
             username = '_json_key'
 //            password = new String(Base64.getDecoder().decode(System.getenv("GOOGLE_AR_CLIENT_SECRET_SSH_TEAM")))
-//            password = new String(Base64.getDecoder().decode(System.getenv("GOOGLE_AR_CLIENT_SECRET_SSH_SERVER")))
+            password = new String(Base64.getDecoder().decode(System.getenv("GOOGLE_AR_CLIENT_SECRET_SSH_SERVER")))
         }
     }
     container {
