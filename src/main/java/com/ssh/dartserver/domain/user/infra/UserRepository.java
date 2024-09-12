@@ -1,7 +1,7 @@
 package com.ssh.dartserver.domain.user.infra;
 
 import com.ssh.dartserver.domain.user.domain.User;
-import com.ssh.dartserver.domain.user.domain.recommendcode.RecommendationCode;
+import com.ssh.dartserver.domain.user.domain.RecommendationCode;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
@@ -18,7 +18,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query(value = "SELECT u FROM User u WHERE u.id = :userId")
     Optional<User> findByIdForUpdate(@Param("userId") Long userId);
 
-    Optional<User> findByUsername(String username);
+    Optional<User> findByAuthInfo_Username(String username);
 
     Optional<User> findByRecommendationCode(RecommendationCode recommendationCode);
 

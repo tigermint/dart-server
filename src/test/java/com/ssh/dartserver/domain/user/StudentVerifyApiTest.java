@@ -9,7 +9,7 @@ import com.ssh.dartserver.ApiTest;
 import com.ssh.dartserver.UserManager;
 import com.ssh.dartserver.domain.university.domain.University;
 import com.ssh.dartserver.domain.university.infra.UniversityRepository;
-import com.ssh.dartserver.domain.user.dto.UserStudentIdCardVerificationRequest;
+import com.ssh.dartserver.domain.user.presentation.v1.request.UserStudentIdCardVerificationRequest;
 import com.ssh.dartserver.testing.IntegrationTest;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;

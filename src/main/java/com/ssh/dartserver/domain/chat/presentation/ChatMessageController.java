@@ -1,8 +1,8 @@
 package com.ssh.dartserver.domain.chat.presentation;
 
-import com.ssh.dartserver.domain.chat.dto.ChatMessageRequest;
-import com.ssh.dartserver.domain.chat.dto.ChatMessageResponse;
-import com.ssh.dartserver.domain.chat.service.ChatMessageService;
+import com.ssh.dartserver.domain.chat.presentation.request.ChatMessageRequest;
+import com.ssh.dartserver.domain.chat.presentation.response.ChatMessageResponse;
+import com.ssh.dartserver.domain.chat.application.ChatMessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;

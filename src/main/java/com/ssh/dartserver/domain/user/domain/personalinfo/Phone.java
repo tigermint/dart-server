@@ -1,14 +1,15 @@
 package com.ssh.dartserver.domain.user.domain.personalinfo;
 
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 
-@Getter
 @Embeddable
-@NoArgsConstructor
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Phone {
     @Column(name = "phone")
     private String value;

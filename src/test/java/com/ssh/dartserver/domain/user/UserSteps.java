@@ -1,8 +1,8 @@
 package com.ssh.dartserver.domain.user;
 
 import com.ssh.dartserver.domain.user.domain.personalinfo.Gender;
-import com.ssh.dartserver.domain.user.dto.UserSignupRequest;
-import com.ssh.dartserver.domain.user.dto.UserUpdateRequest;
+import com.ssh.dartserver.domain.user.presentation.v1.request.UserSignUpRequest;
+import com.ssh.dartserver.domain.user.presentation.v1.request.UserUpdateRequest;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import org.springframework.http.MediaType;
 
 public class UserSteps {
-    public static ExtractableResponse<Response> 회원가입요청(final String jwtToken, final UserSignupRequest request) {
+    public static ExtractableResponse<Response> 회원가입요청(final String jwtToken, final UserSignUpRequest request) {
         return RestAssured.given().log().all()
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .auth().oauth2(jwtToken)
@@ -21,8 +21,8 @@ public class UserSteps {
             .log().all().extract();
     }
 
-    public static UserSignupRequest 회원가입요청_생성() {
-        return UserSignupRequest.builder()
+    public static UserSignUpRequest 회원가입요청_생성() {
+        return UserSignUpRequest.builder()
             .universityId(1L)
             .admissionYear(2010)
             .birthYear(2005)

@@ -1,10 +1,10 @@
 package com.ssh.dartserver.domain.proposal;
 
-import com.ssh.dartserver.domain.proposal.dto.ProposalRequest;
-import com.ssh.dartserver.domain.proposal.dto.ProposalRequest.Create;
-import com.ssh.dartserver.domain.proposal.dto.ProposalRequest.Update;
-import com.ssh.dartserver.domain.team.dto.TeamRequest;
-import com.ssh.dartserver.domain.team.dto.TeamRequest.SingleTeamFriendDto;
+import com.ssh.dartserver.domain.proposal.presentation.request.ProposalRequest;
+import com.ssh.dartserver.domain.proposal.presentation.request.ProposalRequest.Create;
+import com.ssh.dartserver.domain.proposal.presentation.request.ProposalRequest.Update;
+import com.ssh.dartserver.domain.team.presentation.request.TeamRequest;
+import com.ssh.dartserver.domain.team.presentation.request.TeamRequest.SingleTeamFriendDto;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;

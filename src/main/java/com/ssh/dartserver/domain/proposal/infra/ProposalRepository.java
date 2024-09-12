@@ -4,8 +4,10 @@ import com.ssh.dartserver.domain.proposal.domain.Proposal;
 import com.ssh.dartserver.domain.proposal.domain.ProposalStatus;
 import com.ssh.dartserver.domain.team.domain.Team;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,6 +34,14 @@ public interface ProposalRepository extends JpaRepository<Proposal, Long> {
             "and p.proposalStatus = :proposalStatus " +
             "order by p.createdTime desc")
     List<Proposal> findAllRequestedProposalByUserIdPatternAndProposalStatus(@Param("userIdPattern") String userIdPattern, @Param("proposalStatus") ProposalStatus proposalStatus);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE Proposal p " +
+            "SET p.requestingTeam = CASE WHEN p.requestingTeam IN :teams THEN null ELSE p.requestingTeam END, " +
+            "p.requestedTeam = CASE WHEN p.requestedTeam IN :teams THEN null ELSE p.requestedTeam END " +
+            "WHERE p.requestingTeam IN :teams OR p.requestedTeam IN :teams")
+    void updateRequestingOrRequestedTeamsToNullIn(@Param("teams") List<Team> teams);
 }
 
 
