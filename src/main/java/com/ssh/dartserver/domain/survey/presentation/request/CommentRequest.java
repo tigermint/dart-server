@@ -2,7 +2,7 @@ package com.ssh.dartserver.domain.survey.presentation.request;
 
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 @Data
 public class CommentRequest {

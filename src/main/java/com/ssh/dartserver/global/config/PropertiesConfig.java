@@ -8,6 +8,10 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@EnableConfigurationProperties(value = {SwaggerProperty.class, SlackProperty.class, OneSignalProperty.class, JwtProperty.class})
+@EnableConfigurationProperties(value = {
+        SwaggerProperty.class,
+        SlackProperty.class,
+        OneSignalProperty.class,
+        JwtProperty.class})
 public class PropertiesConfig {
 }

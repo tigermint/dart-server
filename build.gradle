@@ -1,9 +1,8 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '2.7.12'
+    id 'org.springframework.boot' version '3.0.13'
     id 'io.spring.dependency-management' version '1.1.0'
     id 'com.google.cloud.tools.jib' version '3.3.2'
-    id 'jacoco'
 }
 
 jib{
@@ -29,7 +28,7 @@ jib{
 
 group = 'com.ssh'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '11'
+sourceCompatibility = '17'
 
 configurations {
     compileOnly {
@@ -42,105 +41,87 @@ repositories {
 }
 
 dependencies {
-    // web
+    // Spring Boot
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
-    implementation 'com.fasterxml.jackson.core:jackson-core'
-
-    // security
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'com.auth0:java-jwt:4.3.0'
-
-    // validation
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
-    // database
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.flywaydb:flyway-core'
-    runtimeOnly 'org.postgresql:postgresql'
-    runtimeOnly 'com.h2database:h2'
+    // Auth0
+    implementation 'com.auth0:java-jwt:4.3.0'
 
-    implementation 'com.querydsl:querydsl-jpa'
-    implementation 'com.querydsl:querydsl-apt'
-    annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jpa"
-    annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
-    annotationProcessor 'jakarta.annotation:jakarta.annotation-api'
+    //Jackson
+    implementation 'com.fasterxml.jackson.core:jackson-core'
 
-    // develop
+    // Lombok
     compileOnly 'org.projectlombok:lombok'
-    compileOnly 'org.springframework:spring-context-indexer'
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
     annotationProcessor 'org.projectlombok:lombok'
 
+    // MapStruct
     implementation 'org.mapstruct:mapstruct:1.5.3.Final'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.3.Final'
 
-    // test
+    // Querydsl
+    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
+    annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
+    annotationProcessor 'jakarta.annotation:jakarta.annotation-api'
+
+    // Postgres
+    runtimeOnly 'org.postgresql:postgresql'
+
+    // Flyway
+    implementation 'org.flywaydb:flyway-core'
+
+    // Spring Context Indexer
+    compileOnly 'org.springframework:spring-context-indexer'
+
+    // Spring DevTools
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+    // Test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
-    testImplementation 'io.rest-assured:rest-assured'  // spring-boot 3는 rest-assured 5 이상을 사용해야함
+    testImplementation 'io.rest-assured:rest-assured'
     testImplementation "com.google.guava:guava:33.0.0-jre"
+    runtimeOnly 'com.h2database:h2'
+
+    // Spring Doc
     implementation 'org.springdoc:springdoc-openapi-ui:1.7.0'
-}
 
-def querydslSrcDir = 'src/main/generated'
-sourceSets {
-    main {
-        java {
-            srcDirs += [ querydslSrcDir ]
-        }
-    }
-}
-
-compileJava {
-    options.compilerArgs << '-Aquerydsl.generatedAnnotationClass=javax.annotation.Generated'
-}
-
-tasks.withType(JavaCompile) {
-    options.generatedSourceOutputDirectory = file(querydslSrcDir)
-}
-
-clean {
-    delete file(querydslSrcDir)
+    runtimeOnly 'org.springframework.boot:spring-boot-properties-migrator'
 }
 
 tasks.named('test') {
     useJUnitPlatform()
 }
 
+// Querydsl 설정
+def querydslDir = "$buildDir/generated/querydsl"
+
+sourceSets {
+    main {
+        java {
+            srcDirs += [querydslDir]
+        }
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.annotationProcessorGeneratedSourcesDirectory = file(querydslDir)
+}
+
+clean {
+    delete file(querydslDir)
+}
+
+
+// Sub-Module
 tasks.register('copyPrivate', Copy) {
     copy {
         from './dart-secret'
         include '*.yml'
         into 'src/main/resources'
-    }
-}
-
-test {
-    finalizedBy 'jacocoTestReport'
-}
-
-jacocoTestReport {
-    reports {
-        html.enabled true
-        csv.enabled true
-        xml.enabled false
-    }
-
-    finalizedBy 'jacocoTestCoverageVerification'
-}
-
-jacocoTestCoverageVerification {
-    violationRules {
-        rule {
-            enabled = false
-            element = 'CLASS'
-
-            limit {
-                counter = 'LINE'
-                value = 'COVEREDRATIO'
-                minimum = 0.00
-            }
-        }
     }
 }

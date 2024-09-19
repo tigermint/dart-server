@@ -1,4 +1,4 @@
-package com.ssh.dartserver.domain.user.presentation.v1;
+package com.ssh.dartserver.domain.user.presentation;
 
 import com.ssh.dartserver.domain.user.application.GuestService;
 import com.ssh.dartserver.domain.user.presentation.v1.request.GuestInviteRequest;
@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.net.URI;
 
 @Deprecated(since="20240724", forRemoval = true)

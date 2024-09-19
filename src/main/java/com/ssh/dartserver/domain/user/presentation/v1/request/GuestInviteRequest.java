@@ -1,6 +1,6 @@
 package com.ssh.dartserver.domain.user.presentation.v1.request;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data

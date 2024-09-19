@@ -2,7 +2,7 @@ package com.ssh.dartserver.domain.auth.presentation.request;
 
 import lombok.AllArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
