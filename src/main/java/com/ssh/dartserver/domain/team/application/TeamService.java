@@ -9,7 +9,6 @@ import com.ssh.dartserver.domain.team.domain.TeamUser;
 import com.ssh.dartserver.domain.team.infra.TeamRegionRepository;
 import com.ssh.dartserver.domain.team.infra.TeamRepository;
 import com.ssh.dartserver.domain.team.infra.TeamUserRepository;
-import com.ssh.dartserver.domain.team.domain.TeamSearchCondition;
 import com.ssh.dartserver.domain.team.presentation.response.*;
 import com.ssh.dartserver.domain.team.util.RegionMapper;
 import com.ssh.dartserver.domain.team.util.TeamMapper;
@@ -72,8 +71,8 @@ public class TeamService {
     }
 
     @Transactional
-    public Page<BlindDateTeamResponse> listVisibleTeam(User user, TeamSearchCondition condition, Pageable pageable) {
-        Page<Team> allVisibleTeamPages = teamRepository.findAllVisibleTeam(user, condition, pageable);
+    public Page<BlindDateTeamResponse> listVisibleTeam(User user, Pageable pageable) {
+        Page<Team> allVisibleTeamPages = teamRepository.findAllVisibleTeam(user, pageable);
 
         List<Team> visibleTeams = allVisibleTeamPages.getContent();
         teamRepository.increaseAllTeamViewCount(visibleTeams, VIEW_COUNT_INCREMENT);
