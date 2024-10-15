@@ -10,6 +10,8 @@ import com.ssh.dartserver.domain.team.presentation.response.RegionResponse;
 import com.ssh.dartserver.domain.team.presentation.request.TeamRequest;
 import com.ssh.dartserver.domain.team.presentation.response.TeamResponse;
 import com.ssh.dartserver.domain.team.infra.*;
+import com.ssh.dartserver.domain.team.util.RegionMapper;
+import com.ssh.dartserver.domain.team.util.TeamMapper;
 import com.ssh.dartserver.domain.university.domain.University;
 import com.ssh.dartserver.domain.university.application.UniversityMapper;
 import com.ssh.dartserver.domain.university.infra.UniversityRepository;
