@@ -26,9 +26,6 @@ public class Team extends BaseTimeEntity {
     @Embedded
     private Name name;
 
-    @Embedded
-    private TeamUsersCombinationHash teamUsersCombinationHash;
-
     @Column(name = "is_visible_to_same_university")
     private Boolean isVisibleToSameUniversity;
 
@@ -40,15 +37,26 @@ public class Team extends BaseTimeEntity {
     private University university;
 
     @OneToMany(mappedBy = "team", cascade = CascadeType.ALL)
-    private List<TeamUser> teamUsers = new ArrayList<>();
-
-    @OneToMany(mappedBy = "team", cascade = CascadeType.ALL)
     private List<TeamRegion> teamRegions = new ArrayList<>();
 
+    @OneToMany(mappedBy = "team", cascade = CascadeType.ALL)
+    private List<TeamImage> teamImages = new ArrayList<>();
+
+    // TODO - 이 주석을 제거하세요. Deprecated 20241015
+    @Deprecated(since = "20241015", forRemoval = false)
+    @Embedded
+    private TeamUsersCombinationHash teamUsersCombinationHash;
+
+    @Deprecated(since = "20241015", forRemoval = false)
+    @OneToMany(mappedBy = "team", cascade = CascadeType.ALL)
+    private List<TeamUser> teamUsers = new ArrayList<>();
+
+    @Deprecated(since = "20241015", forRemoval = false)
     @OneToMany(mappedBy = "team", cascade = CascadeType.ALL)
     @BatchSize(size = 500)
     private List<SingleTeamFriend> singleTeamFriends = new ArrayList<>();
 
+    // TODO 이걸 꼭 팀에서 알아야하나 확인 2024-10-15 @HyeonSik Choi
     @OneToMany(mappedBy = "requestedTeam")
     private List<Proposal> requestedTeamProposals = new ArrayList<>();
 

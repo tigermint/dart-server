@@ -9,6 +9,7 @@ import lombok.*;
 import jakarta.persistence.*;
 import java.util.Optional;
 
+@Deprecated(since = "20241015", forRemoval = false)
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
