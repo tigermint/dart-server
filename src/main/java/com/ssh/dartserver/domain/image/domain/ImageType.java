@@ -1,4 +1,4 @@
-package com.ssh.dartserver.domain.image;
+package com.ssh.dartserver.domain.image.domain;
 
 public enum ImageType {
     URL,  // URL 형식의 이미지

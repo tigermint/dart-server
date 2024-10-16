@@ -1,12 +1,15 @@
-package com.ssh.dartserver.domain.image;
+package com.ssh.dartserver.domain.image.application;
 
+import com.ssh.dartserver.domain.image.domain.Image;
+import com.ssh.dartserver.domain.image.infra.ImageRepository;
+import com.ssh.dartserver.domain.image.domain.ImageType;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-@Service
+@Component
 @RequiredArgsConstructor
-public class ImageService {
+public class ImageUploader {
     private final ImageRepository imageRepository;
 
     // 단일 이미지 URL 등록
@@ -22,21 +25,6 @@ public class ImageService {
                 .toList();
 
         return imageRepository.saveAll(images);
-    }
-
-    // 이미지 정보 조회 (ID로 조회)
-    public Image getImageById(Long id) {
-        return imageRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Image not found with id: " + id));
-    }
-
-    // 이미지 삭제
-    public void deleteImage(Long id) {
-        if (imageRepository.existsById(id)) {
-            imageRepository.deleteById(id);
-        } else {
-            throw new IllegalArgumentException("Image not found with id: " + id);
-        }
     }
 
 }

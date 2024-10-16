@@ -1,4 +1,4 @@
-package com.ssh.dartserver.domain.image;
+package com.ssh.dartserver.domain.image.domain;
 
 import com.ssh.dartserver.global.common.BaseTimeEntity;
 import jakarta.persistence.Column;

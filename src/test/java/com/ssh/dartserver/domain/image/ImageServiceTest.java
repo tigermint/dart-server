@@ -3,6 +3,10 @@ package com.ssh.dartserver.domain.image;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.ssh.dartserver.ApiTest;
+import com.ssh.dartserver.domain.image.application.ImageService;
+import com.ssh.dartserver.domain.image.domain.Image;
+import com.ssh.dartserver.domain.image.domain.ImageType;
+import com.ssh.dartserver.domain.image.infra.ImageRepository;
 import com.ssh.dartserver.testing.IntegrationTest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
