@@ -125,6 +125,8 @@ public class UserController {
         return ResponseEntity.ok(myTeamService.updateTeam(principal.getUser(), teamId, request));
     }
 
+    // v1 team delete logic (deprecated)
+    @Deprecated(since = "20241017")
     @DeleteMapping("/me/teams/{teamId}")
     public ResponseEntity<String> deleteTeam(Authentication authentication, @PathVariable Long teamId) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
