@@ -1,6 +1,10 @@
 package com.ssh.dartserver.domain.team.domain;
 
 import com.ssh.dartserver.domain.proposal.domain.Proposal;
+import com.ssh.dartserver.domain.team.domain.vo.Name;
+import com.ssh.dartserver.domain.team.domain.vo.TeamDescription;
+import com.ssh.dartserver.domain.team.domain.vo.TeamUsersCombinationHash;
+import com.ssh.dartserver.domain.team.domain.vo.ViewCount;
 import com.ssh.dartserver.domain.university.domain.University;
 import com.ssh.dartserver.global.common.BaseTimeEntity;
 import lombok.AllArgsConstructor;

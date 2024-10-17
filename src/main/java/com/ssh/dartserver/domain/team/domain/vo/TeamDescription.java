@@ -1,4 +1,4 @@
-package com.ssh.dartserver.domain.team.domain;
+package com.ssh.dartserver.domain.team.domain.vo;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;

@@ -1,7 +1,7 @@
 package com.ssh.dartserver.domain.team.infra;
 
 import com.ssh.dartserver.domain.team.domain.Team;
-import com.ssh.dartserver.domain.team.domain.TeamUsersCombinationHash;
+import com.ssh.dartserver.domain.team.domain.vo.TeamUsersCombinationHash;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

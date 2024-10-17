@@ -1,4 +1,4 @@
-package com.ssh.dartserver.domain.team.domain;
+package com.ssh.dartserver.domain.team.domain.vo;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

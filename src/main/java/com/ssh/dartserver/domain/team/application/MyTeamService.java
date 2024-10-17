@@ -6,6 +6,7 @@ import com.ssh.dartserver.domain.proposal.domain.Proposal;
 import com.ssh.dartserver.domain.proposal.infra.ProposalRepository;
 import com.ssh.dartserver.domain.question.application.QuestionMapper;
 import com.ssh.dartserver.domain.team.domain.*;
+import com.ssh.dartserver.domain.team.domain.vo.TeamUsersCombinationHash;
 import com.ssh.dartserver.domain.team.presentation.response.RegionResponse;
 import com.ssh.dartserver.domain.team.presentation.request.TeamRequest;
 import com.ssh.dartserver.domain.team.presentation.response.TeamResponse;

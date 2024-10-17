@@ -1,4 +1,4 @@
-package com.ssh.dartserver.domain.team.domain;
+package com.ssh.dartserver.domain.team.domain.vo;
 
 import java.util.Arrays;
 import lombok.Getter;
