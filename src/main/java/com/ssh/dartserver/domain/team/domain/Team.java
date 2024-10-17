@@ -26,6 +26,9 @@ public class Team extends BaseTimeEntity {
     @Embedded
     private Name name;
 
+    @Embedded
+    private TeamDescription description;
+
     @Column(name = "is_visible_to_same_university")
     private Boolean isVisibleToSameUniversity;
 
