@@ -6,7 +6,6 @@ import com.ssh.dartserver.domain.team.domain.Region;
 import com.ssh.dartserver.domain.team.domain.Team;
 import com.ssh.dartserver.domain.team.domain.TeamImage;
 import com.ssh.dartserver.domain.team.domain.TeamRegion;
-import com.ssh.dartserver.domain.team.domain.vo.Name;
 import com.ssh.dartserver.domain.team.domain.vo.TeamDescription;
 import com.ssh.dartserver.domain.team.infra.RegionRepository;
 import com.ssh.dartserver.domain.team.infra.TeamRegionRepository;
@@ -43,27 +42,17 @@ public class BlindDateTeamService {
             throw new IllegalStateException("사용자는 하나의 팀만 생성할 수 있습니다. 이미 생성한 팀이 존재합니다. userId=" + user.getId());
         }
 
-        // 도메인 객체 생성
-        BlindDateTeam blindTeam = BlindDateTeam.builder()
-                .name(new Name(request.name()))
-                .user(user)
-                .description(new TeamDescription(request.description()))
-                .isVisibleToSameUniversity(request.isVisibleToSameUniversity())
-                .regionIds(request.regionIds())
-                .imageUrls(request.imageUrls())
-                .build();
-
         // Entity로 매핑 및 저장
         Team team = Team.builder()
-                .user(blindTeam.getUser())
-                .name(blindTeam.getName().getValue())
-                .description(blindTeam.getDescription())
-                .isVisibleToSameUniversity(blindTeam.isVisibleToSameUniversity())
+                .user(user)
+                .name(request.name())
+                .description(new TeamDescription(request.description()))
+                .isVisibleToSameUniversity(request.isVisibleToSameUniversity())
                 .build();
         teamRepository.save(team);
 
         // 활동 지역 등록
-        List<Region> regions = regionRepository.findAllByIdIn(blindTeam.getRegionIds());
+        List<Region> regions = regionRepository.findAllByIdIn(request.regionIds());
         List<TeamRegion> teamRegions = regions.stream()
                 .map(region -> TeamRegion.builder()
                         .region(region)
@@ -73,7 +62,7 @@ public class BlindDateTeamService {
         teamRegions = teamRegionRepository.saveAll(teamRegions);
 
         // 팀 이미지들 등록
-        List<Image> images = imageUploader.saveImageUrls(blindTeam.getImageUrls());
+        List<Image> images = imageUploader.saveImageUrls(request.imageUrls());
         List<TeamImage> teamImages = images.stream()
                 .map(image -> TeamImage.builder()
                         .team(team)
