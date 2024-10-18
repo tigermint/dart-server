@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.lang.NonNull;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -23,4 +24,8 @@ public interface TeamRepository extends JpaRepository<Team, Long>, TeamRepositor
             "set t.viewCount.value = t.viewCount.value + :viewCountIncrement " +
             "where t in :teams")
     void increaseAllTeamViewCount(@Param("teams") List<Team> teams, @Param("viewCountIncrement") int viewCountIncrement);
+
+    @Query("select (count(t) > 0) from Team t where t.leader.id = ?1")
+    boolean existsByLeader_Id(@NonNull Long id);
+
 }

@@ -27,4 +27,12 @@ public class TeamRegion {
     @JoinColumn(name = "region_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Region region;
 
+    @Override
+    public String toString() {
+        return "TeamRegion{" +
+                "id=" + id +
+                ", teamId=" + team.getId() +
+                ", region=" + region.toString() +
+                '}';
+    }
 }

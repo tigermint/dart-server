@@ -14,6 +14,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -36,4 +37,20 @@ public class TeamImage extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "image_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Image image;
+
+    @Builder
+    public TeamImage(Long id, Team team, Image image) {
+        this.id = id;
+        this.team = team;
+        this.image = image;
+    }
+
+    @Override
+    public String toString() {
+        return "TeamImage{" +
+                "id=" + id +
+                ", teamId=" + team.getId() +
+                ", imageId=" + image.getId() +
+                '}';
+    }
 }

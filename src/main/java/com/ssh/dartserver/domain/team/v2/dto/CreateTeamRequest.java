@@ -1,4 +1,12 @@
 package com.ssh.dartserver.domain.team.v2.dto;
 
-public record CreateTeamRequest() {
+import java.util.List;
+
+public record CreateTeamRequest(
+        String name,
+        String description,
+        boolean isVisibleToSameUniversity,
+        List<Long> regionIds,
+        List<String> imageUrls
+) {
 }
