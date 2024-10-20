@@ -77,6 +77,7 @@ public class TeamRepositoryImpl implements TeamRepositoryCustom {
     }
 
     private BooleanExpression isVisibleToSameUniversityEq(Long universityId) {
+        // FIXME 현재는 같은 학과에게 안보이기가 됨 (universityId가 아닌 name을 사용)
         return team.isVisibleToSameUniversity.isTrue()
                 .or(team.isVisibleToSameUniversity.isFalse().and(team.university.id.ne(universityId)));
     }

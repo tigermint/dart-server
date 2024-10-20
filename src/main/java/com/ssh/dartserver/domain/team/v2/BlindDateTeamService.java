@@ -14,11 +14,14 @@ import com.ssh.dartserver.domain.team.infra.TeamRegionRepository;
 import com.ssh.dartserver.domain.team.infra.TeamRepository;
 import com.ssh.dartserver.domain.team.presentation.response.RegionResponse;
 import com.ssh.dartserver.domain.team.v2.dto.BlindDateTeamInfo;
+import com.ssh.dartserver.domain.team.v2.dto.BlindDateTeamSimpleInfo;
 import com.ssh.dartserver.domain.team.v2.dto.CreateTeamRequest;
 import com.ssh.dartserver.domain.team.v2.dto.UpdateTeamRequest;
 import com.ssh.dartserver.domain.user.domain.User;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -92,22 +95,66 @@ public class BlindDateTeamService {
     }
 
     // 팀 목록 조회
-    public void getTeamList(Pageable pageable) {
+    public Page<BlindDateTeamSimpleInfo> getTeamList(User user, Pageable pageable) {
+        // 검증
+        if (user == null) {
+            throw new IllegalArgumentException("사용자 정보는 null일 수 없습니다.");
+        }
+        if (pageable == null) {
+            throw new IllegalArgumentException("페이징 정보 객체는 null일 수 없습니다.");
+        }
 
-        // TODO 조회수 처리 + 푸시 알림
+        Page<Team> teams = teamRepository.findAll(user, pageable);
+        List<BlindDateTeamSimpleInfo> blindDateTeams = teams.getContent().stream()
+                .map(team -> {
+                    // TODO 조회수 처리 + 푸시 알림
+                    // TODO v1, v2 분기 처리
 
-        // 성별 필터링은 해야함
+                    List<RegionResponse> regions = team.getTeamRegions().stream()
+                            .map(teamRegion -> new RegionResponse(teamRegion.getRegion().getId(),
+                                    teamRegion.getRegion().getName()))
+                            .toList();
 
-        throw new UnsupportedOperationException();
+                    List<String> images = team.getTeamImages().stream()
+                            .map(teamImage -> teamImage.getImage().getData())
+                            .toList();
+
+                    // Proposal 확인하기 (개선 필요)
+                    List<Proposal> proposals = proposalRepository.findAllByRequestingTeamOrRequestedTeam(team,
+                            team);  // findAll의 위험성
+                    boolean isAlreadyProposal = proposals.stream()
+                            .anyMatch(proposal -> team.getId() == proposal.getRequestedTeam().getId()
+                                    || team.getId() == proposal.getRequestingTeam().getId());
+
+                    // v2 처리
+                    return BlindDateTeamSimpleInfo.builder()
+                            .id(team.getId())
+                            .leaderId(team.getLeader().getId())
+                            .age(team.getLeader().getPersonalInfo().getBirthYear().getAge())
+                            .isCertified(team.getLeader().getStudentVerificationInfo().isCertified())
+                            .universityName(team.getLeader().getUniversity().getName())
+                            .departmentName(team.getLeader().getUniversity().getDepartment())
+
+                            .name(team.getName().getValue())
+                            .description(team.getDescription().getDescription())
+                            .isVisibleToSameUniversity(team.getIsVisibleToSameUniversity())
+
+                            .regions(regions)
+                            .imageUrls(images)
+                            .isAlreadyProposalTeam(isAlreadyProposal)
+
+                            .build();
+                })
+                .toList();
+
+        return new PageImpl<>(blindDateTeams, pageable, teams.getTotalElements());
     }
 
     // 팀 상세 조회
     public BlindDateTeamInfo getTeamInfo(long teamId) {
-            // TODO 조회수 처리 + 푸시 알림
-
+        // TODO 조회수 처리 + 푸시 알림
         // TODO v1, v2 분기 처리
-//        if (team.getTeamUsersCombinationHash() != null) {
-//        }
+        // if (team.getTeamUsersCombinationHash() != null) {
 
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 팀 입니다. teamId: " + teamId));
@@ -121,7 +168,7 @@ public class BlindDateTeamService {
                 .toList();
 
         // Proposal 확인하기 (개선 필요)
-        List<Proposal> proposals = proposalRepository.findAllByRequestingTeamOrRequestedTeam(team, team);
+        List<Proposal> proposals = proposalRepository.findAllByRequestingTeamOrRequestedTeam(team, team);  // findAll의 위험성
         boolean isAlreadyProposal = proposals.stream()
                 .anyMatch(proposal -> team.getId() == proposal.getRequestedTeam().getId() || team.getId() == proposal.getRequestingTeam().getId());
 

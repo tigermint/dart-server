@@ -3,9 +3,11 @@ package com.ssh.dartserver.domain.team.v2;
 import static com.ssh.dartserver.domain.university.UniversitySteps.대학생성요청_생성;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.ssh.dartserver.ApiTest;
+import com.ssh.dartserver.TestRepository;
 import com.ssh.dartserver.domain.image.domain.Image;
 import com.ssh.dartserver.domain.image.domain.ImageType;
 import com.ssh.dartserver.domain.image.infra.ImageRepository;
@@ -18,6 +20,7 @@ import com.ssh.dartserver.domain.team.infra.RegionRepository;
 import com.ssh.dartserver.domain.team.infra.TeamRegionRepository;
 import com.ssh.dartserver.domain.team.infra.TeamRepository;
 import com.ssh.dartserver.domain.team.v2.dto.BlindDateTeamInfo;
+import com.ssh.dartserver.domain.team.v2.dto.BlindDateTeamSimpleInfo;
 import com.ssh.dartserver.domain.team.v2.dto.CreateTeamRequest;
 import com.ssh.dartserver.domain.university.domain.University;
 import com.ssh.dartserver.domain.university.infra.UniversityRepository;
@@ -37,6 +40,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 @IntegrationTest
@@ -66,6 +72,9 @@ class BlindDateTeamServiceTest extends ApiTest {
     @Autowired
     private ImageRepository imageRepository;
 
+    @Autowired
+    private TestRepository testRepository;
+
 
     @BeforeEach
     void setUp() {
@@ -80,7 +89,7 @@ class BlindDateTeamServiceTest extends ApiTest {
 
     @Nested
     @DisplayName("팀 생성 테스트")
-    public class CreateTeam {
+    class CreateTeam {
 
         @Test
         @Transactional
@@ -191,7 +200,7 @@ class BlindDateTeamServiceTest extends ApiTest {
 
     @Nested
     @DisplayName("팀 상세 조회 테스트")
-    public class GetTeamInfo {
+    class GetTeamInfo {
 
         @Test
         @DisplayName("등록한 팀의 id를 전달하면 정상적으로 조회한다.")
@@ -290,6 +299,138 @@ class BlindDateTeamServiceTest extends ApiTest {
         void getTeamInfo_Success_WhenTeamIdIsValid() {
             throw new UnsupportedOperationException();  // TODO 기능 구현 필요 + 추가로 v1 클라이언트의 요청도 커버해야함 (이건 기존 서비스 테스트)
         }
+
+    }
+
+    @Nested
+    @DisplayName("팀 목록 조회 테스트")
+    class GetTeamList {
+
+        @Test
+        @DisplayName("인자로 전달된 User가 null인 경우 예외가 발생한다.")
+        void shouldThrowExceptionWhenUserIsNull() {
+            // given
+            Pageable pageable = PageRequest.of(0, 10);
+
+            // when & then
+            assertThrows(IllegalArgumentException.class, () -> {
+                blindDateTeamService.getTeamList(null, pageable);
+            });
+        }
+
+        @Test
+        @DisplayName("인자로 전달된 Pageable이 null인 경우 예외가 발생한다.")
+        @Transactional
+        void shouldThrowExceptionWhenPageableIsNull() {
+            // given
+            University university = testRepository.addUniversity("Test Univ", "CS");
+            User user = testRepository.createUser("Test User", Gender.MALE, university);
+
+            // when & then
+            assertThrows(IllegalArgumentException.class, () -> {
+                blindDateTeamService.getTeamList(user, null);
+            });
+        }
+
+        @Test
+        @DisplayName("전달된 인자로 조회한 값이 없는 경우 성공적으로 반환한다.")
+        @Transactional
+        void shouldReturnNoneTeamsSuccessfully() {
+            // given
+            testRepository.addRegion("부산");
+            testRepository.addRegion("인천");
+            University university = testRepository.addUniversity("Test Univ", "CS");
+
+            User user = testRepository.createUser("Male User", Gender.MALE, university);
+            User user2 = testRepository.createUser("Male User2", Gender.MALE, university);
+
+            Pageable pageable = PageRequest.of(0, 10);
+            testRepository.createTeam("Team 1", user, Boolean.TRUE, "부산");
+            testRepository.createTeam("Team 2", user2, Boolean.TRUE, "인천");
+
+            // when
+            Page<BlindDateTeamSimpleInfo> teamList = blindDateTeamService.getTeamList(user, pageable);
+
+            // then
+            assertNotNull(teamList);
+            assertThat(teamList.getTotalElements()).isZero();
+        }
+
+        @Test
+        @DisplayName("전달된 인자로 조회한 값이 한 개인 경우 성공적으로 반환한다.")
+        @Transactional
+        void shouldReturnSingleTeamSuccessfully() {
+            // given
+            testRepository.addRegion("부산");
+            testRepository.addRegion("인천");
+            University university = testRepository.addUniversity("Test Univ", "CS");
+
+            User user = testRepository.createUser("Male User", Gender.MALE, university);
+            User female = testRepository.createUser("Female User", Gender.FEMALE, university);
+
+            Pageable pageable = PageRequest.of(0, 10);
+            testRepository.createTeam("Team 1", user, Boolean.TRUE, "부산");
+            testRepository.createTeam("Team 2", female, Boolean.TRUE, "인천");
+
+            // when
+            Page<BlindDateTeamSimpleInfo> teamList = blindDateTeamService.getTeamList(user, pageable);
+
+            // then
+            assertNotNull(teamList);
+            BlindDateTeamSimpleInfo teamInfo = teamList.getContent().get(0);
+            assertAll(
+                    () -> assertThat(teamList.getTotalElements()).isEqualTo(1),
+                    () -> assertThat(teamInfo.id()).isEqualTo(2),
+                    () -> assertThat(teamInfo.leaderId()).isEqualTo(2),
+                    () -> assertThat(teamInfo.age()).isEqualTo(25),
+                    () -> assertThat(teamInfo.isCertified()).isFalse(),
+                    () -> assertThat(teamInfo.universityName()).isEqualTo("Test Univ"),
+                    () -> assertThat(teamInfo.departmentName()).isEqualTo("CS"),
+                    () -> assertThat(teamInfo.name()).isEqualTo("Team 2"),
+                    () -> assertThat(teamInfo.description()).isEqualTo("팀 설명입니다."),
+                    () -> assertThat(teamInfo.isVisibleToSameUniversity()).isTrue(),
+                    () -> assertThat(teamInfo.regions().get(0).getName()).isEqualTo("인천"),
+                    () -> assertThat(teamInfo.imageUrls().get(0)).isEqualTo("https://www.naver.com/image1.jpg"),
+                    () -> assertThat(teamInfo.isAlreadyProposalTeam()).isFalse()
+            );
+        }
+
+        @Test
+        @DisplayName("전달된 인자로 조회한 값이 여러개인 경우 성공적으로 반환한다.")
+        @Transactional
+        void shouldReturnMultipleTeamsSuccessfully() {
+
+            // given
+            testRepository.addRegion("부산");
+            testRepository.addRegion("인천");
+            University university = testRepository.addUniversity("Test Univ", "CS");
+
+            User user = testRepository.createUser("Male User", Gender.MALE, university);
+            User female1 = testRepository.createUser("Female User1", Gender.FEMALE, university);
+            User female2 = testRepository.createUser("Female User2", Gender.FEMALE, university);
+            User female3 = testRepository.createUser("Female User3", Gender.FEMALE, university);
+            User female4 = testRepository.createUser("Female User4", Gender.FEMALE, university);
+            User female5 = testRepository.createUser("Female User5", Gender.FEMALE, university);
+            User female6 = testRepository.createUser("Female User6", Gender.FEMALE, university);
+
+            Pageable pageable = PageRequest.of(0, 10);
+            testRepository.createTeam("Team", user, Boolean.TRUE, "부산");
+            testRepository.createTeam("True1", female1, Boolean.TRUE, "인천");
+            testRepository.createTeam("False1", female2, Boolean.FALSE, "인천");  // 같은 학교 조회 x
+            testRepository.createTeam("False2", female3, Boolean.FALSE, "부산");  // 같은 학교 조회 x
+            testRepository.createTeam("True2", female4, Boolean.TRUE, "부산");
+            testRepository.createTeam("True3", female5, Boolean.TRUE, "인천");
+            testRepository.createTeam("True4", female6, Boolean.TRUE, "인천");
+
+            // when
+            Page<BlindDateTeamSimpleInfo> teamList = blindDateTeamService.getTeamList(user, pageable);
+
+            // then
+            assertNotNull(teamList);
+            assertThat(teamList.getTotalElements()).isEqualTo(4);
+        }
+
+        // TODO 조회수 처리 및 푸시 알림?
 
     }
 
