@@ -46,6 +46,11 @@ public class TeamImage extends BaseTimeEntity {
         this.image = image;
     }
 
+    public TeamImage(Team team, Image image) {
+        this.team = team;
+        this.image = image;
+    }
+
     @Override
     public String toString() {
         return "TeamImage{" +

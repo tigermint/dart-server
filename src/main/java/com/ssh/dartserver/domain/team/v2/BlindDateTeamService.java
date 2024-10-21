@@ -2,12 +2,14 @@ package com.ssh.dartserver.domain.team.v2;
 
 import com.ssh.dartserver.domain.image.application.ImageUploader;
 import com.ssh.dartserver.domain.image.domain.Image;
+import com.ssh.dartserver.domain.image.domain.ImageType;
 import com.ssh.dartserver.domain.proposal.domain.Proposal;
 import com.ssh.dartserver.domain.proposal.infra.ProposalRepository;
 import com.ssh.dartserver.domain.team.domain.Region;
 import com.ssh.dartserver.domain.team.domain.Team;
 import com.ssh.dartserver.domain.team.domain.TeamImage;
 import com.ssh.dartserver.domain.team.domain.TeamRegion;
+import com.ssh.dartserver.domain.team.domain.vo.Name;
 import com.ssh.dartserver.domain.team.domain.vo.TeamDescription;
 import com.ssh.dartserver.domain.team.infra.RegionRepository;
 import com.ssh.dartserver.domain.team.infra.TeamRegionRepository;
@@ -85,9 +87,69 @@ public class BlindDateTeamService {
         teamRepository.save(team);
     }
 
-    // 팀 수정
+    // 팀 수정 (Put)
     public void updateTeam(User user, UpdateTeamRequest request) {
-        throw new UnsupportedOperationException();
+        // 검증
+        if (user == null) {
+            throw new IllegalArgumentException("사용자 정보는 null일 수 없습니다.");
+        }
+        if (request == null) {
+            throw new IllegalArgumentException("팀 수정 요청(UpdateTeamRequest)는 null일 수 없습니다.");
+        }
+
+        Team team = teamRepository.findById(request.teamId())
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 팀 입니다. teamId: " + request.teamId()));
+
+        if (!team.isLeader(user)) {
+            throw new IllegalArgumentException("자신이 만든 팀만 삭제할 수 있습니다. team.leaderId: " + team.getLeader().getId());
+        }
+
+        // regionId로 regions 가져오기
+        List<Region> regions = request.regionIds().stream()
+                .map(regionId -> regionRepository.findById(regionId)
+                        .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 RegionId입니다. value: " + regionId)))
+                .toList();
+
+        List<TeamRegion> teamRegions = teamRegionRepository.findAllByTeamId(team.getId());
+        List<TeamRegion> teamRegions1 = regions.stream()
+                .map(region -> {
+                    Optional<TeamRegion> teamRegion = findTeamRegionByRegion(teamRegions, region);
+                    return teamRegion.orElseGet(() -> new TeamRegion(team, region));
+                })
+                .toList();
+
+        // ImageUrl을 비교하여 아직 등록되지 않은 이미지만 새로 등록
+        List<TeamImage> teamImages = teamImageRepository.findAllByTeam(team);
+        List<TeamImage> teamImages1 = request.imageUrls().stream()
+                .map(imageUrl -> {
+                    Optional<TeamImage> teamImage = findTeamImageByImageUrl(teamImages, imageUrl);
+                    return teamImage.orElseGet(() -> {
+                        Image image = new Image(ImageType.URL, imageUrl);
+                        return new TeamImage(team, image);
+                    });
+                })
+                .toList();
+
+        // 로직
+        team.setName(Name.from(request.name()));
+        team.setDescription(new TeamDescription(request.description()));
+        team.setIsVisibleToSameUniversity(request.isVisibleToSameUniversity());
+        team.setTeamRegions(teamRegions1);
+        team.setTeamImages(teamImages1);
+
+        teamRepository.save(team);
+    }
+
+    private Optional<TeamRegion> findTeamRegionByRegion(List<TeamRegion> teamRegions, Region region) {
+        return teamRegions.stream()
+                .filter(teamRegion -> teamRegion.isRegionEqual(region))
+                .findAny();
+    }
+
+    private Optional<TeamImage> findTeamImageByImageUrl(List<TeamImage> teamImages, String imageUrl) {
+        return teamImages.stream()
+                .filter(teamImage -> teamImage.getImage().isImageUrlEqual(imageUrl))
+                .findAny();
     }
 
     // 팀 삭제

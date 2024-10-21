@@ -27,6 +27,15 @@ public class TeamRegion {
     @JoinColumn(name = "region_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Region region;
 
+    public boolean isRegionEqual(Region region) {
+        return this.region == region;
+    }
+
+    public TeamRegion(Team team, Region region) {
+        this.team = team;
+        this.region = region;
+    }
+
     @Override
     public String toString() {
         return "TeamRegion{" +

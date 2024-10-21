@@ -99,4 +99,15 @@ public class Team extends BaseTimeEntity {
     public boolean isLeader(User user) {
         return leader.equals(user);
     }
+
+    public void setTeamRegions(List<TeamRegion> teamRegions) {
+        this.teamRegions.clear();
+        this.teamRegions.addAll(teamRegions);
+    }
+
+    public void setTeamImages(List<TeamImage> teamImages) {
+        this.teamImages.clear();
+        this.teamImages.addAll(teamImages);
+    }
+
 }

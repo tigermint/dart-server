@@ -36,12 +36,23 @@ public class Image extends BaseTimeEntity {
     @Column(name = "data", nullable = false)
     private String data;
 
+    public boolean isImageUrlEqual(String imageUrl) {
+        if (!type.isUrl()) {
+            return false;
+        }
+        return data.equals(imageUrl);
+    }
+
     public Image(Long id, ImageType type, String data) {
         validateData(type, data);
 
         this.id = id;
         this.type = type;
         this.data = data;
+    }
+
+    public Image(ImageType type, String data) {
+        this(null, type, data);
     }
 
     private void validateData(ImageType type, String data) {

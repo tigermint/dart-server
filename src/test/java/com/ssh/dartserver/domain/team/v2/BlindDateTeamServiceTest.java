@@ -23,6 +23,7 @@ import com.ssh.dartserver.domain.team.infra.TeamRepository;
 import com.ssh.dartserver.domain.team.v2.dto.BlindDateTeamInfo;
 import com.ssh.dartserver.domain.team.v2.dto.BlindDateTeamSimpleInfo;
 import com.ssh.dartserver.domain.team.v2.dto.CreateTeamRequest;
+import com.ssh.dartserver.domain.team.v2.dto.UpdateTeamRequest;
 import com.ssh.dartserver.domain.university.domain.University;
 import com.ssh.dartserver.domain.university.infra.UniversityRepository;
 import com.ssh.dartserver.domain.user.domain.AuthInfo;
@@ -34,6 +35,7 @@ import com.ssh.dartserver.domain.user.domain.studentverificationinfo.StudentVeri
 import com.ssh.dartserver.domain.user.infra.UserRepository;
 import com.ssh.dartserver.global.common.Role;
 import com.ssh.dartserver.testing.IntegrationTest;
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -536,6 +538,136 @@ class BlindDateTeamServiceTest extends ApiTest {
 
     }
 
+    @Nested
+    @DisplayName("팀 수정 테스트")
+    class UpdateTeam {
+
+        @Test
+        @DisplayName("User가 null인 경우 예외가 발생한다.")
+        void shouldThrowExceptionWhenUserIsNull() {
+            // given
+            UpdateTeamRequest request = new UpdateTeamRequest(
+                    1L, "새 팀 이름", "새 팀 설명", true, List.of(1L, 2L), List.of("https://example.com/image1.jpg")
+            );
+
+            // when & then
+            assertThrows(IllegalArgumentException.class, () -> {
+                blindDateTeamService.updateTeam(null, request);
+            });
+        }
+
+        @Test
+        @DisplayName("UpdateTeamRequest가 null인 경우 예외가 발생한다.")
+        @Transactional
+        void shouldThrowExceptionWhenRequestIsNull() {
+            // given
+            University university = testRepository.addUniversity("Test Univ", "CS");
+            User user = testRepository.createUser("Test User", Gender.MALE, university);
+
+            // when & then
+            assertThrows(IllegalArgumentException.class, () -> {
+                blindDateTeamService.updateTeam(user, null);
+            });
+        }
+
+        @Test
+        @DisplayName("팀을 찾을 수 없는 경우 예외가 발생한다.")
+        @Transactional
+        void shouldThrowExceptionWhenTeamNotFound() {
+            // given
+            testRepository.addRegion("부산");
+            University university = testRepository.addUniversity("Test Univ", "CS");
+            User user = testRepository.createUser("Male User", Gender.MALE, university);
+            testRepository.createTeam("Team", user, Boolean.TRUE, "부산");
+
+            UpdateTeamRequest request = new UpdateTeamRequest(
+                    999L, "새 팀 이름", "새 팀 설명", true, List.of(1L, 2L), List.of("https://example.com/image1.jpg")
+            );
+
+            // when & then
+            assertThrows(IllegalArgumentException.class, () -> {
+                blindDateTeamService.updateTeam(user, request);
+            });
+        }
+
+
+        @Test
+        @DisplayName("팀 리더가 아닌 사용자가 팀을 수정하려는 경우 예외가 발생한다.")
+        @Transactional
+        void shouldThrowExceptionWhenUserIsNotLeader() {
+            // given
+            testRepository.addRegion("부산");
+            University university = testRepository.addUniversity("Test Univ", "CS");
+            User leader = testRepository.createUser("Leader", Gender.MALE, university);
+            User nonLeader = testRepository.createUser("Non-Leader", Gender.MALE, university);
+
+            Team team = testRepository.createTeam("Team", leader, Boolean.TRUE, "부산");
+
+            UpdateTeamRequest request = new UpdateTeamRequest(
+                    team.getId(), "새 팀 이름", "새 팀 설명", true, List.of(1L, 2L), List.of("https://example.com/image1.jpg")
+            );
+
+            // when & then
+            assertThrows(IllegalArgumentException.class, () -> {
+                blindDateTeamService.updateTeam(nonLeader, request);
+            });
+        }
+
+        @Test
+        @DisplayName("존재하지 않는 RegionId가 있는 경우 예외가 발생한다.")
+        @Transactional
+        void shouldThrowExceptionWhenRegionNotFound() {
+            // given
+            testRepository.addRegion("부산");
+            University university = testRepository.addUniversity("Test Univ", "CS");
+            User user = testRepository.createUser("Test User", Gender.MALE, university);
+
+            Team team = testRepository.createTeam("Team", user, Boolean.TRUE, "부산");
+
+            UpdateTeamRequest request = new UpdateTeamRequest(
+                    team.getId(), "새 팀 이름", "새 팀 설명", true, List.of(999L), List.of("https://example.com/image1.jpg")
+            );
+
+            // when & then
+            assertThrows(IllegalArgumentException.class, () -> {
+                blindDateTeamService.updateTeam(user, request);
+            });
+        }
+
+        @Test
+        @DisplayName("팀 수정이 성공적으로 완료된다.")
+        @Transactional
+        void shouldUpdateTeamSuccessfully() {
+            // given
+            testRepository.addRegion("부산");
+            testRepository.addRegion("인천");
+            testRepository.addRegion("천안");
+            University university = testRepository.addUniversity("Test Univ", "CS");
+            User user = testRepository.createUser("Test User", Gender.MALE, university);
+
+            Team team = testRepository.createTeam("Team", user, Boolean.TRUE, "부산");
+
+            UpdateTeamRequest request = new UpdateTeamRequest(
+                    team.getId(), "새 팀 이름", "새 팀 설명", true, new ArrayList<>(List.of(2L, 3L)), new ArrayList<>(List.of("https://example.com/image1.jpg", "https://example.com/image2.jpg"))
+            );
+
+            // when
+            blindDateTeamService.updateTeam(user, request);
+
+            // then
+            assertNotNull(team);
+            assertAll(
+                    () -> assertThat(team.getName().getValue()).isEqualTo("새 팀 이름"),
+                    () -> assertThat(team.getDescription().getDescription()).isEqualTo("새 팀 설명"),
+                    () -> assertThat(team.getTeamRegions()).hasSize(2),
+                    () -> assertThat(team.getTeamImages()).hasSize(2),
+                    () -> assertThat(team.getTeamImages().get(0).getImage().getData()).isIn("https://example.com/image1.jpg", "https://example.com/image2.jpg")
+            );
+
+            // TODO 사용되지 않는 TeamRegion이 정상적으로 삭제되는지, TeamImages와 TeamImage가 정상적으로 삭제되는지 확인
+        }
+
+    }
 
     private User createUser() {
         return userRepository.save(User.builder()
