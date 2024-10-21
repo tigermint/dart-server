@@ -16,7 +16,9 @@ import com.ssh.dartserver.domain.user.domain.personalinfo.PersonalInfo;
 import com.ssh.dartserver.domain.user.domain.studentverificationinfo.StudentVerificationInfo;
 import com.ssh.dartserver.global.common.Role;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.NoResultException;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -120,6 +122,31 @@ public class TestRepository {
                 .setParameter("name", name)
                 .setParameter("department", department)
                 .getSingleResult();
+    }
+
+    public List<TeamRegion> findTeamRegionsByTeamId(long teamId) {
+        return entityManager.createQuery(
+                        "SELECT tr FROM TeamRegion tr WHERE tr.team.id = :teamId", TeamRegion.class)
+                .setParameter("teamId", teamId)
+                .getResultList();
+    }
+
+    public List<TeamImage> findTeamImagesByTeamId(long teamId) {
+        return entityManager.createQuery(
+                        "SELECT ti FROM TeamImage ti WHERE ti.team.id = :teamId", TeamImage.class)
+                .setParameter("teamId", teamId)
+                .getResultList();
+    }
+
+    public Optional<Image> findImageByImageId(long imageId) {
+        try {
+            return Optional.ofNullable(entityManager.createQuery(
+                            "SELECT i FROM Image i WHERE i.id = :imageId", Image.class)
+                    .setParameter("imageId", imageId)
+                    .getSingleResult());
+        } catch (NoResultException e) {
+            return Optional.empty();
+        }
     }
 
 }

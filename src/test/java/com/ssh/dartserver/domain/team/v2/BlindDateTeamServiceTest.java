@@ -2,6 +2,7 @@ package com.ssh.dartserver.domain.team.v2;
 
 import static com.ssh.dartserver.domain.university.UniversitySteps.대학생성요청_생성;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -433,6 +434,108 @@ class BlindDateTeamServiceTest extends ApiTest {
         // TODO 조회수 처리 및 푸시 알림?
 
     }
+
+    @Nested
+    @DisplayName("팀 삭제 테스트")
+    class DeleteTeam {
+
+        @Test
+        @DisplayName("인자로 전달된 User가 null인 경우 예외가 발생한다.")
+        void shouldThrowExceptionWhenUserIsNull() {
+            // given
+            long teamId = 1L;
+
+            // when & then
+            assertThrows(IllegalArgumentException.class, () -> {
+                blindDateTeamService.deleteTeam(null, teamId);
+            });
+        }
+
+        @Test
+        @DisplayName("인자로 전달된 teamId에 해당하는 팀이 없을 경우 성공적으로 수행된다.")
+        @Transactional
+        void shouldSucceedWhenTeamDoesNotExist() {
+            // given
+            University university = testRepository.addUniversity("Test Univ", "CS");
+            User user = testRepository.createUser("Test User", Gender.MALE, university);
+            long nonExistingTeamId = 999L;
+
+            // expect
+            assertThatNoException().isThrownBy(
+                    () -> blindDateTeamService.deleteTeam(user, nonExistingTeamId)
+            );
+        }
+
+        @Test
+        @DisplayName("자신이 만든 팀을 삭제하려는 경우 성공적으로 수행된다.")
+        @Transactional
+        void shouldSucceedWhenDeleteMyTeam() {
+            // given
+            testRepository.addRegion("부산");
+            University university = testRepository.addUniversity("Test Univ", "CS");
+            User user = testRepository.createUser("Test User", Gender.MALE, university);
+            Team team = testRepository.createTeam("Team 1", user, Boolean.TRUE, "부산");
+
+            long teamId = team.getId();
+            long imageId = testRepository.findTeamImagesByTeamId(teamId).get(0).getImage().getId();
+
+            // when
+            blindDateTeamService.deleteTeam(user, team.getId());
+
+            // then
+            assertAll(
+                    () -> assertThat(teamRepository.findAll()).isEmpty(),
+                    // 팀 삭제 후에도 user는 여전히 존재해야한다.
+                    () -> assertThat(userRepository.existsById(user.getId())).isTrue(),
+                    // 팀 삭제 시 TeamRegions는 함께 삭제된다.
+                    () -> assertThat(testRepository.findTeamRegionsByTeamId(teamId)).isEmpty(),
+                    // 팀 삭제 시 TeamImages는 함께 삭제된다.
+                    () -> assertThat(testRepository.findTeamImagesByTeamId(teamId)).isEmpty(),
+                    // 팀 삭제 시 TeamImages와 연결된 Image도 함께 삭제된다.
+                    () -> assertThat(testRepository.findImageByImageId(imageId)).isEmpty()
+            );
+        }
+
+        @Test
+        @DisplayName("이미 삭제된 팀을 삭제하려는 경우 성공적으로 수행된다.")
+        @Transactional
+        void shouldSucceedWhenTeamAlreadyDeleted() {
+            // given
+            testRepository.addRegion("부산");
+            University university = testRepository.addUniversity("Test Univ", "CS");
+            User user = testRepository.createUser("Test User", Gender.MALE, university);
+            Team team = testRepository.createTeam("Team 1", user, Boolean.TRUE, "부산");
+
+            // expect
+            assertThatNoException().isThrownBy(
+                    () -> {
+                        blindDateTeamService.deleteTeam(user, team.getId());
+                        blindDateTeamService.deleteTeam(user, team.getId());  // 삭제된 팀을 다시한번 삭제
+                    }
+            );
+        }
+
+        @Test
+        @DisplayName("삭제하려는 팀이 자신이 만든 팀이 아닌 경우 예외가 발생한다.")
+        @Transactional
+        void shouldThrowExceptionWhenUserIsNotLeader() {
+            // given
+            testRepository.addRegion("부산");
+            University university = testRepository.addUniversity("Test Univ", "CS");
+            User leader = testRepository.createUser("Leader", Gender.MALE, university);
+            User otherUser = testRepository.createUser("Other User", Gender.MALE, university);
+            Team team = testRepository.createTeam("Team 1", leader, Boolean.TRUE, "부산");
+
+            // expect
+            assertThrows(IllegalArgumentException.class, () -> {
+                blindDateTeamService.deleteTeam(otherUser, team.getId());
+            });
+        }
+
+        // TODO v1 팀 삭제 로직 처리
+
+    }
+
 
     private User createUser() {
         return userRepository.save(User.builder()

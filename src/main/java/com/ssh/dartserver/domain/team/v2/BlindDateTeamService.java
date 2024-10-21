@@ -19,6 +19,7 @@ import com.ssh.dartserver.domain.team.v2.dto.CreateTeamRequest;
 import com.ssh.dartserver.domain.team.v2.dto.UpdateTeamRequest;
 import com.ssh.dartserver.domain.user.domain.User;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -91,7 +92,23 @@ public class BlindDateTeamService {
 
     // 팀 삭제
     public void deleteTeam(User user, long teamId) {
-        throw new UnsupportedOperationException();
+        // 검증
+        if (user == null) {
+            throw new IllegalArgumentException("사용자 정보는 null일 수 없습니다.");
+        }
+
+        Optional<Team> team = teamRepository.findById(teamId);
+        if (team.isEmpty()) {
+            return;  // 이미 삭제된 경우, 무시
+        }
+
+        // TODO v1은 leader가 존재하지 않으므로 기존 삭제 로직을 사용할 것
+        if (!team.get().isLeader(user)) {
+            throw new IllegalArgumentException("자신이 만든 팀만 삭제할 수 있습니다. team.leaderId: " + team.get().getLeader().getId());
+        }
+
+        // 로직
+        teamRepository.delete(team.get());  // 연관 객체 처리는 어케되있는지 확인!
     }
 
     // 팀 목록 조회

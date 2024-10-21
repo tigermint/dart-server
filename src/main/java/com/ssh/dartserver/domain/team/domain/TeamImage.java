@@ -2,6 +2,7 @@ package com.ssh.dartserver.domain.team.domain;
 
 import com.ssh.dartserver.domain.image.domain.Image;
 import com.ssh.dartserver.global.common.BaseTimeEntity;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
@@ -34,7 +35,7 @@ public class TeamImage extends BaseTimeEntity {
     @JoinColumn(name = "team_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Team team;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "image_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Image image;
 

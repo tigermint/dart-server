@@ -95,4 +95,8 @@ public class Team extends BaseTimeEntity {
     public void increaseViewCount(int viewCountIncrement) {
         this.viewCount = this.viewCount.increase(viewCountIncrement);
     }
+
+    public boolean isLeader(User user) {
+        return leader.equals(user);
+    }
 }
