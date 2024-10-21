@@ -31,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class BlindDateTeamService {
     private final TeamRepository teamRepository;
     private final TeamRegionRepository teamRegionRepository;
@@ -88,6 +89,7 @@ public class BlindDateTeamService {
     }
 
     // 팀 수정 (Put)
+    @Transactional
     public void updateTeam(User user, UpdateTeamRequest request) {
         // 검증
         if (user == null) {
@@ -153,6 +155,7 @@ public class BlindDateTeamService {
     }
 
     // 팀 삭제
+    @Transactional
     public void deleteTeam(User user, long teamId) {
         // 검증
         if (user == null) {
@@ -174,6 +177,7 @@ public class BlindDateTeamService {
     }
 
     // 팀 목록 조회
+    @Transactional(readOnly = true)
     public Page<BlindDateTeamSimpleInfo> getTeamList(User user, Pageable pageable) {
         // 검증
         if (user == null) {
@@ -230,6 +234,7 @@ public class BlindDateTeamService {
     }
 
     // 팀 상세 조회
+    @Transactional(readOnly = true)
     public BlindDateTeamInfo getTeamInfo(long teamId) {
         // TODO 조회수 처리 + 푸시 알림
         // TODO v1, v2 분기 처리
