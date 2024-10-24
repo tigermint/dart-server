@@ -34,11 +34,11 @@ class BlindDateTeamRepositoryImplTest extends ApiTest {
 
         University university = testRepository.findUniversityByName("인천대학교", "컴퓨터공학과");
         User currentUser = testRepository.createUser("testUser", Gender.FEMALE, university);
-        Pageable pageable = PageRequest.of(0, 4);
+        Pageable pageable = PageRequest.of(0, 5);
 
         Page<Team> result = blindDateTeamRepositoryImpl.findAll(currentUser, pageable);  // <- 페이징 쿼리 및 카운트 쿼리 2개 발생
-        assertThat(result.getContent()).hasSize(4);
-        assertThat(result.getTotalElements()).isEqualTo(4);
+        assertThat(result.getContent()).hasSize(5);
+        assertThat(result.getTotalElements()).isEqualTo(5);
         assertThat(result.getTotalPages()).isEqualTo(1);
     }
 
@@ -54,8 +54,8 @@ class BlindDateTeamRepositoryImplTest extends ApiTest {
 
         Page<Team> result = blindDateTeamRepositoryImpl.findAll(currentUser, pageable);
         assertThat(result.getContent()).hasSize(1);
-        assertThat(result.getTotalElements()).isEqualTo(4);
-        assertThat(result.getTotalPages()).isEqualTo(4);
+        assertThat(result.getTotalElements()).isEqualTo(5);
+        assertThat(result.getTotalPages()).isEqualTo(5);
     }
 
     @Test
@@ -84,7 +84,7 @@ class BlindDateTeamRepositoryImplTest extends ApiTest {
 
         Page<Team> result = blindDateTeamRepositoryImpl.findAll(currentUser, pageable);
         assertThat(result.getContent()).isNotEmpty();
-        assertThat(result.getContent()).hasSizeLessThanOrEqualTo(10);  // 데이터를 모두 반환
+        assertThat(result.getContent()).hasSize(5);  // 데이터를 모두 반환
     }
 
     @Test
@@ -121,6 +121,7 @@ class BlindDateTeamRepositoryImplTest extends ApiTest {
         University uni2 = testRepository.addUniversity("서울대학교", "일어일문학과");
 
         // 사용자 데이터 생성 (성별과 학교가 다른 8명의 사용자)
+        User maleUser0 = testRepository.createUser("maleUser0", Gender.MALE, uni1);
         User maleUser1 = testRepository.createUser("maleUser1", Gender.MALE, uni1);
         User femaleUser1 = testRepository.createUser("femaleUser1", Gender.FEMALE, uni1);
         User maleUser2 = testRepository.createUser("maleUser2", Gender.MALE, uni1);
@@ -129,12 +130,14 @@ class BlindDateTeamRepositoryImplTest extends ApiTest {
         User femaleUser3 = testRepository.createUser("femaleUser3", Gender.FEMALE, uni2);
         User maleUser4 = testRepository.createUser("maleUser4", Gender.MALE, uni2);
         User femaleUser4 = testRepository.createUser("femaleUser4", Gender.FEMALE, uni2);
+        User maleUser5 = testRepository.createUser("maleUser5", Gender.MALE, uni2);
 
         // 지역 데이터 생성
         testRepository.addRegion("인천");
         testRepository.addRegion("서울");
 
         // 팀 데이터 생성 (각기 다른 Boolean 값과 지역 조합을 가지도록 설정)
+        testRepository.createTeam("Team 0", maleUser1, Boolean.FALSE, "인천");    // FALSE, 인천
         testRepository.createTeam("Team 1", maleUser1, Boolean.TRUE, "인천");    // TRUE, 인천
         testRepository.createTeam("Team 2", femaleUser1, Boolean.FALSE, "인천");  // FALSE, 인천
         testRepository.createTeam("Team 3", maleUser2, Boolean.TRUE, "서울");     // TRUE, 서울
@@ -143,6 +146,7 @@ class BlindDateTeamRepositoryImplTest extends ApiTest {
         testRepository.createTeam("Team 6", femaleUser3, Boolean.FALSE, "인천");  // FALSE, 인천
         testRepository.createTeam("Team 7", maleUser4, Boolean.TRUE, "서울");     // TRUE, 서울
         testRepository.createTeam("Team 8", femaleUser4, Boolean.FALSE, "서울");  // FALSE, 서울
+        testRepository.createTeam("Team 9", maleUser5, Boolean.FALSE, "인천");    // FALSE, 인천
 
         // 팀에 이미지 및 지역 설정
         testRepository.addTeamImage("Team 1", "https://www.naver.com/image1.jpg");
