@@ -29,4 +29,16 @@ public interface TeamRepository extends JpaRepository<Team, Long>, TeamRepositor
     @Query("select (count(t) > 0) from Team t where t.leader.id = ?1")
     boolean existsByLeader_Id(@NonNull Long id);
 
+    Optional<Team> findByLeader_IdOrTeamUsers_User_Id(Long id, Long id1);
+
+    @Query("SELECT DISTINCT t FROM Team t " +
+            "LEFT JOIN FETCH t.teamUsers tu " +
+            "LEFT JOIN FETCH tu.user " +
+            "LEFT JOIN FETCH t.leader " +
+            "WHERE t.leader.id = :userId " +
+            "OR EXISTS (SELECT 1 FROM TeamUser tui WHERE tui.team = t AND tui.user.id = :userId)")
+    Optional<Team> findByLeader_IdOrTeamUsers_User_Id(
+            @Param("userId") Long userId
+    );
+
 }

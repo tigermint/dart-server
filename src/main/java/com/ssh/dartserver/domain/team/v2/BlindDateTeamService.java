@@ -5,6 +5,7 @@ import com.ssh.dartserver.domain.image.domain.Image;
 import com.ssh.dartserver.domain.image.domain.ImageType;
 import com.ssh.dartserver.domain.proposal.domain.Proposal;
 import com.ssh.dartserver.domain.proposal.infra.ProposalRepository;
+import com.ssh.dartserver.domain.team.application.MyTeamService;
 import com.ssh.dartserver.domain.team.domain.Region;
 import com.ssh.dartserver.domain.team.domain.Team;
 import com.ssh.dartserver.domain.team.domain.TeamImage;
@@ -24,12 +25,14 @@ import com.ssh.dartserver.domain.user.infra.UserRepository;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -41,6 +44,7 @@ public class BlindDateTeamService {
     private final RegionRepository regionRepository;
     private final ImageUploader imageUploader;
     private final ProposalRepository proposalRepository;
+    private final MyTeamService myTeamService;
 
     // 팀 생성
     @Transactional
@@ -52,6 +56,8 @@ public class BlindDateTeamService {
         if (request == null) {
             throw new IllegalArgumentException("팀 생성 요청(CreateTeamRequest)는 null일 수 없습니다.");
         }
+
+        // TODO v1형태 (combinationHash 또는 teamUser)로도 중복 팀 생성 검사 필요
         if (teamRepository.existsByLeader_Id(user.getId())) {
             throw new IllegalStateException("사용자는 하나의 팀만 생성할 수 있습니다. 이미 생성한 팀이 존재합니다. userId=" + user.getId());
         }
@@ -104,10 +110,15 @@ public class BlindDateTeamService {
         Team team = teamRepository.findById(request.teamId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 팀 입니다. teamId: " + request.teamId()));
 
+        if (team.getTeamUsersCombinationHash() != null) {
+            throw new IllegalStateException("v1 버전에서 만든 팀은 수정할 수 없습니다. 팀을 삭제하고 다시 생성해주세요.");
+        }
+
         if (!team.isLeader(user)) {
             throw new IllegalArgumentException("자신이 만든 팀만 삭제할 수 있습니다. team.leaderId: " + team.getLeader().getId());
         }
 
+        // TODO 더 이상 사용되지 않는 regions, teamImage를 명시적으로 삭제해야 함
         // regionId로 regions 가져오기
         List<Region> regions = request.regionIds().stream()
                 .map(regionId -> regionRepository.findById(regionId)
@@ -121,6 +132,8 @@ public class BlindDateTeamService {
                     return teamRegion.orElseGet(() -> new TeamRegion(team, region));
                 })
                 .toList();
+
+        log.info("NewRegions: {}", teamRegions1);
 
         // ImageUrl을 비교하여 아직 등록되지 않은 이미지만 새로 등록
         List<TeamImage> teamImages = teamImageRepository.findAllByTeam(team);
@@ -169,9 +182,18 @@ public class BlindDateTeamService {
             return;  // 이미 삭제된 경우, 무시
         }
 
-        // TODO v1은 leader가 존재하지 않으므로 기존 삭제 로직을 사용할 것
+        if (team.get().getTeamUsersCombinationHash() != null) {
+            // v1 처리
+            log.debug("v1 팀을 삭제합니다.");
+            myTeamService.deleteTeam(user, teamId);
+            return;
+        }
+
+        // v2 처리
+        log.debug("v2 팀을 삭제합니다.");
         if (!team.get().isLeader(user)) {
-            throw new IllegalArgumentException("자신이 만든 팀만 삭제할 수 있습니다. team.leaderId: " + team.get().getLeader().getId());
+            throw new IllegalArgumentException(
+                    "자신이 만든 팀만 삭제할 수 있습니다. team.leaderId: " + team.get().getLeader().getId());
         }
 
         // 로직
@@ -179,8 +201,7 @@ public class BlindDateTeamService {
     }
 
     // 팀 목록 조회
-//    @Transactional(readOnly = true)
-    @Transactional
+    @Transactional(readOnly = true)
     public Page<BlindDateTeamSimpleInfo> getTeamList(User user, Pageable pageable) {
         // 검증
         if (user == null) {
@@ -198,7 +219,7 @@ public class BlindDateTeamService {
 
         Page<Team> teams = teamRepository.findAll(user, pageable);
         List<BlindDateTeamInfo> blindDateTeams = teams.getContent().stream()
-                .map(team -> getBlindDateTeamInfo(team))
+                .map(team -> convertBlindDateTeamInfo(team))
                 .toList();
 
         // 결과를 다시 맵핑 (이후 상세조회와 목록조회의 로직이 달라진다면 수정)
@@ -224,6 +245,16 @@ public class BlindDateTeamService {
         return new PageImpl<>(simpleTeams, pageable, teams.getTotalElements());
     }
 
+    // 내 팀 조회
+    // TODO Test 작성 필요
+    @Transactional(readOnly = true)
+    public BlindDateTeamInfo getUserTeamInfo(User user) {
+        Team team = teamRepository.findByLeader_IdOrTeamUsers_User_Id(user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("해당 유저가 만든 팀이 존재하지 않습니다."));
+
+        return convertBlindDateTeamInfo(team);
+    }
+
     // 팀 상세 조회
     @Transactional(readOnly = true)
     public BlindDateTeamInfo getTeamInfo(long teamId) {
@@ -232,10 +263,10 @@ public class BlindDateTeamService {
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 팀 입니다. teamId: " + teamId));
 
-        return getBlindDateTeamInfo(team);
+        return convertBlindDateTeamInfo(team);
     }
 
-    private BlindDateTeamInfo getBlindDateTeamInfo(Team team) {
+    private BlindDateTeamInfo convertBlindDateTeamInfo(Team team) {
         // v1, v2 분기 처리
         List<String> images;
         long leaderId;
@@ -277,7 +308,8 @@ public class BlindDateTeamService {
                 .toList();
 
         // 공통 - Proposal 확인하기 (개선 필요)
-        List<Proposal> proposals = proposalRepository.findAllByRequestingTeamOrRequestedTeam(team, team);  // findAll의 위험성
+        List<Proposal> proposals = proposalRepository.findAllByRequestingTeamOrRequestedTeam(team,
+                team);  // findAll의 위험성
         boolean isAlreadyProposal = proposals.stream()
                 .anyMatch(proposal -> {
                     Team requested = proposal.getRequestedTeam();

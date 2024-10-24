@@ -303,6 +303,8 @@ class BlindDateTeamServiceTest extends ApiTest {
             throw new UnsupportedOperationException();  // TODO 기능 구현 필요 + 추가로 v1 클라이언트의 요청도 커버해야함 (이건 기존 서비스 테스트)
         }
 
+        // TODO 보낸 호감이 존재하는 경우에 대한 테스트
+
     }
 
     @Nested
