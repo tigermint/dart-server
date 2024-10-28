@@ -22,7 +22,6 @@ import java.util.List;
 
 @Entity
 @Getter
-@Setter
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
@@ -86,10 +85,21 @@ public class Team extends BaseTimeEntity {
         this.viewCount = ViewCount.from(0);
     }
 
+    @Deprecated(since = "20241028")
+    // v1 team update
     public void update(String name, Boolean isVisibleToSameUniversity, TeamUsersCombinationHash teamUsersCombinationHash) {
         this.name = Name.from(name);
         this.isVisibleToSameUniversity = isVisibleToSameUniversity;
         this.teamUsersCombinationHash = teamUsersCombinationHash;
+    }
+
+    // v2 team update
+    public void update(String name, String description, boolean isVisibleToSameUniversity, List<TeamRegion> teamRegions, List<TeamImage> teamImages) {
+        this.name = Name.from(name);
+        this.description = new TeamDescription(description);
+        this.isVisibleToSameUniversity = isVisibleToSameUniversity;
+        setTeamRegions(teamRegions);
+        setTeamImages(teamImages);
     }
 
     public void increaseViewCount(int viewCountIncrement) {

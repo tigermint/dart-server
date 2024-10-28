@@ -148,12 +148,7 @@ public class BlindDateTeamService {
                 .toList();
 
         // 로직
-        team.setName(Name.from(request.name()));
-        team.setDescription(new TeamDescription(request.description()));
-        team.setIsVisibleToSameUniversity(request.isVisibleToSameUniversity());
-        team.setTeamRegions(teamRegions1);
-        team.setTeamImages(teamImages1);
-
+        team.update(request.name(), request.description(), request.isVisibleToSameUniversity(), teamRegions1, teamImages1);
         teamRepository.save(team);
     }
 
