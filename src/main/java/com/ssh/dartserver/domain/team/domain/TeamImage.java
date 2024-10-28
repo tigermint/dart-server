@@ -21,7 +21,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
-@Setter
 @Entity
 @Table(name = "team_image")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
