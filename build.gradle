@@ -7,7 +7,7 @@ plugins {
 
 jib{
     from{
-        image='adoptopenjdk/openjdk11:jre-11.0.2.9-alpine'
+        image='eclipse-temurin:17-jre-alpine'
     }
     to{
 //        image='asia-northeast3-docker.pkg.dev/dart-388516/cloud-run-source-deploy/dart-server:latest'
