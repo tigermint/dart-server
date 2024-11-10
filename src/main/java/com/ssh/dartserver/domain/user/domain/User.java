@@ -146,4 +146,24 @@ public class User extends BaseTimeEntity {
         }
         return this.getPersonalInfo().getName().getValue();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+
+        // ID가 null일 경우 영속화되지 않은 엔티티로 간주하고, 동일성 비교
+        if (id == null || user.id == null) {
+            return super.equals(o); // 객체 동일성 비교
+        }
+
+        return Objects.equals(id, user.id); // 영속화된 경우 ID 비교
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
 }

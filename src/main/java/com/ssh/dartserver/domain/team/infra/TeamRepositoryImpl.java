@@ -5,9 +5,7 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.ssh.dartserver.domain.team.domain.OrderMethod;
 import com.ssh.dartserver.domain.team.domain.Team;
-import com.ssh.dartserver.domain.team.domain.TeamSearchCondition;
 import com.ssh.dartserver.domain.user.domain.User;
 import com.ssh.dartserver.domain.user.domain.studentverificationinfo.StudentIdCardVerificationStatus;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +13,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.ssh.dartserver.domain.proposal.domain.QProposal.proposal;
@@ -31,7 +28,7 @@ public class TeamRepositoryImpl implements TeamRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Page<Team> findAllVisibleTeam(User currentUser, TeamSearchCondition condition, Pageable pageable) {
+    public Page<Team> findAllVisibleTeam(User currentUser, Pageable pageable) {
         List<Team> content = queryFactory
                 .select(team)
                 .distinct()
@@ -43,12 +40,9 @@ public class TeamRepositoryImpl implements TeamRepositoryCustom {
                 .leftJoin(team.requestedTeamProposals, proposal)
                 .where(
                         teamUser.user.personalInfo.gender.ne(currentUser.getPersonalInfo().getGender()),
-                        isVisibleToSameUniversityEq(currentUser.getUniversity().getId()),
-                        verifiedStudentEq(condition.getVerifiedStudent()),
-                        hasProfileImageEq(condition.getHasProfileImage()),
-                        regionEq(condition.getRegionId())
+                        isVisibleToSameUniversityEq(currentUser.getUniversity().getId())
                 )
-                .orderBy(createOrderSpecifier(condition.getOrder()))
+                .orderBy(createOrderSpecifier())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -62,27 +56,13 @@ public class TeamRepositoryImpl implements TeamRepositoryCustom {
                 .join(team.singleTeamFriends, singleTeamFriend)
                 .where(
                         teamUser.user.personalInfo.gender.ne(currentUser.getPersonalInfo().getGender()),
-                        isVisibleToSameUniversityEq(currentUser.getUniversity().getId()),
-                        verifiedStudentEq(condition.getVerifiedStudent()),
-                        hasProfileImageEq(condition.getHasProfileImage()),
-                        regionEq(condition.getRegionId())
+                        isVisibleToSameUniversityEq(currentUser.getUniversity().getId())
                 );
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
     }
 
-    private static OrderSpecifier<?>[] createOrderSpecifier(OrderMethod order) {
-        List<OrderSpecifier<?>> orderSpecifiers = new ArrayList<>();
-
-        if (order == null || order.equals(OrderMethod.LATEST)) {
-            orderSpecifiers.add(new OrderSpecifier<>(Order.DESC, team.createdTime));
-        } else if (order.equals(OrderMethod.LIKE)) {
-            orderSpecifiers.add(new OrderSpecifier<>(Order.DESC, team.requestedTeamProposals.size()));
-            orderSpecifiers.add(new OrderSpecifier<>(Order.DESC, team.createdTime));
-        } else if (order.equals(OrderMethod.VIEW)) {
-            orderSpecifiers.add(new OrderSpecifier<>(Order.DESC, team.viewCount.value));
-        } else {
-            orderSpecifiers.add(new OrderSpecifier<>(Order.DESC, team.createdTime));
-        }
+    private static OrderSpecifier<?>[] createOrderSpecifier() {
+        List<OrderSpecifier<?>> orderSpecifiers = List.of(new OrderSpecifier<>(Order.DESC, team.createdTime));
         return orderSpecifiers.toArray(new OrderSpecifier[0]);
     }
 
@@ -97,6 +77,7 @@ public class TeamRepositoryImpl implements TeamRepositoryCustom {
     }
 
     private BooleanExpression isVisibleToSameUniversityEq(Long universityId) {
+        // FIXME 현재는 같은 학과에게 안보이기가 됨 (universityId가 아닌 name을 사용)
         return team.isVisibleToSameUniversity.isTrue()
                 .or(team.isVisibleToSameUniversity.isFalse().and(team.university.id.ne(universityId)));
     }

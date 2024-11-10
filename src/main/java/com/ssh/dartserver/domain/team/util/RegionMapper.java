@@ -1,4 +1,4 @@
-package com.ssh.dartserver.domain.team.application;
+package com.ssh.dartserver.domain.team.util;
 
 import com.ssh.dartserver.domain.team.domain.Region;
 import com.ssh.dartserver.domain.team.presentation.response.RegionResponse;

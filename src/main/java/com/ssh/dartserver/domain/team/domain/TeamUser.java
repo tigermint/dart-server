@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import jakarta.persistence.*;
 
+@Deprecated(since = "20241015", forRemoval = false)
 @Entity
 @Getter
 @NoArgsConstructor

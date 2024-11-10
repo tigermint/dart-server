@@ -1,13 +1,15 @@
-package com.ssh.dartserver.domain.team.domain;
+package com.ssh.dartserver.domain.team.domain.vo;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import lombok.ToString;
 
 @Embeddable
 @Getter
+@ToString
 @NoArgsConstructor
 public class Name {
     @Column(name = "name")
@@ -26,10 +28,5 @@ public class Name {
 
     public static Name from(String value) {
         return new Name(value);
-    }
-
-    @Override
-    public String toString() {
-        return value;
     }
 }

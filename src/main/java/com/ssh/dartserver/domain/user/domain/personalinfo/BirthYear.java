@@ -1,5 +1,6 @@
 package com.ssh.dartserver.domain.user.domain.personalinfo;
 
+import com.ssh.dartserver.global.util.DateTimeUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,5 +36,7 @@ public class BirthYear {
         );
     }
 
-
+    public int getAge() {
+        return DateTimeUtil.nowFromZone().getYear() - value + 1;
+    }
 }

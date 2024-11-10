@@ -1,13 +1,15 @@
-package com.ssh.dartserver.domain.team.domain;
+package com.ssh.dartserver.domain.team.domain.vo;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import lombok.ToString;
 
 @Embeddable
 @Getter
+@ToString
 @NoArgsConstructor
 public class ViewCount {
 

@@ -2,6 +2,7 @@ package com.ssh.dartserver.domain.team.application;
 
 import com.ssh.dartserver.domain.team.presentation.response.RegionResponse;
 import com.ssh.dartserver.domain.team.infra.RegionRepository;
+import com.ssh.dartserver.domain.team.util.RegionMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
