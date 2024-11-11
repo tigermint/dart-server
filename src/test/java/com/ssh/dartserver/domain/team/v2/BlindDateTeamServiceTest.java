@@ -549,12 +549,12 @@ class BlindDateTeamServiceTest extends ApiTest {
         void shouldThrowExceptionWhenUserIsNull() {
             // given
             UpdateTeamRequest request = new UpdateTeamRequest(
-                    1L, "새 팀 이름", "새 팀 설명", true, List.of(1L, 2L), List.of("https://example.com/image1.jpg")
+                    "새 팀 이름", "새 팀 설명", true, List.of(1L, 2L), List.of("https://example.com/image1.jpg")
             );
 
             // when & then
             assertThrows(IllegalArgumentException.class, () -> {
-                blindDateTeamService.updateTeam(null, request);
+                blindDateTeamService.updateTeam(null, 1L, request);
             });
         }
 
@@ -568,7 +568,7 @@ class BlindDateTeamServiceTest extends ApiTest {
 
             // when & then
             assertThrows(IllegalArgumentException.class, () -> {
-                blindDateTeamService.updateTeam(user, null);
+                blindDateTeamService.updateTeam(user, 1L, null);
             });
         }
 
@@ -583,12 +583,12 @@ class BlindDateTeamServiceTest extends ApiTest {
             testRepository.createTeam("Team", user, Boolean.TRUE, "부산");
 
             UpdateTeamRequest request = new UpdateTeamRequest(
-                    999L, "새 팀 이름", "새 팀 설명", true, List.of(1L, 2L), List.of("https://example.com/image1.jpg")
+                    "새 팀 이름", "새 팀 설명", true, List.of(1L, 2L), List.of("https://example.com/image1.jpg")
             );
 
             // when & then
             assertThrows(IllegalArgumentException.class, () -> {
-                blindDateTeamService.updateTeam(user, request);
+                blindDateTeamService.updateTeam(user, 999L, request);
             });
         }
 
@@ -606,12 +606,12 @@ class BlindDateTeamServiceTest extends ApiTest {
             Team team = testRepository.createTeam("Team", leader, Boolean.TRUE, "부산");
 
             UpdateTeamRequest request = new UpdateTeamRequest(
-                    team.getId(), "새 팀 이름", "새 팀 설명", true, List.of(1L, 2L), List.of("https://example.com/image1.jpg")
+                    "새 팀 이름", "새 팀 설명", true, List.of(1L, 2L), List.of("https://example.com/image1.jpg")
             );
 
             // when & then
             assertThrows(IllegalArgumentException.class, () -> {
-                blindDateTeamService.updateTeam(nonLeader, request);
+                blindDateTeamService.updateTeam(nonLeader, team.getId(), request);
             });
         }
 
@@ -627,12 +627,12 @@ class BlindDateTeamServiceTest extends ApiTest {
             Team team = testRepository.createTeam("Team", user, Boolean.TRUE, "부산");
 
             UpdateTeamRequest request = new UpdateTeamRequest(
-                    team.getId(), "새 팀 이름", "새 팀 설명", true, List.of(999L), List.of("https://example.com/image1.jpg")
+                    "새 팀 이름", "새 팀 설명", true, List.of(999L), List.of("https://example.com/image1.jpg")
             );
 
             // when & then
             assertThrows(IllegalArgumentException.class, () -> {
-                blindDateTeamService.updateTeam(user, request);
+                blindDateTeamService.updateTeam(user, team.getId(), request);
             });
         }
 
@@ -650,11 +650,11 @@ class BlindDateTeamServiceTest extends ApiTest {
             Team team = testRepository.createTeam("Team", user, Boolean.TRUE, "부산");
 
             UpdateTeamRequest request = new UpdateTeamRequest(
-                    team.getId(), "새 팀 이름", "새 팀 설명", true, new ArrayList<>(List.of(2L, 3L)), new ArrayList<>(List.of("https://example.com/image1.jpg", "https://example.com/image2.jpg"))
+                    "새 팀 이름", "새 팀 설명", true, new ArrayList<>(List.of(2L, 3L)), new ArrayList<>(List.of("https://example.com/image1.jpg", "https://example.com/image2.jpg"))
             );
 
             // when
-            blindDateTeamService.updateTeam(user, request);
+            blindDateTeamService.updateTeam(user, team.getId(), request);
 
             // then
             assertNotNull(team);
