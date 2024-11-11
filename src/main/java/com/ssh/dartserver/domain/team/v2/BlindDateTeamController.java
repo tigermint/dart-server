@@ -55,7 +55,6 @@ public class BlindDateTeamController {
     // 팀 상세 조회
     @GetMapping("/{id}")
     public BlindDateTeamInfo getTeam(Authentication authentication, @PathVariable long id) {
-        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
         return blindTeamService.getTeamInfo(id);
     }
 
