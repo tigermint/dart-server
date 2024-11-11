@@ -32,10 +32,10 @@ public class BlindDateTeamController {
     }
 
     // 팀 수정
-    @PutMapping
-    public void updateTeam(Authentication authentication, @RequestBody UpdateTeamRequest request) {
+    @PutMapping("/{id}")
+    public void updateTeam(Authentication authentication, @PathVariable long id, @RequestBody UpdateTeamRequest request) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
-        blindTeamService.updateTeam(principal.getUser(), request);
+        blindTeamService.updateTeam(principal.getUser(), id, request);
     }
 
     // 팀 삭제

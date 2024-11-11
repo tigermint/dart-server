@@ -98,7 +98,7 @@ public class BlindDateTeamService {
 
     // 팀 수정 (Put)
     @Transactional
-    public void updateTeam(User user, UpdateTeamRequest request) {
+    public void updateTeam(User user, long teamId, UpdateTeamRequest request) {
         // 검증
         if (user == null) {
             throw new IllegalArgumentException("사용자 정보는 null일 수 없습니다.");
@@ -107,8 +107,8 @@ public class BlindDateTeamService {
             throw new IllegalArgumentException("팀 수정 요청(UpdateTeamRequest)는 null일 수 없습니다.");
         }
 
-        Team team = teamRepository.findById(request.teamId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 팀 입니다. teamId: " + request.teamId()));
+        Team team = teamRepository.findById(teamId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 팀 입니다. teamId: " + teamId));
 
         if (team.getTeamUsersCombinationHash() != null) {
             throw new IllegalStateException("v1 버전에서 만든 팀은 수정할 수 없습니다. 팀을 삭제하고 다시 생성해주세요.");
