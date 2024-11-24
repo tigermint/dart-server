@@ -64,6 +64,8 @@ public class BlindDateTeamReader {
                         .regions(team.regions())
                         .imageUrls(team.imageUrls())
                         .isAlreadyProposalTeam(team.isAlreadyProposalTeam())
+                        .teamVersion(team.teamVersion())
+
                         .build())
                 .toList();
 
@@ -91,6 +93,7 @@ public class BlindDateTeamReader {
         return convertBlindDateTeamInfo(team);
     }
 
+    // TODO Test 작성 필요 (클래스 분리 후)
     private BlindDateTeamInfo convertBlindDateTeamInfo(Team team) {
         // v1, v2 분기 처리
         List<String> images;
@@ -100,9 +103,11 @@ public class BlindDateTeamReader {
         String universityName;
         String departmentName;
         String teamDescription;
+        String teamVersion;
 
         if (team.getTeamUsersCombinationHash() != null) {
             // v1 처리
+            teamVersion = "v1";
             User user = team.getTeamUsers().get(0).getUser();
 
             images = List.of(user.getPersonalInfo().getProfileImageUrl().getValue());
@@ -115,6 +120,7 @@ public class BlindDateTeamReader {
             teamDescription = "";
         } else {
             // v2 처리
+            teamVersion = "v2";
             images = team.getTeamImages().stream()
                     .map(teamImage -> teamImage.getImage().getData())
                     .toList();
@@ -145,7 +151,7 @@ public class BlindDateTeamReader {
                     return exp1 || exp2;
                 });
 
-        // v2 처리
+        // DTO 생성
         return BlindDateTeamInfo.builder()
                 .id(team.getId())
                 .leaderId(leaderId)
@@ -161,6 +167,7 @@ public class BlindDateTeamReader {
                 .regions(regions)
                 .imageUrls(images)
                 .isAlreadyProposalTeam(isAlreadyProposal)
+                .teamVersion(teamVersion)
 
                 .build();
     }
