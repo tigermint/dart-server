@@ -38,7 +38,6 @@ public class BlindDateTeamReader {
 
         // TODO ContextHolder에서 기억하는 User값을 Entity가 아닌 전용 DTO(VO)로 변환해두는 것이 좋아보임. (임시로 사용)
         user = userRepository.findWithUniversityById(user.getId()).orElseThrow();
-        System.out.println("대학교이름! " + user.getUniversity().getName());
 
         // TODO 조회수 처리 + 푸시 알림
 

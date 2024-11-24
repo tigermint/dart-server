@@ -48,9 +48,6 @@ public class BlindDateTeamRepositoryImpl implements BlindDateTeamRepository {
                 ).orderBy(new OrderSpecifier<>(Order.DESC, team.createdTime)).offset(pageable.getOffset())
                 .limit(pageable.getPageSize()).fetch();
 
-        System.out.println("===================출력================");
-        System.out.println(teams);
-
         Long count = queryFactory.select(team.countDistinct())
                 .from(team)
                 .leftJoin(team.teamUsers, teamUser)
