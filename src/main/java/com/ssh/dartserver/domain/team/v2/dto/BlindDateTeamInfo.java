@@ -16,6 +16,7 @@ public record BlindDateTeamInfo(
         String departmentName,
 
         // team info
+        String teamVersion,
         String name,
         String description,
         boolean isVisibleToSameUniversity,

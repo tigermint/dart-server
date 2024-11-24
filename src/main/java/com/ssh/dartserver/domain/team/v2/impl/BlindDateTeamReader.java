@@ -6,6 +6,7 @@ import com.ssh.dartserver.domain.team.domain.Team;
 import com.ssh.dartserver.domain.team.infra.TeamRepository;
 import com.ssh.dartserver.domain.team.presentation.response.RegionResponse;
 import com.ssh.dartserver.domain.team.v2.dto.BlindDateTeamInfo;
+import com.ssh.dartserver.domain.team.v2.dto.BlindDateTeamSearchCondition;
 import com.ssh.dartserver.domain.team.v2.dto.BlindDateTeamSimpleInfo;
 import com.ssh.dartserver.domain.user.domain.User;
 import com.ssh.dartserver.domain.user.infra.UserRepository;
@@ -13,6 +14,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,18 +29,18 @@ public class BlindDateTeamReader {
 
     // 팀 목록 조회
     @Transactional(readOnly = true)
-    public Page<BlindDateTeamSimpleInfo> getTeamList(User user, Pageable pageable) {
+    public Page<BlindDateTeamSimpleInfo> getTeamList(User user, BlindDateTeamSearchCondition condition) {
         // 검증
         if (user == null) {
             throw new IllegalArgumentException("사용자 정보는 null일 수 없습니다.");
         }
-        if (pageable == null) {
+        if (condition == null) {
             throw new IllegalArgumentException("페이징 정보 객체는 null일 수 없습니다.");
         }
+        Pageable pageable = PageRequest.of(condition.page(), condition.size());  // sort 구현 x
 
         // TODO ContextHolder에서 기억하는 User값을 Entity가 아닌 전용 DTO(VO)로 변환해두는 것이 좋아보임. (임시로 사용)
-        user = userRepository.findWithUniversityById(user.getId()).orElseThrow();
-        System.out.println("대학교이름! " + user.getUniversity().getName());
+        user = userRepository.findWithUniversityById(user.getId()).orElseThrow();  // 사용자 전체 정보를 조회
 
         // TODO 조회수 처리 + 푸시 알림
 
@@ -64,6 +66,8 @@ public class BlindDateTeamReader {
                         .regions(team.regions())
                         .imageUrls(team.imageUrls())
                         .isAlreadyProposalTeam(team.isAlreadyProposalTeam())
+                        .teamVersion(team.teamVersion())
+
                         .build())
                 .toList();
 
@@ -91,6 +95,7 @@ public class BlindDateTeamReader {
         return convertBlindDateTeamInfo(team);
     }
 
+    // TODO Test 작성 필요 (클래스 분리 후)
     private BlindDateTeamInfo convertBlindDateTeamInfo(Team team) {
         // v1, v2 분기 처리
         List<String> images;
@@ -100,9 +105,11 @@ public class BlindDateTeamReader {
         String universityName;
         String departmentName;
         String teamDescription;
+        String teamVersion;
 
         if (team.getTeamUsersCombinationHash() != null) {
             // v1 처리
+            teamVersion = "v1";
             User user = team.getTeamUsers().get(0).getUser();
 
             images = List.of(user.getPersonalInfo().getProfileImageUrl().getValue());
@@ -115,6 +122,7 @@ public class BlindDateTeamReader {
             teamDescription = "";
         } else {
             // v2 처리
+            teamVersion = "v2";
             images = team.getTeamImages().stream()
                     .map(teamImage -> teamImage.getImage().getData())
                     .toList();
@@ -145,7 +153,7 @@ public class BlindDateTeamReader {
                     return exp1 || exp2;
                 });
 
-        // v2 처리
+        // DTO 생성
         return BlindDateTeamInfo.builder()
                 .id(team.getId())
                 .leaderId(leaderId)
@@ -161,6 +169,7 @@ public class BlindDateTeamReader {
                 .regions(regions)
                 .imageUrls(images)
                 .isAlreadyProposalTeam(isAlreadyProposal)
+                .teamVersion(teamVersion)
 
                 .build();
     }
