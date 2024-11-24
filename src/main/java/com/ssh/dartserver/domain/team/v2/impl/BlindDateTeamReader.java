@@ -6,6 +6,7 @@ import com.ssh.dartserver.domain.team.domain.Team;
 import com.ssh.dartserver.domain.team.infra.TeamRepository;
 import com.ssh.dartserver.domain.team.presentation.response.RegionResponse;
 import com.ssh.dartserver.domain.team.v2.dto.BlindDateTeamInfo;
+import com.ssh.dartserver.domain.team.v2.dto.BlindDateTeamSearchCondition;
 import com.ssh.dartserver.domain.team.v2.dto.BlindDateTeamSimpleInfo;
 import com.ssh.dartserver.domain.user.domain.User;
 import com.ssh.dartserver.domain.user.infra.UserRepository;
@@ -13,6 +14,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,17 +29,18 @@ public class BlindDateTeamReader {
 
     // 팀 목록 조회
     @Transactional(readOnly = true)
-    public Page<BlindDateTeamSimpleInfo> getTeamList(User user, Pageable pageable) {
+    public Page<BlindDateTeamSimpleInfo> getTeamList(User user, BlindDateTeamSearchCondition condition) {
         // 검증
         if (user == null) {
             throw new IllegalArgumentException("사용자 정보는 null일 수 없습니다.");
         }
-        if (pageable == null) {
+        if (condition == null) {
             throw new IllegalArgumentException("페이징 정보 객체는 null일 수 없습니다.");
         }
+        Pageable pageable = PageRequest.of(condition.page(), condition.size());  // sort 구현 x
 
         // TODO ContextHolder에서 기억하는 User값을 Entity가 아닌 전용 DTO(VO)로 변환해두는 것이 좋아보임. (임시로 사용)
-        user = userRepository.findWithUniversityById(user.getId()).orElseThrow();
+        user = userRepository.findWithUniversityById(user.getId()).orElseThrow();  // 사용자 전체 정보를 조회
 
         // TODO 조회수 처리 + 푸시 알림
 

@@ -1,6 +1,7 @@
 package com.ssh.dartserver.domain.team.v2;
 
 import com.ssh.dartserver.domain.team.v2.dto.BlindDateTeamInfo;
+import com.ssh.dartserver.domain.team.v2.dto.BlindDateTeamSearchCondition;
 import com.ssh.dartserver.domain.team.v2.dto.BlindDateTeamSimpleInfo;
 import com.ssh.dartserver.domain.team.v2.dto.CreateTeamRequest;
 import com.ssh.dartserver.domain.team.v2.dto.UpdateTeamRequest;
@@ -46,8 +47,8 @@ public class BlindDateTeamService {
 
     // 팀 목록 조회
     @Transactional(readOnly = true)
-    public Page<BlindDateTeamSimpleInfo> getTeamList(User user, Pageable pageable) {
-        return blindDateTeamReader.getTeamList(user, pageable);
+    public Page<BlindDateTeamSimpleInfo> getTeamList(User user, BlindDateTeamSearchCondition condition) {
+        return blindDateTeamReader.getTeamList(user, condition);
     }
 
     // 내 팀 조회

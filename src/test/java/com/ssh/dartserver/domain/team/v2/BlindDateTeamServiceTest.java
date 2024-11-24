@@ -21,6 +21,7 @@ import com.ssh.dartserver.domain.team.infra.RegionRepository;
 import com.ssh.dartserver.domain.team.infra.TeamRegionRepository;
 import com.ssh.dartserver.domain.team.infra.TeamRepository;
 import com.ssh.dartserver.domain.team.v2.dto.BlindDateTeamInfo;
+import com.ssh.dartserver.domain.team.v2.dto.BlindDateTeamSearchCondition;
 import com.ssh.dartserver.domain.team.v2.dto.BlindDateTeamSimpleInfo;
 import com.ssh.dartserver.domain.team.v2.dto.CreateTeamRequest;
 import com.ssh.dartserver.domain.team.v2.dto.UpdateTeamRequest;
@@ -315,11 +316,11 @@ class BlindDateTeamServiceTest extends ApiTest {
         @DisplayName("인자로 전달된 User가 null인 경우 예외가 발생한다.")
         void shouldThrowExceptionWhenUserIsNull() {
             // given
-            Pageable pageable = PageRequest.of(0, 10);
+            BlindDateTeamSearchCondition condition = new BlindDateTeamSearchCondition(0, 10, List.of());
 
             // when & then
             assertThrows(IllegalArgumentException.class, () -> {
-                blindDateTeamService.getTeamList(null, pageable);
+                blindDateTeamService.getTeamList(null, condition);
             });
         }
 
@@ -349,12 +350,12 @@ class BlindDateTeamServiceTest extends ApiTest {
             User user = testRepository.createUser("Male User", Gender.MALE, university);
             User user2 = testRepository.createUser("Male User2", Gender.MALE, university);
 
-            Pageable pageable = PageRequest.of(0, 10);
+            BlindDateTeamSearchCondition condition = new BlindDateTeamSearchCondition(0, 10, List.of());
             testRepository.createTeam("Team 1", user, Boolean.TRUE, "부산");
             testRepository.createTeam("Team 2", user2, Boolean.TRUE, "인천");
 
             // when
-            Page<BlindDateTeamSimpleInfo> teamList = blindDateTeamService.getTeamList(user, pageable);
+            Page<BlindDateTeamSimpleInfo> teamList = blindDateTeamService.getTeamList(user, condition);
 
             // then
             assertNotNull(teamList);
@@ -373,12 +374,12 @@ class BlindDateTeamServiceTest extends ApiTest {
             User user = testRepository.createUser("Male User", Gender.MALE, university);
             User female = testRepository.createUser("Female User", Gender.FEMALE, university);
 
-            Pageable pageable = PageRequest.of(0, 10);
+            BlindDateTeamSearchCondition condition = new BlindDateTeamSearchCondition(0, 10, List.of());
             testRepository.createTeam("Team 1", user, Boolean.TRUE, "부산");
             testRepository.createTeam("Team 2", female, Boolean.TRUE, "인천");
 
             // when
-            Page<BlindDateTeamSimpleInfo> teamList = blindDateTeamService.getTeamList(user, pageable);
+            Page<BlindDateTeamSimpleInfo> teamList = blindDateTeamService.getTeamList(user, condition);
 
             // then
             assertNotNull(teamList);
@@ -418,7 +419,6 @@ class BlindDateTeamServiceTest extends ApiTest {
             User female5 = testRepository.createUser("Female User5", Gender.FEMALE, university);
             User female6 = testRepository.createUser("Female User6", Gender.FEMALE, university);
 
-            Pageable pageable = PageRequest.of(0, 10);
             testRepository.createTeam("Team", user, Boolean.TRUE, "부산");
             testRepository.createTeam("True1", female1, Boolean.TRUE, "인천");
             testRepository.createTeam("False1", female2, Boolean.FALSE, "인천");  // 같은 학교 조회 x
@@ -428,7 +428,8 @@ class BlindDateTeamServiceTest extends ApiTest {
             testRepository.createTeam("True4", female6, Boolean.TRUE, "인천");
 
             // when
-            Page<BlindDateTeamSimpleInfo> teamList = blindDateTeamService.getTeamList(user, pageable);
+            BlindDateTeamSearchCondition condition = new BlindDateTeamSearchCondition(0, 10, List.of());
+            Page<BlindDateTeamSimpleInfo> teamList = blindDateTeamService.getTeamList(user, condition);
 
             // then
             assertNotNull(teamList);

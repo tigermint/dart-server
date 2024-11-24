@@ -1,6 +1,7 @@
 package com.ssh.dartserver.domain.team.v2;
 
 import com.ssh.dartserver.domain.team.v2.dto.BlindDateTeamInfo;
+import com.ssh.dartserver.domain.team.v2.dto.BlindDateTeamSearchCondition;
 import com.ssh.dartserver.domain.team.v2.dto.BlindDateTeamSimpleInfo;
 import com.ssh.dartserver.domain.team.v2.dto.CreateTeamRequest;
 import com.ssh.dartserver.domain.team.v2.dto.UpdateTeamRequest;
@@ -47,9 +48,9 @@ public class BlindDateTeamController {
 
     // 팀 목록 조회
     @GetMapping
-    public Page<BlindDateTeamSimpleInfo> getTeams(Authentication authentication, Pageable pageable) {  // TODO pageable을 대체할 condition 객체 만들기
+    public Page<BlindDateTeamSimpleInfo> getTeams(Authentication authentication, BlindDateTeamSearchCondition condition) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
-        return blindTeamService.getTeamList(principal.getUser(), pageable);
+        return blindTeamService.getTeamList(principal.getUser(), condition);
     }
 
     // 팀 상세 조회
