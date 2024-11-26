@@ -10,6 +10,7 @@ import com.ssh.dartserver.domain.team.v2.dto.BlindDateTeamSearchCondition;
 import com.ssh.dartserver.domain.team.v2.dto.BlindDateTeamSimpleInfo;
 import com.ssh.dartserver.domain.user.domain.User;
 import com.ssh.dartserver.domain.user.infra.UserRepository;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -112,7 +113,9 @@ public class BlindDateTeamReader {
             teamVersion = "v1";
             User user = team.getTeamUsers().get(0).getUser();
 
-            images = List.of(user.getPersonalInfo().getProfileImageUrl().getValue());
+            images = new ArrayList<>();
+            team.getSingleTeamFriends().forEach(teamUser -> images.add(teamUser.getProfileImageUrl().getValue()));
+            images.add(user.getPersonalInfo().getProfileImageUrl().getValue());
 
             leaderId = user.getId();
             age = user.getPersonalInfo().getBirthYear().getAge();
