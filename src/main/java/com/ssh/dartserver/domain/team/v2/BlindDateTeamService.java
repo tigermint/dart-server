@@ -1,5 +1,8 @@
 package com.ssh.dartserver.domain.team.v2;
 
+import com.ssh.dartserver.domain.team.domain.Team;
+import com.ssh.dartserver.domain.team.infra.TeamRepository;
+import com.ssh.dartserver.domain.team.util.TeamViewCountNotificationUtil;
 import com.ssh.dartserver.domain.team.v2.dto.BlindDateTeamInfo;
 import com.ssh.dartserver.domain.team.v2.dto.BlindDateTeamSearchCondition;
 import com.ssh.dartserver.domain.team.v2.dto.BlindDateTeamSimpleInfo;
@@ -13,9 +16,11 @@ import com.ssh.dartserver.domain.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -26,6 +31,9 @@ public class BlindDateTeamService {
     private final BlindDateTeamReader blindDateTeamReader;
     private final BlindDateTeamUpdater blindDateTeamUpdater;
     private final BlindDateTeamDeleter blindDateTeamDeleter;
+
+    private final TeamRepository teamRepository;
+    private final TeamViewCountNotificationUtil teamViewCountNotificationUtil;
 
     // 팀 생성
     @Transactional
@@ -46,9 +54,22 @@ public class BlindDateTeamService {
     }
 
     // 팀 목록 조회
-    @Transactional(readOnly = true)
+    @Transactional
     public Page<BlindDateTeamSimpleInfo> getTeamList(User user, BlindDateTeamSearchCondition condition) {
-        return blindDateTeamReader.getTeamList(user, condition);
+        Page<BlindDateTeamSimpleInfo> teams = blindDateTeamReader.getTeamList(user, condition);
+
+        // View Count Service
+        List<Team> teamList = teams.stream()
+                .map(team -> teamRepository.findById(team.id()))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .peek(team -> team.increaseViewCount(1))
+                .toList();
+
+        log.debug("조회된 팀. TeamIds: {}", teamList.stream().map(Team::getId).toList());
+        teamViewCountNotificationUtil.postNotificationOnViewCountMileStone(teamList);
+
+        return teams;
     }
 
     // 내 팀 조회
@@ -59,9 +80,18 @@ public class BlindDateTeamService {
     }
 
     // 팀 상세 조회
-    @Transactional(readOnly = true)
+    @Transactional
     public BlindDateTeamInfo getTeamInfo(long teamId) {
-        return blindDateTeamReader.getTeamInfo(teamId);
+        BlindDateTeamInfo teamInfo = blindDateTeamReader.getTeamInfo(teamId);
+
+        // View Count Service
+        Team team = teamRepository.findById(teamInfo.id()).orElseThrow();
+        team.increaseViewCount(1);
+
+        log.debug("조회된 팀. TeamId: {}, Now ViewCount: {}", teamInfo.id(), team.getViewCount());
+        teamViewCountNotificationUtil.postNotificationOnViewCountMileStone(team);
+
+        return teamInfo;
     }
 
 }
