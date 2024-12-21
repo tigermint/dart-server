@@ -189,7 +189,7 @@ public class BlindDateTeamReader {
         boolean exp1 = requested == null ? false : team.getId() == requested.getId();
         boolean exp2 = requesting == null ? false : team.getId() == requesting.getId();
 
-        log.info("이미 호감을 전달했는가?: {}, (requested: {}, requesting: {})", exp1 || exp2, requested!=null ? requested.getId() : null, requesting!=null ? requesting.getId() : null);
+        log.debug("이미 호감을 전달했는가?: {}, (requested: {}, requesting: {})", exp1 || exp2, requested!=null ? requested.getId() : null, requesting!=null ? requesting.getId() : null);
         return exp1 || exp2;
     }
 

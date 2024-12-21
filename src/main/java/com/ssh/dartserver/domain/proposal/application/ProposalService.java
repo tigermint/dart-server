@@ -38,15 +38,14 @@ public class ProposalService {
     private static final String PROPOSAL_CONTENTS = "매칭 제안이 도착했어요 💌";
 
     private final ProposalRepository proposalRepository;
-
     private final ProposalCreator proposalCreator;
-    private final UserRepository userRepository;
+    private final ProposalReader proposalReader;
     private final BlindDateTeamReader blindDateTeamReader;
 
     private final ProposalMapper proposalMapper;
 
     private final PlatformNotification notification;
-    private final TeamAverageAgeCalculator teamAverageAgeCalculator;
+
 
     @Transactional
     public Long createProposal(User user, ProposalRequest.Create request) {
@@ -68,15 +67,12 @@ public class ProposalService {
         return proposalId;
     }
 
-
     public List<ProposalResponse.ListDto> listSentProposal(User user) {
-        String userIdPattern = "%-" + user.getId() + "-%";
-        return getListDtos(proposalRepository.findAllRequestingProposalByUserIdPatternAndProposalStatus(userIdPattern, ProposalStatus.PROPOSAL_IN_PROGRESS));
+        return proposalReader.listSentProposal(user);
     }
 
     public List<ProposalResponse.ListDto> listReceivedProposal(User user) {
-        String userIdPattern = "%-" + user.getId() + "-%";
-        return getListDtos(proposalRepository.findAllRequestedProposalByUserIdPatternAndProposalStatus(userIdPattern, ProposalStatus.PROPOSAL_IN_PROGRESS));
+        return proposalReader.listReceivedProposal(user);
     }
 
     @Transactional
@@ -88,102 +84,5 @@ public class ProposalService {
         return proposalMapper.toUpdateDto(proposal);
     }
 
-
-    private List<ProposalResponse.ListDto> getListDtos(List<Proposal> proposals) {
-        return proposals.stream()
-                .flatMap(proposal -> {
-                    Team requestingTeam = proposal.getRequestingTeam();
-                    Team requestedTeam = proposal.getRequestedTeam();
-
-                    if(requestingTeam == null || requestedTeam == null) {
-                        return Stream.empty();
-                    }
-
-                    return Stream.of(proposalMapper.toListDto(
-                            proposal,
-                            getListTeamDto(requestingTeam, requestingTeam.getTeamUsers(), requestingTeam.getTeamRegions()),
-                            getListTeamDto(requestedTeam, requestedTeam.getTeamUsers(), requestedTeam.getTeamRegions())
-                    ));
-                })
-                .collect(Collectors.toList());
-    }
-
-    private ProposalResponse.ListDto.TeamDto getListTeamDto(Team team, List<TeamUser> teamUsers, List<TeamRegion> teamRegions) {
-        return Optional.ofNullable(team)
-                .map(t -> proposalMapper.toListTeamDto(
-                        t,
-                        Optional.of(teamUsers)
-                                .filter(users -> users.size() == 1)
-                                .map(this::getAverageAgeOfSingleTeamUsers)
-                                .orElseGet(() -> getAverageAgeOfMultipleTeamUsers(teamUsers)),
-                        Optional.of(teamUsers)
-                                .filter(users -> users.size() == 1)
-                                .map(users -> getListSingleTeamUserDto(team, users))
-                                .orElseGet(() -> getListMultipleTeamUserDto(teamUsers)),
-                        teamRegions.stream()
-                                .map(teamRegion -> proposalMapper.toListRegionDto(teamRegion.getRegion()))
-                                .collect(Collectors.toList())
-                ))
-                .orElse(null);
-    }
-
-    private List<ProposalResponse.ListDto.UserDto> getListSingleTeamUserDto(Team team, List<TeamUser> teamUsers) {
-        return Stream.concat(
-                        teamUsers.stream()
-                                .map(TeamUser::getUser),
-                        team.getSingleTeamFriends().stream()
-                                .map(singleTeamFriend ->
-                                        User.createSingleTeamFriendUser(
-                                                singleTeamFriend.getNickname().getValue(),
-                                                singleTeamFriend.getBirthYear().getValue(),
-                                                singleTeamFriend.getProfileImageUrl().getValue(),
-                                                singleTeamFriend.getUniversity()
-                                        )
-                                )
-                )
-                .map(teamUser -> proposalMapper.toListUserDto(teamUser, proposalMapper.toListUniversityDto(teamUser.getUniversity())))
-                .collect(Collectors.toList());
-    }
-
-    private List<ProposalResponse.ListDto.UserDto> getListMultipleTeamUserDto(List<TeamUser> teamUsers) {
-        return teamUsers.stream()
-                .map(TeamUser::getUser)
-                .map(teamUser -> proposalMapper.toListUserDto(teamUser, proposalMapper.toListUniversityDto(teamUser.getUniversity())))
-                .collect(Collectors.toList());
-    }
-
-    private Double getAverageAgeOfMultipleTeamUsers(List<TeamUser> teamUsers) {
-        return teamAverageAgeCalculator.getAverageAge(
-                teamUsers.stream()
-                        .map(TeamUser::getUser)
-                        .map(user -> user.getPersonalInfo().getBirthYear().getValue())
-                        .collect(Collectors.toList())
-        );
-    }
-
-    private Double getAverageAgeOfSingleTeamUsers(List<TeamUser> teamUsers) {
-        return teamAverageAgeCalculator.getAverageAge(
-                Stream.concat(
-                                teamUsers.get(0).getTeam().getSingleTeamFriends().stream()
-                                        .map(SingleTeamFriend::getBirthYear)
-                                        .map(BirthYear::getValue),
-                                Stream.of(teamUsers.get(0).getUser().getPersonalInfo().getBirthYear().getValue())
-                        )
-                        .collect(Collectors.toList())
-        );
-    }
-
-    private void validateAlreadySentProposal(Long requestingTeamId, Long requestedTeamId) {
-        proposalRepository.findByRequestingTeamIdAndRequestedTeamId(requestingTeamId, requestedTeamId)
-                .ifPresent(p -> {
-                    throw new IllegalArgumentException("이미 매칭 제안 요청을 보냈습니다. RequestingTeam: " + requestingTeamId + ", RequestedTeam: " + requestedTeamId);
-                });
-    }
-
-    private void validateUserInTeam(User user, List<TeamUser> requestingTeamUsers) {
-        if (requestingTeamUsers.stream().noneMatch(teamUser -> teamUser.getUser().getId().equals(user.getId()))) {
-            throw new IllegalArgumentException("유저가 해당 팀에 속해있지 않습니다. (userId:" + user.getId() + ")");
-        }
-    }
 }
 
