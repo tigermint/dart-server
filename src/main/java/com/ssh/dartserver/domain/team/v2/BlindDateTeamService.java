@@ -38,7 +38,7 @@ public class BlindDateTeamService {
     // 팀 생성
     @Transactional
     public void createTeam(User user, CreateTeamRequest request) {
-        log.info("새로운 팀을 생성합니다. userId: {}, request: {}", user.getId(), request);
+        log.info("새로운 팀을 생성합니다. userId: {}, request: {}", user != null ? user.getId() : null, request);
         blindDateTeamCreator.createTeam(user, request);
     }
 
