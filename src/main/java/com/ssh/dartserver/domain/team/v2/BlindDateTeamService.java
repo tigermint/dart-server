@@ -81,8 +81,8 @@ public class BlindDateTeamService {
 
     // 팀 상세 조회
     @Transactional
-    public BlindDateTeamInfo getTeamInfo(long teamId) {
-        BlindDateTeamInfo teamInfo = blindDateTeamReader.getTeamInfo(teamId);
+    public BlindDateTeamInfo getTeamInfo(long teamId, User user) {
+        BlindDateTeamInfo teamInfo = blindDateTeamReader.getTeamInfo(teamId, user);
 
         // View Count Service
         Team team = teamRepository.findById(teamInfo.id()).orElseThrow();

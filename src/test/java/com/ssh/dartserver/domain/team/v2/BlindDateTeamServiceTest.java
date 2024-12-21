@@ -245,7 +245,7 @@ class BlindDateTeamServiceTest extends ApiTest {
             teamRepository.save(team);
 
             // When: 내가 등록한 팀의 id로 팀 정보를 조회할 때
-            BlindDateTeamInfo teamInfo = blindDateTeamService.getTeamInfo(team.getId());
+            BlindDateTeamInfo teamInfo = blindDateTeamService.getTeamInfo(team.getId(), user);
 
             // Then: 팀 정보가 정상적으로 반환되어야 합니다. TODO v2 팀 전체 정보가 잘 들어오는지 확인!
             assertThat(teamInfo).isNotNull();
@@ -276,7 +276,7 @@ class BlindDateTeamServiceTest extends ApiTest {
 
             // Expect: IllegalArgumentException 예외가 발생해야 합니다.
             assertThrows(IllegalArgumentException.class, () -> {
-                blindDateTeamService.getTeamInfo(invalidTeamId);
+                blindDateTeamService.getTeamInfo(invalidTeamId, null);
             });
         }
 
@@ -289,11 +289,11 @@ class BlindDateTeamServiceTest extends ApiTest {
 
             // Expect: IllegalArgumentException 예외가 발생해야 합니다.
             assertThrows(IllegalArgumentException.class, () -> {
-                blindDateTeamService.getTeamInfo(zeroTeamId);
+                blindDateTeamService.getTeamInfo(zeroTeamId, null);
             });
 
             assertThrows(IllegalArgumentException.class, () -> {
-                blindDateTeamService.getTeamInfo(negativeTeamId);
+                blindDateTeamService.getTeamInfo(negativeTeamId, null);
             });
         }
 

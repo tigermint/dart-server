@@ -45,11 +45,12 @@ public class BlindDateTeamReader {
         // TODO ContextHolder에서 기억하는 User값을 Entity가 아닌 전용 DTO(VO)로 변환해두는 것이 좋아보임. (임시로 사용)
         user = userRepository.findWithUniversityById(user.getId()).orElseThrow();  // 사용자 전체 정보를 조회
 
-        // TODO 조회수 처리 + 푸시 알림
+        Team viewerTeam = teamRepository.findByLeader_IdOrTeamUsers_User_Id(user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("팀을 조회하기 위해서는 본인이 만든 팀이 존재해야합니다."));
 
         Page<Team> teams = teamRepository.findAll(user, pageable);
         List<BlindDateTeamInfo> blindDateTeams = teams.getContent().stream()
-                .map(team -> convertBlindDateTeamInfo(team))
+                .map(team -> convertBlindDateTeamInfo(team, viewerTeam))
                 .toList();
 
         // 결과를 다시 맵핑 (이후 상세조회와 목록조회의 로직이 달라진다면 수정)
@@ -84,22 +85,26 @@ public class BlindDateTeamReader {
         Team team = teamRepository.findByLeader_IdOrTeamUsers_User_Id(user.getId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저가 만든 팀이 존재하지 않습니다."));
 
-        return convertBlindDateTeamInfo(team);
+        return convertBlindDateTeamInfo(team, team);
     }
 
     // 팀 상세 조회
     @Transactional(readOnly = true)
-    public BlindDateTeamInfo getTeamInfo(long teamId) {
-        // TODO 조회수 처리 + 푸시 알림
-
+    public BlindDateTeamInfo getTeamInfo(long teamId, User user) {
         Team team = teamRepository.findById(teamId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 팀 입니다. teamId: " + teamId));
 
-        return convertBlindDateTeamInfo(team);
+        if (user == null) {
+            throw new IllegalArgumentException("팀을 조회하려는 유저의 정보는 null일 수 없습니다.");
+        }
+        Team viewerTeam = teamRepository.findByLeader_IdOrTeamUsers_User_Id(user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("팀을 조회하기 위해서는 본인이 만든 팀이 존재해야합니다. viewerId: " + user.getId()));
+
+        return convertBlindDateTeamInfo(team, viewerTeam);
     }
 
     // TODO Test 작성 필요 (클래스 분리 후)
-    private BlindDateTeamInfo convertBlindDateTeamInfo(Team team) {
+    private BlindDateTeamInfo convertBlindDateTeamInfo(Team team, Team viewerTeam) {
         // v1, v2 분기 처리
         List<String> images;
         long leaderId;
@@ -146,10 +151,9 @@ public class BlindDateTeamReader {
                 .toList();
 
         // 공통 - Proposal 확인하기 (개선 필요)  TODO 테스트 작성 필요
-        // TODO 헉!!! 내 팀이랑 상대 팀이랑 일케 비교해야하는데 그렇게 안하고있네... 외부에서 내 팀 번호를 받아오던가 그렇게 해야할듯?
-        List<Proposal> proposals = proposalRepository.findAllByRequestingTeamOrRequestedTeam(team, team);  // findAll의 위험성
+        List<Proposal> proposals = proposalRepository.findAllByRequestingTeamOrRequestedTeam(team, team);  // TODO findAll의 위험성
         boolean isAlreadyProposal = proposals.stream()
-                .anyMatch(proposal -> isAlreadyProposal(team, proposal));
+                .anyMatch(proposal -> isAlreadyProposal(viewerTeam, proposal));
 
         // DTO 생성
         return BlindDateTeamInfo.builder()
