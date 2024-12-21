@@ -38,18 +38,21 @@ public class BlindDateTeamService {
     // 팀 생성
     @Transactional
     public void createTeam(User user, CreateTeamRequest request) {
+        log.info("새로운 팀을 생성합니다. userId: {}, request: {}", user.getId(), request);
         blindDateTeamCreator.createTeam(user, request);
     }
 
     // 팀 수정 (Put)
     @Transactional
     public void updateTeam(User user, long teamId, UpdateTeamRequest request) {
+        log.info("팀 정보를 수정합니다. teamId: {}, request: {}", teamId, request);
         blindDateTeamUpdater.updateTeam(user, teamId, request);
     }
 
     // 팀 삭제
     @Transactional
     public void deleteTeam(User user, long teamId) {
+        log.info("팀을 삭제합니다. teamId: {}", teamId);
         blindDateTeamDeleter.deleteTeam(user, teamId);
     }
 
