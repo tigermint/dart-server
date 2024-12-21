@@ -9,7 +9,10 @@ import com.ssh.dartserver.domain.team.domain.SingleTeamFriend;
 import com.ssh.dartserver.domain.team.domain.Team;
 import com.ssh.dartserver.domain.team.domain.TeamRegion;
 import com.ssh.dartserver.domain.team.domain.TeamUser;
+import com.ssh.dartserver.domain.team.infra.TeamRepository;
 import com.ssh.dartserver.domain.team.infra.TeamUserRepository;
+import com.ssh.dartserver.domain.team.v2.dto.BlindDateTeamInfo;
+import com.ssh.dartserver.domain.team.v2.impl.BlindDateTeamReader;
 import com.ssh.dartserver.domain.user.domain.User;
 import com.ssh.dartserver.domain.user.domain.personalinfo.BirthYear;
 import com.ssh.dartserver.domain.user.infra.UserRepository;
@@ -33,8 +36,9 @@ public class ProposalService {
     private static final String PROPOSAL_CONTENTS = "매칭 제안이 도착했어요 💌";
 
     private final ProposalRepository proposalRepository;
-    private final TeamUserRepository teamUserRepository;
+    private final TeamRepository teamRepository;
     private final UserRepository userRepository;
+    private final BlindDateTeamReader blindDateTeamReader;
 
     private final ProposalMapper proposalMapper;
 
@@ -45,28 +49,28 @@ public class ProposalService {
     public Long createProposal(User user, ProposalRequest.Create request) {
         validateAlreadySentProposal(request.getRequestingTeamId(), request.getRequestedTeamId());
 
-        List<TeamUser> requestingTeamUsers = teamUserRepository.findAllByTeamId(request.getRequestingTeamId());
-        List<TeamUser> requestedTeamUsers = teamUserRepository.findAllByTeamId(request.getRequestedTeamId());
-        validateUserInTeam(user, requestingTeamUsers);
+        // 모든 팀원을 가져오고, 요청한 유저가 생성한 팀인지 확인하기
+        BlindDateTeamInfo requestedTeam = blindDateTeamReader.getTeamInfo(request.getRequestedTeamId(), user);
+        BlindDateTeamInfo requestingTeam = blindDateTeamReader.getTeamInfo(request.getRequestingTeamId(), user);
+        if (requestingTeam.leaderId() != user.getId()) {
+            throw new IllegalArgumentException("유저가 해당 팀에 속해있지 않습니다. (userId:" + user.getId() + ")");
+        }
 
+        // 포인트 차감하기
         user.subtractPoint(PROPOSAL_POINT);
 
+        // 새로운 호감 생성하기
         Proposal proposal = Proposal.builder()
                 .proposalStatus(ProposalStatus.PROPOSAL_IN_PROGRESS)
-                .requestingTeam(requestingTeamUsers.get(0).getTeam())
-                .requestedTeam(requestedTeamUsers.get(0).getTeam())
+                .requestingTeam(teamRepository.getById(requestingTeam.id()))  // TODO 호감 생성 부분 동작하도록 수정
+                .requestedTeam(teamRepository.getById(requestedTeam.id()))
                 .build();
 
         userRepository.save(user);
         proposalRepository.save(proposal);
 
-        List<Long> requestedTeamUserIds = requestedTeamUsers.stream()
-                .map(TeamUser::getUser)
-                .map(User::getId)
-                .collect(Collectors.toList());
-
         CompletableFuture.runAsync(() ->
-                notification.postNotificationSpecificDevice(requestedTeamUserIds, PROPOSAL_CONTENTS)
+                notification.postNotificationSpecificDevice(requestedTeam.leaderId(), PROPOSAL_CONTENTS)
         );
 
         return proposal.getId();
