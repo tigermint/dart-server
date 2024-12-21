@@ -19,6 +19,7 @@ import com.ssh.dartserver.domain.user.infra.UserRepository;
 import com.ssh.dartserver.global.infra.notification.PlatformNotification;
 import com.ssh.dartserver.global.util.TeamAverageAgeCalculator;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +29,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -36,7 +38,8 @@ public class ProposalService {
     private static final String PROPOSAL_CONTENTS = "매칭 제안이 도착했어요 💌";
 
     private final ProposalRepository proposalRepository;
-    private final TeamRepository teamRepository;
+
+    private final ProposalCreator proposalCreator;
     private final UserRepository userRepository;
     private final BlindDateTeamReader blindDateTeamReader;
 
@@ -47,33 +50,22 @@ public class ProposalService {
 
     @Transactional
     public Long createProposal(User user, ProposalRequest.Create request) {
-        validateAlreadySentProposal(request.getRequestingTeamId(), request.getRequestedTeamId());
-
-        // 모든 팀원을 가져오고, 요청한 유저가 생성한 팀인지 확인하기
         BlindDateTeamInfo requestedTeam = blindDateTeamReader.getTeamInfo(request.getRequestedTeamId(), user);
         BlindDateTeamInfo requestingTeam = blindDateTeamReader.getTeamInfo(request.getRequestingTeamId(), user);
         if (requestingTeam.leaderId() != user.getId()) {
             throw new IllegalArgumentException("유저가 해당 팀에 속해있지 않습니다. (userId:" + user.getId() + ")");
         }
 
-        // 포인트 차감하기
         user.subtractPoint(PROPOSAL_POINT);
 
-        // 새로운 호감 생성하기
-        Proposal proposal = Proposal.builder()
-                .proposalStatus(ProposalStatus.PROPOSAL_IN_PROGRESS)
-                .requestingTeam(teamRepository.getById(requestingTeam.id()))  // TODO 호감 생성 부분 동작하도록 수정
-                .requestedTeam(teamRepository.getById(requestedTeam.id()))
-                .build();
-
-        userRepository.save(user);
-        proposalRepository.save(proposal);
+        Long proposalId = proposalCreator.create(requestingTeam.id(), requestedTeam.id());
 
         CompletableFuture.runAsync(() ->
                 notification.postNotificationSpecificDevice(requestedTeam.leaderId(), PROPOSAL_CONTENTS)
         );
 
-        return proposal.getId();
+        log.info("호감을 전송합니다. ProposalId: {} (팀 {} -> 팀 {})", proposalId, request.getRequestingTeamId(), request.getRequestedTeamId());
+        return proposalId;
     }
 
 
@@ -184,7 +176,7 @@ public class ProposalService {
     private void validateAlreadySentProposal(Long requestingTeamId, Long requestedTeamId) {
         proposalRepository.findByRequestingTeamIdAndRequestedTeamId(requestingTeamId, requestedTeamId)
                 .ifPresent(p -> {
-                    throw new IllegalArgumentException("이미 매칭 제안 요청을 보냈습니다.");
+                    throw new IllegalArgumentException("이미 매칭 제안 요청을 보냈습니다. RequestingTeam: " + requestingTeamId + ", RequestedTeam: " + requestedTeamId);
                 });
     }
 
