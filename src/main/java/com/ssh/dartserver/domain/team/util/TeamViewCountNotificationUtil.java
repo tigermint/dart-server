@@ -37,7 +37,7 @@ public class TeamViewCountNotificationUtil {
                 .toList();
 
         if (teamsReachedMilestone.isEmpty()) {
-            log.info("Push 알림을 전송할 팀이 없습니다.");
+            log.debug("Push 알림을 전송할 팀이 없습니다.");
             return;
         }
 
