@@ -13,6 +13,7 @@ import com.ssh.dartserver.domain.user.infra.UserRepository;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -20,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BlindDateTeamReader {
@@ -143,18 +145,11 @@ public class BlindDateTeamReader {
                 .map(teamRegion -> new RegionResponse(teamRegion.getRegion().getId(), teamRegion.getRegion().getName()))
                 .toList();
 
-        // 공통 - Proposal 확인하기 (개선 필요)
-        List<Proposal> proposals = proposalRepository.findAllByRequestingTeamOrRequestedTeam(team,
-                team);  // findAll의 위험성
+        // 공통 - Proposal 확인하기 (개선 필요)  TODO 테스트 작성 필요
+        // TODO 헉!!! 내 팀이랑 상대 팀이랑 일케 비교해야하는데 그렇게 안하고있네... 외부에서 내 팀 번호를 받아오던가 그렇게 해야할듯?
+        List<Proposal> proposals = proposalRepository.findAllByRequestingTeamOrRequestedTeam(team, team);  // findAll의 위험성
         boolean isAlreadyProposal = proposals.stream()
-                .anyMatch(proposal -> {
-                    Team requested = proposal.getRequestedTeam();
-                    Team requesting = proposal.getRequestingTeam();
-
-                    boolean exp1 = requested == null ? false : team.getId() == requested.getId();
-                    boolean exp2 = requesting == null ? false : team.getId() == requesting.getId();
-                    return exp1 || exp2;
-                });
+                .anyMatch(proposal -> isAlreadyProposal(team, proposal));
 
         // DTO 생성
         return BlindDateTeamInfo.builder()
@@ -175,6 +170,23 @@ public class BlindDateTeamReader {
                 .teamVersion(teamVersion)
 
                 .build();
+    }
+
+    /**
+     * 특정 팀과 호감을 주고 받았는지 확인한다.
+     * @param team 조회하는 사용자가 속한 팀의 id
+     * @param proposal 보낸 호감 정보
+     * @return 호감을 주거나 받은 경우 true
+     */
+    private static boolean isAlreadyProposal(Team team, Proposal proposal) {
+        Team requested = proposal.getRequestedTeam();  // 요청받은 팀 정보
+        Team requesting = proposal.getRequestingTeam();  // 요청한 팀 정보
+
+        boolean exp1 = requested == null ? false : team.getId() == requested.getId();
+        boolean exp2 = requesting == null ? false : team.getId() == requesting.getId();
+
+        log.info("이미 호감을 전달했는가?: {}, (requested: {}, requesting: {})", exp1 || exp2, requested!=null ? requested.getId() : null, requesting!=null ? requesting.getId() : null);
+        return exp1 || exp2;
     }
 
 }
