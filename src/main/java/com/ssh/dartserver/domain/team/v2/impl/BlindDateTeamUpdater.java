@@ -15,9 +15,11 @@ import com.ssh.dartserver.domain.user.domain.User;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BlindDateTeamUpdater {
@@ -30,6 +32,8 @@ public class BlindDateTeamUpdater {
     // 팀 수정 (Put)
     @Transactional
     public void updateTeam(User user, long teamId, UpdateTeamRequest request) {
+        log.info("팀 정보 수정 요청이 들어왔습니다. TeamId: {}, Request: {}", teamId, request);
+
         // 검증
         if (user == null) {
             throw new IllegalArgumentException("사용자 정보는 null일 수 없습니다.");
@@ -49,8 +53,9 @@ public class BlindDateTeamUpdater {
             throw new IllegalArgumentException("자신이 만든 팀만 삭제할 수 있습니다. team.leaderId: " + team.getLeader().getId());
         }
 
-        // TODO 더 이상 사용되지 않는 regions, teamImage를 명시적으로 삭제해야 함
         // regionId로 regions 가져오기
+        teamRegionRepository.deleteAllByTeamId(team.getId());
+
         List<Region> regions = request.regionIds().stream()
                 .map(regionId -> regionRepository.findById(regionId)
                         .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 RegionId입니다. value: " + regionId)))
@@ -66,6 +71,10 @@ public class BlindDateTeamUpdater {
 
         // ImageUrl을 비교하여 아직 등록되지 않은 이미지만 새로 등록
         List<TeamImage> teamImages = teamImageRepository.findAllByTeam(team);
+        teamImages.stream()
+                .filter(teamImage -> !request.imageUrls().contains(teamImage.getImage().getData()))
+                .forEach(teamImageRepository::delete);
+
         List<TeamImage> teamImages1 = request.imageUrls().stream()
                 .map(imageUrl -> {
                     Optional<TeamImage> teamImage = findTeamImageByImageUrl(teamImages, imageUrl);
