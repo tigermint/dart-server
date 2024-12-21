@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -29,17 +30,36 @@ public class ProposalReader {
     private final ProposalMapper proposalMapper;
     private final TeamAverageAgeCalculator teamAverageAgeCalculator;
 
-    // TODO v1, v2 로직 구분
     @Transactional(readOnly = true)
     public List<ProposalResponse.ListDto> listSentProposal(User user) {
-        String userIdPattern = "%-" + user.getId() + "-%";
-        return getListDtos(proposalRepository.findAllRequestingProposalByUserIdPatternAndProposalStatus(userIdPattern, ProposalStatus.PROPOSAL_IN_PROGRESS));
+        List<Proposal> proposals = new ArrayList<>();
+
+        // v2
+        proposals = proposalRepository.findByProposalStatusAndRequestingTeam_Leader_Id(ProposalStatus.PROPOSAL_IN_PROGRESS, user.getId());
+
+        // v1
+        if (proposals.isEmpty()) {
+            String userIdPattern = "%-" + user.getId() + "-%";
+            proposals = proposalRepository.findAllRequestingProposalByUserIdPatternAndProposalStatus(userIdPattern, ProposalStatus.PROPOSAL_IN_PROGRESS);
+        }
+
+        return getListDtos(proposals);
     }
 
     @Transactional(readOnly = true)
     public List<ProposalResponse.ListDto> listReceivedProposal(User user) {
-        String userIdPattern = "%-" + user.getId() + "-%";
-        return getListDtos(proposalRepository.findAllRequestedProposalByUserIdPatternAndProposalStatus(userIdPattern, ProposalStatus.PROPOSAL_IN_PROGRESS));
+        List<Proposal> proposals = new ArrayList<>();
+
+        // v2
+        proposals = proposalRepository.findByProposalStatusAndRequestedTeam_Leader_Id(ProposalStatus.PROPOSAL_IN_PROGRESS, user.getId());
+
+        // v1
+        if (proposals.isEmpty()) {
+            String userIdPattern = "%-" + user.getId() + "-%";
+            proposals = proposalRepository.findAllRequestedProposalByUserIdPatternAndProposalStatus(userIdPattern, ProposalStatus.PROPOSAL_IN_PROGRESS);
+        }
+
+        return getListDtos(proposals);
     }
 
     // TODO 조회 로직 리팩터링 (Calculator쪽으로 책임을 분리한다던가..)
