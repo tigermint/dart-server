@@ -5,29 +5,17 @@ import com.ssh.dartserver.domain.proposal.domain.ProposalStatus;
 import com.ssh.dartserver.domain.proposal.infra.ProposalRepository;
 import com.ssh.dartserver.domain.proposal.presentation.request.ProposalRequest;
 import com.ssh.dartserver.domain.proposal.presentation.response.ProposalResponse;
-import com.ssh.dartserver.domain.team.domain.SingleTeamFriend;
-import com.ssh.dartserver.domain.team.domain.Team;
-import com.ssh.dartserver.domain.team.domain.TeamRegion;
-import com.ssh.dartserver.domain.team.domain.TeamUser;
-import com.ssh.dartserver.domain.team.infra.TeamRepository;
-import com.ssh.dartserver.domain.team.infra.TeamUserRepository;
 import com.ssh.dartserver.domain.team.v2.dto.BlindDateTeamInfo;
 import com.ssh.dartserver.domain.team.v2.impl.BlindDateTeamReader;
 import com.ssh.dartserver.domain.user.domain.User;
-import com.ssh.dartserver.domain.user.domain.personalinfo.BirthYear;
-import com.ssh.dartserver.domain.user.infra.UserRepository;
 import com.ssh.dartserver.global.infra.notification.PlatformNotification;
-import com.ssh.dartserver.global.util.TeamAverageAgeCalculator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -63,7 +51,7 @@ public class ProposalService {
                 notification.postNotificationSpecificDevice(requestedTeam.leaderId(), PROPOSAL_CONTENTS)
         );
 
-        log.info("호감을 전송합니다. ProposalId: {} (팀 {} -> 팀 {})", proposalId, request.getRequestingTeamId(), request.getRequestedTeamId());
+        log.info("호감을 전송하였습니다. ProposalId: {} (팀 {} -> 팀 {})", proposalId, request.getRequestingTeamId(), request.getRequestedTeamId());
         return proposalId;
     }
 
