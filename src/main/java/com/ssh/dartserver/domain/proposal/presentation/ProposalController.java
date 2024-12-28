@@ -18,7 +18,9 @@ import java.net.URI;
 @RequiredArgsConstructor
 @RequestMapping("/v1/proposals")
 public class ProposalController {
+
     private final ProposalService proposalService;
+
     @PostMapping
     public ResponseEntity<Void> createProposal(Authentication authentication, @RequestBody ProposalRequest.Create request) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
@@ -29,4 +31,5 @@ public class ProposalController {
                 .toUri();
         return ResponseEntity.created(location).build();
     }
+
 }
