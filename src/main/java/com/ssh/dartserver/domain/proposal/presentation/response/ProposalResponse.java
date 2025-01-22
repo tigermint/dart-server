@@ -1,6 +1,8 @@
 package com.ssh.dartserver.domain.proposal.presentation.response;
 
 import com.ssh.dartserver.domain.user.domain.studentverificationinfo.StudentIdCardVerificationStatus;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -19,6 +21,7 @@ public class ProposalResponse {
         private TeamDto requestedTeam;
 
         @Data
+        @Builder
         public static class TeamDto {
             private Long teamId;
             private String name;
@@ -28,6 +31,7 @@ public class ProposalResponse {
         }
 
         @Data
+        @Builder
         public static class UserDto {
             private Long userId;
             private String nickname;
@@ -38,12 +42,14 @@ public class ProposalResponse {
         }
 
         @Data
+        @AllArgsConstructor
         public static class RegionDto {
             private Long regionId;
             private String name;
         }
 
         @Data
+        @AllArgsConstructor
         public static class UniversityDto {
             private Long universityId;
             private String name;

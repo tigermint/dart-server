@@ -84,20 +84,43 @@ public class ProposalReader {
 
     private ProposalResponse.ListDto.TeamDto getListTeamDto(Team team, List<TeamUser> teamUsers, List<TeamRegion> teamRegions) {
         return Optional.ofNullable(team)
-                .map(t -> proposalMapper.toListTeamDto(
-                        t,
-                        Optional.of(teamUsers)
-                                .filter(users -> users.size() == 1)
-                                .map(this::getAverageAgeOfSingleTeamUsers)
-                                .orElseGet(() -> getAverageAgeOfMultipleTeamUsers(teamUsers)),
-                        Optional.of(teamUsers)
-                                .filter(users -> users.size() == 1)
-                                .map(users -> getListSingleTeamUserDto(team, users))
-                                .orElseGet(() -> getListMultipleTeamUserDto(teamUsers)),
-                        teamRegions.stream()
-                                .map(teamRegion -> proposalMapper.toListRegionDto(teamRegion.getRegion()))
-                                .collect(Collectors.toList())
-                ))
+                .map(t -> {
+                    // v2 team
+                    if (t.getTeamUsersCombinationHash() == null) {
+                        return ProposalResponse.ListDto.TeamDto.builder()
+                                .teamId(t.getId())
+                                .name(t.getName().getValue())
+                                .averageAge(t.getLeader().getPersonalInfo().getBirthYear().getAge())
+                                .users(List.of(ProposalResponse.ListDto.UserDto.builder()
+                                                .userId(t.getLeader().getId())
+                                                .nickname(t.getLeader().getNicknameOrElseName())
+                                                .birthYear(t.getLeader().getPersonalInfo().getBirthYear().getValue())
+                                                .studentIdCardVerificationStatus(t.getLeader().getStudentVerificationInfo().getStudentIdCardVerificationStatus())
+                                                .profileImageUrl(t.getTeamImages().size() == 0 ? null : t.getTeamImages().get(0).getImage().getData())
+                                                .university(new ProposalResponse.ListDto.UniversityDto(t.getLeader().getUniversity().getId(), t.getLeader().getUniversity().getName(), t.getLeader().getUniversity().getDepartment()))
+                                        .build()))
+                                .regions(t.getTeamRegions().stream()
+                                        .map(region -> new ProposalResponse.ListDto.RegionDto(region.getRegion().getId(), region.getRegion().getName()))
+                                        .toList())
+                                .build();
+                    }
+
+                    // v1 team
+                    return proposalMapper.toListTeamDto(
+                            t,
+                            Optional.of(teamUsers)
+                                    .filter(users -> users.size() == 1)
+                                    .map(this::getAverageAgeOfSingleTeamUsers)
+                                    .orElseGet(() -> getAverageAgeOfMultipleTeamUsers(teamUsers)),
+                            Optional.of(teamUsers)
+                                    .filter(users -> users.size() == 1)
+                                    .map(users -> getListSingleTeamUserDto(team, users))
+                                    .orElseGet(() -> getListMultipleTeamUserDto(teamUsers)),
+                            teamRegions.stream()
+                                    .map(teamRegion -> proposalMapper.toListRegionDto(teamRegion.getRegion()))
+                                    .collect(Collectors.toList())
+                    );
+                })
                 .orElse(null);
     }
 

@@ -2,9 +2,6 @@ package com.ssh.dartserver.domain.user.presentation.v1;
 
 import com.ssh.dartserver.domain.chat.presentation.response.ChatRoomResponse;
 import com.ssh.dartserver.domain.chat.application.ChatRoomService;
-import com.ssh.dartserver.domain.proposal.presentation.request.ProposalRequest;
-import com.ssh.dartserver.domain.proposal.presentation.response.ProposalResponse;
-import com.ssh.dartserver.domain.proposal.application.ProposalService;
 import com.ssh.dartserver.domain.question.presentation.response.ReceivedQuestionResponse;
 import com.ssh.dartserver.domain.question.application.QuestionService;
 import com.ssh.dartserver.domain.team.presentation.request.TeamRequest;
@@ -46,7 +43,6 @@ public class UserController {
     private final MyTeamService myTeamService;
     private final QuestionService questionService;
     private final ChatRoomService chatRoomService;
-    private final ProposalService proposalService;
 
     @PostMapping("/signup")
     public ResponseEntity<UserProfileResponse> signUp(
@@ -170,21 +166,4 @@ public class UserController {
         return ResponseEntity.ok(chatRoomService.listChatRoom(principal.getUser()));
     }
 
-    @GetMapping("/me/proposals")
-    public ResponseEntity<List<ProposalResponse.ListDto>> listProposal(Authentication authentication, @RequestParam(defaultValue = "sent") String type) {
-        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
-        if (type.equals("sent")) {  // TODO Enum
-            return ResponseEntity.ok(proposalService.listSentProposal(principal.getUser()));
-        }
-        if (type.equals("received")) {
-            return ResponseEntity.ok(proposalService.listReceivedProposal(principal.getUser()));
-        }
-        return ResponseEntity.badRequest().build();
-    }
-
-    @PatchMapping("/me/proposals/{proposalId}")
-    public ResponseEntity<ProposalResponse.UpdateDto> updateProposal(Authentication authentication, @PathVariable Long proposalId, @RequestBody ProposalRequest.Update request) {
-        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
-        return ResponseEntity.ok(proposalService.updateProposal(principal.getUser(), proposalId, request));
-    }
 }
