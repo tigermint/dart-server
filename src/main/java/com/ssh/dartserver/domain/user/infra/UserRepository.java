@@ -1,14 +1,14 @@
 package com.ssh.dartserver.domain.user.infra;
 
 import com.ssh.dartserver.domain.user.domain.User;
-import com.ssh.dartserver.domain.user.domain.recommendcode.RecommendationCode;
+import com.ssh.dartserver.domain.user.domain.RecommendationCode;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import javax.persistence.LockModeType;
+import jakarta.persistence.LockModeType;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,7 +18,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query(value = "SELECT u FROM User u WHERE u.id = :userId")
     Optional<User> findByIdForUpdate(@Param("userId") Long userId);
 
-    Optional<User> findByUsername(String username);
+    Optional<User> findByAuthInfo_Username(String username);
 
     Optional<User> findByRecommendationCode(RecommendationCode recommendationCode);
 
@@ -36,4 +36,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "WHERE f1.user.id = :userId AND f1.friendUser.id = f2.user.id AND f2.friendUser.id != :userId")
     List<User> findAllFriendsOfFriendsByUserId(@Param("userId") Long id);
 
+    @Query("SELECT u FROM User u JOIN FETCH u.university WHERE u.id = :userId")
+    Optional<User> findWithUniversityById(@Param("userId") Long userId);
 }

@@ -1,7 +1,7 @@
 package com.ssh.dartserver.domain.team.presentation;
 
-import com.ssh.dartserver.domain.team.dto.RegionResponse;
-import com.ssh.dartserver.domain.team.service.RegionService;
+import com.ssh.dartserver.domain.team.presentation.response.RegionResponse;
+import com.ssh.dartserver.domain.team.application.RegionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -1,11 +1,8 @@
 package com.ssh.dartserver.domain.proposal;
 
-import static com.ssh.dartserver.domain.proposal.ProposalSteps.*;
-import static org.assertj.core.api.Assertions.*;
-
 import com.ssh.dartserver.ApiTest;
 import com.ssh.dartserver.UserManager;
-import com.ssh.dartserver.domain.proposal.dto.ProposalRequest.Create;
+import com.ssh.dartserver.domain.proposal.presentation.request.ProposalRequest.Create;
 import com.ssh.dartserver.testing.IntegrationTest;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -14,8 +11,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
+import static com.ssh.dartserver.domain.proposal.ProposalSteps.호감보내기요청;
+import static com.ssh.dartserver.domain.proposal.ProposalSteps.호감보내기요청_생성;
+import static org.assertj.core.api.Assertions.assertThat;
+
 @IntegrationTest
-public class ProposalApiTest  extends ApiTest {
+class ProposalApiTest  extends ApiTest {
     @Autowired
     private UserManager userManager;
     @Autowired

@@ -1,14 +1,16 @@
 package com.ssh.dartserver.domain.user.domain.personalinfo;
 
+import com.ssh.dartserver.global.util.DateTimeUtil;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
 
-@Getter
 @Embeddable
-@NoArgsConstructor
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class BirthYear {
     private static final int BIRTH_YEAR_MIN = 1995;
     private static final int BIRTH_YEAR_MAX = 2005;
@@ -16,9 +18,13 @@ public class BirthYear {
     @Column(name = "birth_year")
     private int value;
 
-    public BirthYear(int value) {
+    private BirthYear(int value) {
         validateBirthYear(value);
         this.value = value;
+    }
+
+    public static BirthYear from(int value) {
+        return new BirthYear(value);
     }
 
     private void validateBirthYear(int value) {
@@ -30,9 +36,7 @@ public class BirthYear {
         );
     }
 
-
-    public static BirthYear from(int value) {
-        return new BirthYear(value);
+    public int getAge() {
+        return DateTimeUtil.nowFromZone().getYear() - value + 1;
     }
-
 }

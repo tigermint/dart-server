@@ -5,8 +5,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.ssh.dartserver.ApiTest;
 import com.ssh.dartserver.UserManager;
 import com.ssh.dartserver.domain.chat.domain.ChatMessageType;
-import com.ssh.dartserver.domain.chat.dto.ChatMessageRequest;
-import com.ssh.dartserver.domain.chat.dto.ChatMessageResponse;
+import com.ssh.dartserver.domain.chat.presentation.request.ChatMessageRequest;
+import com.ssh.dartserver.domain.chat.presentation.response.ChatMessageResponse;
 import com.ssh.dartserver.domain.region.RegionSteps;
 import com.ssh.dartserver.domain.team.TeamSteps;
 import com.ssh.dartserver.domain.team.infra.RegionRepository;
@@ -14,7 +14,7 @@ import com.ssh.dartserver.domain.university.UniversitySteps;
 import com.ssh.dartserver.domain.university.infra.UniversityRepository;
 import com.ssh.dartserver.domain.user.domain.User;
 import com.ssh.dartserver.domain.user.domain.personalinfo.Gender;
-import com.ssh.dartserver.global.auth.service.jwt.JwtProperties;
+import com.ssh.dartserver.global.config.properties.JwtProperty;
 import com.ssh.dartserver.testing.IntegrationTest;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -166,7 +166,7 @@ class ChatMessageApiTest extends ApiTest {
 
     private StompSession connectWebSocket(final String jwtToken) throws Exception {
         final StompHeaders stompHeaders = new StompHeaders();
-        stompHeaders.add(JwtProperties.HEADER_STRING.getValue(), JwtProperties.TOKEN_PREFIX.getValue() + jwtToken);
+        stompHeaders.add(JwtProperty.HEADER_STRING, JwtProperty.TOKEN_PREFIX + jwtToken);
 
         ListenableFuture<StompSession> connect = stompClient.connect(
                 getWebSocketUri(),

@@ -10,13 +10,15 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-public interface ProposalRepository extends JpaRepository<Proposal, Long> {
+public interface ProposalRepository extends JpaRepository<Proposal, Long>, ProposalRepositoryCustom {
+
     Optional<Proposal> findByRequestingTeamIdAndRequestedTeamId(Long requestingTeamId, Long requestedTeamId);
 
     List<Proposal> findAllByRequestingTeamIdOrRequestedTeamId(Long requestingTeamId, Long requestedTeamId);
 
     List<Proposal> findAllByRequestingTeamOrRequestedTeam(Team team1, Team team2);
 
+    // v1
     @Query("select p from Proposal p " +
             "join fetch p.requestingTeam rtg " +
             "join fetch p.requestedTeam rtd " +
@@ -25,6 +27,7 @@ public interface ProposalRepository extends JpaRepository<Proposal, Long> {
             "order by p.createdTime desc")
     List<Proposal> findAllRequestingProposalByUserIdPatternAndProposalStatus(@Param("userIdPattern") String userIdPattern, @Param("proposalStatus") ProposalStatus proposalStatus);
 
+    // v1
     @Query("select p from Proposal p " +
             "join fetch p.requestedTeam rtd " +
             "join fetch p.requestingTeam rtg " +
@@ -32,6 +35,11 @@ public interface ProposalRepository extends JpaRepository<Proposal, Long> {
             "and p.proposalStatus = :proposalStatus " +
             "order by p.createdTime desc")
     List<Proposal> findAllRequestedProposalByUserIdPatternAndProposalStatus(@Param("userIdPattern") String userIdPattern, @Param("proposalStatus") ProposalStatus proposalStatus);
+
+    // v2
+    List<Proposal> findByProposalStatusAndRequestingTeam_Leader_Id(ProposalStatus proposalStatus, Long id);
+
+    // v2
+    List<Proposal> findByProposalStatusAndRequestedTeam_Leader_Id(ProposalStatus proposalStatus, Long id);
+
 }
-
-

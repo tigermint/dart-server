@@ -1,9 +1,13 @@
 package com.ssh.dartserver.domain.team.presentation;
 
-import com.ssh.dartserver.domain.team.dto.*;
-import com.ssh.dartserver.domain.team.service.MyTeamService;
-import com.ssh.dartserver.domain.team.service.TeamService;
-import com.ssh.dartserver.global.auth.service.oauth.PrincipalDetails;
+import com.ssh.dartserver.domain.team.application.MyTeamService;
+import com.ssh.dartserver.domain.team.application.TeamService;
+import com.ssh.dartserver.domain.team.presentation.request.TeamSearchCondition;
+import com.ssh.dartserver.domain.team.presentation.request.TeamRequest;
+import com.ssh.dartserver.domain.team.presentation.response.BlindDateTeamDetailResponse;
+import com.ssh.dartserver.domain.team.presentation.response.BlindDateTeamResponse;
+import com.ssh.dartserver.domain.team.presentation.response.TeamResponse;
+import com.ssh.dartserver.global.security.PrincipalDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,7 +16,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
@@ -52,10 +56,11 @@ public class TeamController {
         return ResponseEntity.ok(teamService.readTeam(principal.getUser(), id));
     }
 
+    // 이전 버전 클라이언트 의존성으로 인해 내부적으로 사용되지 않는 TeamSearchCondition 입력을 받는다.
     @GetMapping
-    public ResponseEntity<Page<BlindDateTeamResponse>> listTeam(Authentication authentication, TeamSearchCondition condition, Pageable pageable) {
+    public ResponseEntity<Page<BlindDateTeamResponse>> listTeam(Authentication authentication, @Deprecated TeamSearchCondition condition, Pageable pageable) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
-        return ResponseEntity.ok(teamService.listVisibleTeam(principal.getUser(), condition, pageable));
+        return ResponseEntity.ok(teamService.listVisibleTeam(principal.getUser(), pageable));
     }
 
 }

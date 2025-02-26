@@ -5,7 +5,7 @@ import com.ssh.dartserver.domain.question.domain.Question;
 import com.ssh.dartserver.domain.user.domain.User;
 import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @Getter

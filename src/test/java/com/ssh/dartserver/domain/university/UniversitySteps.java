@@ -1,16 +1,17 @@
 package com.ssh.dartserver.domain.university;
 
 import com.ssh.dartserver.domain.university.domain.University;
-import com.ssh.dartserver.domain.university.dto.UniversitySearchRequest;
+import com.ssh.dartserver.domain.university.presentation.response.UniversitySearchRequest;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.springframework.http.MediaType;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import org.springframework.http.MediaType;
 
 public class UniversitySteps {
     public static List<University> 대학생성요청_생성(int count) {

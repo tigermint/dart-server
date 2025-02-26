@@ -1,27 +1,35 @@
 package com.ssh.dartserver.domain.user.domain.studentverificationinfo;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-import javax.persistence.Embeddable;
-import javax.persistence.Embedded;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 
-@Getter
 @Embeddable
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class StudentVerificationInfo {
+
     @Enumerated(EnumType.STRING)
     private StudentIdCardVerificationStatus studentIdCardVerificationStatus;
+
     @Embedded
     private StudentIdCardImageUrl studentIdCardImageUrl;
 
-    public StudentVerificationInfo() {
-        this.studentIdCardVerificationStatus = StudentIdCardVerificationStatus.NOT_VERIFIED_YET;
-        this.studentIdCardImageUrl = new StudentIdCardImageUrl();
+    private StudentVerificationInfo(StudentIdCardVerificationStatus studentIdCardVerificationStatus, StudentIdCardImageUrl studentIdCardImageUrl) {
+        this.studentIdCardVerificationStatus = studentIdCardVerificationStatus;
+        this.studentIdCardImageUrl = studentIdCardImageUrl;
     }
 
     public static StudentVerificationInfo newInstance() {
-        return new StudentVerificationInfo();
+        return new StudentVerificationInfo(
+                StudentIdCardVerificationStatus.NOT_VERIFIED_YET,
+                StudentIdCardImageUrl.newInstance()
+        );
     }
 
     public void updateStudentIdCardVerificationStatus(StudentIdCardVerificationStatus status) {

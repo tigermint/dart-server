@@ -1,8 +1,8 @@
 package com.ssh.dartserver.domain.proposal.presentation;
 
-import com.ssh.dartserver.domain.proposal.dto.ProposalRequest;
-import com.ssh.dartserver.domain.proposal.service.ProposalService;
-import com.ssh.dartserver.global.auth.service.oauth.PrincipalDetails;
+import com.ssh.dartserver.domain.proposal.presentation.request.ProposalRequest;
+import com.ssh.dartserver.domain.proposal.application.ProposalService;
+import com.ssh.dartserver.global.security.PrincipalDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -18,7 +18,9 @@ import java.net.URI;
 @RequiredArgsConstructor
 @RequestMapping("/v1/proposals")
 public class ProposalController {
+
     private final ProposalService proposalService;
+
     @PostMapping
     public ResponseEntity<Void> createProposal(Authentication authentication, @RequestBody ProposalRequest.Create request) {
         PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
@@ -29,4 +31,5 @@ public class ProposalController {
                 .toUri();
         return ResponseEntity.created(location).build();
     }
+
 }

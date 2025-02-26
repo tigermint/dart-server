@@ -3,7 +3,7 @@ package com.ssh.dartserver.domain.chat.domain;
 import com.ssh.dartserver.global.common.BaseTimeEntity;
 import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @Getter

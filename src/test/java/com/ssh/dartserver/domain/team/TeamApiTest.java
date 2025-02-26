@@ -3,7 +3,7 @@ package com.ssh.dartserver.domain.team;
 import com.ssh.dartserver.ApiTest;
 import com.ssh.dartserver.UserManager;
 import com.ssh.dartserver.domain.region.RegionSteps;
-import com.ssh.dartserver.domain.team.dto.TeamRequest;
+import com.ssh.dartserver.domain.team.presentation.request.TeamRequest;
 import com.ssh.dartserver.domain.team.infra.RegionRepository;
 import com.ssh.dartserver.domain.university.UniversitySteps;
 import com.ssh.dartserver.domain.university.infra.UniversityRepository;

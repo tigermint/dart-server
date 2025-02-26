@@ -4,7 +4,7 @@ import com.ssh.dartserver.domain.user.domain.User;
 import com.ssh.dartserver.global.common.BaseTimeEntity;
 import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,8 +30,10 @@ public class Comment extends BaseTimeEntity {
     private User user;
 
     @OneToMany(mappedBy = "comment")
+    @Builder.Default
     private List<CommentLike> commentLikes = new ArrayList<>();
 
     @OneToMany(mappedBy = "comment")
+    @Builder.Default
     private List<CommentReport> commentReports = new ArrayList<>();
 }
