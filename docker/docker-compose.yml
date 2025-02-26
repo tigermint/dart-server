@@ -18,6 +18,10 @@ services:
     depends_on:
       - dart-db-local
     restart: always
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://dart-db-local:5432/dart-db
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=postgres
     volumes:
       - .:/dart
     ports:
