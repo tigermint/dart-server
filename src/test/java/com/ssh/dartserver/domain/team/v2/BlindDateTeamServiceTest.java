@@ -1,12 +1,5 @@
 package com.ssh.dartserver.domain.team.v2;
 
-import static com.ssh.dartserver.domain.university.UniversitySteps.대학생성요청_생성;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatNoException;
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import com.ssh.dartserver.ApiTest;
 import com.ssh.dartserver.TestRepository;
 import com.ssh.dartserver.domain.image.domain.Image;
@@ -20,11 +13,7 @@ import com.ssh.dartserver.domain.team.domain.vo.TeamDescription;
 import com.ssh.dartserver.domain.team.infra.RegionRepository;
 import com.ssh.dartserver.domain.team.infra.TeamRegionRepository;
 import com.ssh.dartserver.domain.team.infra.TeamRepository;
-import com.ssh.dartserver.domain.team.v2.dto.BlindDateTeamInfo;
-import com.ssh.dartserver.domain.team.v2.dto.BlindDateTeamSearchCondition;
-import com.ssh.dartserver.domain.team.v2.dto.BlindDateTeamSimpleInfo;
-import com.ssh.dartserver.domain.team.v2.dto.CreateTeamRequest;
-import com.ssh.dartserver.domain.team.v2.dto.UpdateTeamRequest;
+import com.ssh.dartserver.domain.team.v2.dto.*;
 import com.ssh.dartserver.domain.university.domain.University;
 import com.ssh.dartserver.domain.university.infra.UniversityRepository;
 import com.ssh.dartserver.domain.user.domain.AuthInfo;
@@ -35,19 +24,20 @@ import com.ssh.dartserver.domain.user.domain.personalinfo.PersonalInfo;
 import com.ssh.dartserver.domain.user.domain.studentverificationinfo.StudentVerificationInfo;
 import com.ssh.dartserver.domain.user.infra.UserRepository;
 import com.ssh.dartserver.global.common.Role;
+import com.ssh.dartserver.global.util.DateTimeUtil;
 import com.ssh.dartserver.testing.IntegrationTest;
-import java.util.ArrayList;
-import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.ssh.dartserver.domain.university.UniversitySteps.대학생성요청_생성;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
+import static org.junit.jupiter.api.Assertions.*;
 
 @IntegrationTest
 class BlindDateTeamServiceTest extends ApiTest {
@@ -247,7 +237,9 @@ class BlindDateTeamServiceTest extends ApiTest {
             // When: 내가 등록한 팀의 id로 팀 정보를 조회할 때
             BlindDateTeamInfo teamInfo = blindDateTeamService.getTeamInfo(team.getId(), user);
 
-            // Then: 팀 정보가 정상적으로 반환되어야 합니다. TODO v2 팀 전체 정보가 잘 들어오는지 확인!
+            // Then: 팀 정보가 정상적으로 반환되어야 합니다.
+            final int expectedAge = DateTimeUtil.nowFromZone().getYear() - user.getPersonalInfo().getBirthYear().getValue() + 1;
+
             assertThat(teamInfo).isNotNull();
             assertAll(
                     () -> assertThat(teamInfo.id()).isEqualTo(team.getId()),
@@ -255,7 +247,7 @@ class BlindDateTeamServiceTest extends ApiTest {
                     () -> assertThat(teamInfo.name()).isEqualTo("멋진 TEAM"),
                     () -> assertThat(teamInfo.description()).isEqualTo("팀 설명입니다."),
                     () -> assertThat(teamInfo.isVisibleToSameUniversity()).isTrue(),
-                    () -> assertThat(teamInfo.age()).isEqualTo(25),  // 나이 값 설정
+                    () -> assertThat(teamInfo.age()).isEqualTo(expectedAge),
                     () -> assertThat(teamInfo.isCertified()).isFalse(),
                     () -> assertThat(teamInfo.universityName()).isEqualTo("Tech University 1000"),
                     () -> assertThat(teamInfo.departmentName()).isEqualTo("컴퓨터공학과"),
@@ -382,13 +374,15 @@ class BlindDateTeamServiceTest extends ApiTest {
             Page<BlindDateTeamSimpleInfo> teamList = blindDateTeamService.getTeamList(user, condition);
 
             // then
-            assertNotNull(teamList);
             BlindDateTeamSimpleInfo teamInfo = teamList.getContent().get(0);
+            final int expectedAge = DateTimeUtil.nowFromZone().getYear() - user.getPersonalInfo().getBirthYear().getValue() + 1;
+
+            assertNotNull(teamList);
             assertAll(
                     () -> assertThat(teamList.getTotalElements()).isEqualTo(1),
                     () -> assertThat(teamInfo.id()).isEqualTo(2),
                     () -> assertThat(teamInfo.leaderId()).isEqualTo(2),
-                    () -> assertThat(teamInfo.age()).isEqualTo(25),
+                    () -> assertThat(teamInfo.age()).isEqualTo(expectedAge),
                     () -> assertThat(teamInfo.isCertified()).isFalse(),
                     () -> assertThat(teamInfo.universityName()).isEqualTo("Test Univ"),
                     () -> assertThat(teamInfo.departmentName()).isEqualTo("CS"),
