@@ -12,8 +12,8 @@ import jakarta.persistence.Embeddable;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class BirthYear {
-    private static final int BIRTH_YEAR_MIN = 1995;
-    private static final int BIRTH_YEAR_MAX = 2005;
+    private static final int MIN_AGE = 20;
+    private static final int MAX_AGE = 30;
 
     @Column(name = "birth_year")
     private int value;
@@ -27,13 +27,14 @@ public class BirthYear {
         return new BirthYear(value);
     }
 
-    private void validateBirthYear(int value) {
-        if (BIRTH_YEAR_MIN <= value && value <= BIRTH_YEAR_MAX) {
-            return;
+    private void validateBirthYear(final int value) {
+        int currentYear = DateTimeUtil.nowFromZone().getYear();
+        int minBirthYear = currentYear - MAX_AGE + 1;
+        int maxBirthYear = currentYear - MIN_AGE + 1;
+
+        if (value < minBirthYear && value > maxBirthYear) {
+            throw new IllegalArgumentException(String.format("생년은 %d ~ %d 사이의 값이어야 합니다. 현재값: %d", minBirthYear, maxBirthYear, value));
         }
-        throw new IllegalArgumentException(
-            String.format("생년은 %d ~ %d 사이의 값이어야 합니다. 현재값: %d", BIRTH_YEAR_MIN, BIRTH_YEAR_MAX, value)
-        );
     }
 
     public int getAge() {
