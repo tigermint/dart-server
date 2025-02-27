@@ -1,0 +1,66 @@
+name: 'Build and Deploy to Cloud Run'
+
+on:
+  push:
+    branches:
+      - 'main'
+  pull_request:
+    branches:
+      - 'main'
+
+env:
+  PROJECT_ID: 'dart-400112'
+  SERVICE: 'dart-server-alpha'
+  REGION: 'asia-northeast3'
+
+jobs:
+  deploy:
+    runs-on: 'ubuntu-latest'
+
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+      - name: 'Checkout'
+        uses: 'actions/checkout@v4'
+        with:
+          submodules: recursive
+          token: ${{ secrets.SUBMODULE_DEPLOY_KEY }}
+
+      - name: 'Authenticate to Google Cloud'
+        id: 'auth'
+        uses: 'google-github-actions/auth@v2'
+        with:
+          workload_identity_provider: '${{ secrets.WIF_PROVIDER }}'
+          service_account: '${{ secrets.WIF_SERVICE_ACCOUNT }}'
+          token_format: 'access_token'
+          project_id: '${{ env.PROJECT_ID }}'
+
+      # 이미지 레지스트리 인증 설정
+      - name: 'Docker Auth'
+        uses: 'docker/login-action@v3'
+        with:
+          username: 'oauth2accesstoken'
+          password: '${{ steps.auth.outputs.access_token }}'
+          registry: '${{ env.REGION }}-docker.pkg.dev'
+
+      # Jib을 사용한 빌드 및 푸시
+      - name: 'Build and Push Container using Jib'
+        env:
+          GOOGLE_AR_CLIENT_SECRET: ${{ secrets.GOOGLE_AR_CLIENT_SECRET_SSH_SERVER }}
+          SPRING_PROFILES_ACTIVE: alpha
+        run: './gradlew jib'
+
+      # Cloud Run에 배포
+      - name: 'Deploy to Cloud Run'
+        id: 'deploy'
+        uses: 'google-github-actions/deploy-cloudrun@v2'
+        with:
+          service: '${{ env.SERVICE }}'
+          region: '${{ env.REGION }}'
+          image: '${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/cloud-run-source-deploy/dart-server:latest'
+
+      # 배포 URL 출력
+      - name: 'Show Output'
+        run: 'echo ${{ steps.deploy.outputs.url }}'
